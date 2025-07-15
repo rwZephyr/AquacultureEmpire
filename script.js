@@ -188,7 +188,6 @@ function buyNewPen(){
   penPurchaseCost *= 1.5;
   updateDisplay();
 }
-function buyDevCash(){ cash+=100000; updateDisplay(); }
 
 // feed / harvest / restock
 function feedFish(){
