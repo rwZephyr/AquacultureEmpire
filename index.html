@@ -54,6 +54,20 @@
       <div>Staff Capacity: <span id="bargeStaffCapacity">0</span></div>
     </div>
 
+    <div id="staffCard" class="staffCard">
+      <h2>Staff</h2>
+      <div id="staffList"></div>
+      <div class="hireControls">
+        <select id="hireRole">
+          <option value="Feeder Loader">Feeder Loader</option>
+          <option value="Silo Refill">Silo Refill</option>
+          <option value="Maintenance">Maintenance</option>
+          <option value="Mortality Collector">Mortality Collector</option>
+        </select>
+        <button onclick="hireStaff()">Hire</button>
+      </div>
+    </div>
+
     <!-- Harvest info (single-pen harvest preview) -->
     <div id="harvestInfo" class="harvestInfo"></div>
 

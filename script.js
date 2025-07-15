@@ -20,7 +20,8 @@ let sites = [
     licenses: ['shrimp'],
     pens: [
       { species: "shrimp", fishCount: 500, averageWeight: 0.01 }
-    ]
+    ],
+    staff: []
   }
 ];
 
@@ -38,6 +39,13 @@ const speciesData = {
 };
 const siteNamePrefixes = ["Driftwood","Stormreach","Gullrock","Cedar","Misty","Haven","Breakwater","Whispering","Duskwater","Salmonstone","SeaLion"];
 const siteNameSuffixes = ["Sound","Inlet","Bay","Island","Channel","Passage","Lagoon","Rock"];
+
+const staffRoles = [
+  'Feeder Loader',
+  'Silo Refill',
+  'Maintenance',
+  'Mortality Collector'
+];
 
 // UTILITIES
 function capitalizeFirstLetter(str){ return str.charAt(0).toUpperCase()+str.slice(1); }
@@ -74,6 +82,7 @@ function updateDisplay(){
   updateHarvestInfo();
   updateLicenseShop();
   renderPenGrid(site);
+  renderStaffList(site);
 }
 
 // harvest preview
@@ -127,6 +136,21 @@ function renderPenGrid(site){
       <button onclick="upgradeFeeder(${idx})">Upgrade Feeder</button>
     `;
     grid.appendChild(card);
+  });
+}
+
+function renderStaffList(site){
+  const list = document.getElementById('staffList');
+  if(!list) return;
+  list.innerHTML = '';
+  site.staff.forEach((member, idx)=>{
+    const row = document.createElement('div');
+    row.className = 'staffRow';
+    const select = `<select onchange="assignRole(${idx}, this.value)">
+      ${staffRoles.map(r=>`<option value="${r}" ${member.role===r?'selected':''}>${r}</option>`).join('')}
+    </select>`;
+    row.innerHTML = `Staff ${idx+1}: ${select} <button onclick="fireStaff(${idx})">Fire</button>`;
+    list.appendChild(row);
   });
 }
 
@@ -189,6 +213,32 @@ function buyNewPen(){
   updateDisplay();
 }
 function buyDevCash(){ cash+=100000; updateDisplay(); }
+
+// --- STAFF MANAGEMENT ---
+function hireStaff(){
+  const site = sites[currentSiteIndex];
+  const role = document.getElementById('hireRole').value;
+  if(site.staff.length >= site.barge.staffCapacity) return openModal('No staff capacity available.');
+  site.staff.push({role});
+  updateDisplay();
+}
+function fireStaff(idx){
+  const site = sites[currentSiteIndex];
+  site.staff.splice(idx,1);
+  updateDisplay();
+}
+function assignRole(idx, role){
+  const site = sites[currentSiteIndex];
+  if(site.staff[idx]) site.staff[idx].role = role;
+  updateDisplay();
+}
+
+function feedPen(site, pen){
+  if(site.barge.feed<1 || pen.fishCount===0) return;
+  site.barge.feed--;
+  const gain = 1 / speciesData[pen.species].fcr;
+  pen.averageWeight += gain/pen.fishCount;
+}
 
 // feed / harvest / restock
 function feedFish(){
@@ -280,6 +330,18 @@ setInterval(()=>{
         }
       }
     });
+
+    const loaders = site.staff.filter(s=>s.role==='Feeder Loader').length;
+    for(let l=0;l<loaders;l++){
+      site.pens.forEach(p=>feedPen(site,p));
+    }
+
+    if(site.staff.some(s=>s.role==='Silo Refill')){
+      if(site.barge.feed <= site.barge.feedCapacity-20 && cash>=5){
+        cash -=5;
+        site.barge.feed +=20;
+      }
+    }
   });
   updateDisplay();
 },1000);

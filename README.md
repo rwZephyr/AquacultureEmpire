@@ -19,4 +19,13 @@
 +- `script.js` – game logic including purchases, feeding, harvesting and UI updates.
 +- `style.css` – minimal styling for layout and components.
 +
++## Staff System
++Sites now support hiring staff members who perform automated tasks. Available roles are:
++
++- **Feeder Loader** – automatically feeds all pens each second.
++- **Silo Refill** – automatically buys feed when the barge has space.
++- **Maintenance** – reserved for future automation tasks.
++- **Mortality Collector** – reserved for future features.
++
++Use the new Staff card on the main screen to hire employees, change their role or fire them. Staff count is limited by each barge's `staffCapacity`.
 +Feel free to modify `script.js` or the data structures within it to tweak starting values, species parameters or upgrade costs.
