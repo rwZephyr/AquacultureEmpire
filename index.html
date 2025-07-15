@@ -1,0 +1,84 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Aquaculture Empire</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="sidebar">
+    <button id="toggleSidebar">☰</button>
+    <div id="sidebarContent">
+      <button id="toggleShop" onclick="togglePanel('shop')">&#128722;</button>
+      <button id="toggleDevMenu" onclick="togglePanel('devMenu')">🛠</button>
+      <div id="shop" class="panel">
+        <h2>Shop</h2>
+        <button onclick="buyFeed()">+20kg Feed</button>
+        <button onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
+        <button onclick="buyNewPen()">+ Pen</button>
+        <div id="storageUpgradeInfo"></div>
+        <div id="penPurchaseInfo"></div>
+        <div id="licenseShop"></div>
+      </div>
+      <div id="devMenu" class="panel">
+        <h2>Dev</h2>
+        <button onclick="addDevCash()">+ $1M</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Top bar: site nav on left, cash on right -->
+    <div id="topBar">
+      <div class="top-left">
+        <strong>Site:</strong>
+        <span id="siteName">-</span>
+        <button onclick="previousSite()">⟵</button>
+        <button onclick="nextSite()">⟶</button>
+        <button onclick="buyNewSite()">+ New Site</button>
+      </div>
+      <div class="top-right">
+        <div><strong>Cash:</strong> $<span id="cashCount">0</span></div>
+      </div>
+    </div>
+
+    <!-- Legacy “resources” block so feedCount/feedCapacity still exist -->
+    <div id="resources">
+      <div>Feed: <span id="feedCount">0</span> kg / <span id="feedCapacity">0</span> kg</div>
+    </div>
+
+    <!-- Barge card -->
+    <div id="bargeCard" class="bargeCard">
+      <h2>Barge Status</h2>
+      <div>Feed: <span id="bargeFeed">0</span> / <span id="bargeFeedCapacity">0</span> kg</div>
+      <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
+      <div>Staff Capacity: <span id="bargeStaffCapacity">0</span></div>
+    </div>
+
+    <!-- Harvest info (single-pen harvest preview) -->
+    <div id="harvestInfo" class="harvestInfo"></div>
+
+    <!-- Pen grid -->
+    <div id="penGrid">
+      <h2>Pen Status</h2>
+      <div id="penGridContainer" class="grid"></div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal">
+      <div id="modalContent">
+        <p id="modalText"></p>
+        <button onclick="closeModal()">OK</button>
+      </div>
+    </div>
+    <div id="restockModal">
+      <div id="restockModalContent">
+        <h2>Choose Species</h2>
+        <div id="restockOptions"></div>
+        <button onclick="closeRestockModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

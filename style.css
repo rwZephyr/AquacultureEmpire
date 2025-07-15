@@ -1,0 +1,248 @@
+/* Global Styles */
+body {
+  font-family: Arial, sans-serif;
+  background: #1a272e;
+  color: #dbe5ed;
+  text-align: center;
+  margin-top: 30px;
+}
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+button {
+  margin: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background: #65849f;
+  color: #343b43;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+button:hover {
+  background-color: #4be0ff;
+  box-shadow: 0 0 5px #4be0ff;
+}
+button:active {
+  transform: scale(0.97);
+}
+
+/* Sidebar Layout */
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 60px;
+  background: #142027;
+  transition: width 0.3s;
+  overflow: hidden;
+  z-index: 10;
+}
+#sidebar.open {
+  width: 200px;
+}
+#toggleSidebar {
+  width: 100%;
+  background: #1a272e;
+  border: none;
+  color: #8899a6;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px 0;
+}
+#sidebarContent {
+  overflow-y: auto;
+  height: 100%;
+  padding-top: 10px;
+  padding-bottom: 40px; 
+}
+
+/* Sidebar Buttons */
+#sidebarContent button {
+  display: block;
+  width: 48px;
+  height: 48px;
+  margin: 10px auto;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #4c545b;
+  padding: 0;
+  transition: color 0.3s, transform 0.2s;
+  border-radius: 8px;
+}
+#sidebarContent button.active {
+  color: #4be0ff;
+  background-color: #1f2d35;
+  box-shadow: 0 0 10px #4be0ff88;
+}
+#sidebar button.open {
+  color: #4be0ff;
+  background-color: #1f2d35;
+  box-shadow: 0 0 10px #4be0ff88;
+}
+
+/* Sidebar Panels (Shop, Dev, etc.) */
+#sidebar .panel {
+  padding: 10px;
+  padding-bottom: 40px; /* add space at bottom */
+  font-size: 14px;
+  background-color: #1f2d35;
+  border-radius: 8px;
+  margin: 10px 6px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+#sidebar .panel.visible {
+  max-height: 75vh;
+  opacity: 1;
+  overflow-y: auto;
+}
+#sidebar .panel button {
+  font-size: 13px;
+  padding: 6px 8px;
+  margin: 4px 0;
+  width: 100%;
+  background-color: #2b3b4a;
+  color: #dbe5ed;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* ===== MODAL OVERLAY ===== */
+#modal,
+#restockModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+#modal.visible,
+#restockModal.visible {
+  display: flex;
+}
+
+#modalContent,
+#restockModalContent {
+  background: #293745;
+  color: #dbe5ed;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 300px;
+}
+#sidebarContent,
+#sidebar .panel {
+  scrollbar-width: none; /* Firefox */
+}
+#sidebarContent::-webkit-scrollbar,
+#sidebar .panel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+#penGrid .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.penCard {
+  background: #1f2d35;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: left;
+  color: #dbe5ed;
+  box-shadow: 0 0 4px #0005;
+}
+.penCard h3 {
+  font-size: 18px;
+  margin-bottom: 4px;
+  margin-top: 2px;
+}
+.penCard .stat {
+  font-size: 14px;
+  margin: 4px 0;
+}
+.penCard button {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding:4px 6px;
+  font-size: 13px;
+  background-color: #2b3b4a;
+  border: none;
+  color: #dbe5ed;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.penCard button:hover {
+  background-color: #4be0ff;
+  color: #142027;
+}
+.bargeCard {
+  background: #1f2d35;
+  border-radius: 10px;
+  padding: 16px;
+  margin: 16px auto;
+  color: #dbe5ed;
+  box-shadow: 0 0 4px #0005;
+  max-width: 300px;
+}
+.bargeCard h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #4be0ff;
+}
+.bargeCard div {
+  font-size: 14px;
+  margin: 6px 0;
+}
+#topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1f2d35;
+  padding: 12px 16px;
+  margin: 10px auto 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 6px #0006;
+  color: #dbe5ed;
+  max-width: 900px;
+}
+
+.top-left, .top-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.top-left button, .top-right button {
+  font-size: 14px;
+  padding: 6px 12px;
+  background-color: #2b3b4a;
+  color: #dbe5ed;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.top-left button:hover, .top-right button:hover {
+  background-color: #4be0ff;
+  color: #142027;
+}
