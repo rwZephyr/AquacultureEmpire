@@ -160,8 +160,11 @@ function buyFeedStorageUpgrade(){
   if(storageUpgradeLevel>=feedStorageUpgrades.length) return openModal("Max feed storage reached!");
   const up = feedStorageUpgrades[storageUpgradeLevel];
   if(cash<up.cost) return openModal("Not enough cash to upgrade feed storage!");
-  cash-=up.cost; sites[currentSiteIndex].barge.feedCapacity=up.capacity;
-  storageUpgradeLevel++; updateDisplay();
+  cash -= up.cost;
+  // Apply new capacity to all existing sites
+  sites.forEach(site => site.barge.feedCapacity = up.capacity);
+  storageUpgradeLevel++;
+  updateDisplay();
 }
 function buyLicense(sp){
   const site = sites[currentSiteIndex];
@@ -172,9 +175,12 @@ function buyLicense(sp){
 function buyNewSite(){
   if(cash<20000) return openModal("Not enough cash to buy a new site!");
   cash-=20000;
+  const defaultCapacity = storageUpgradeLevel>0
+    ? feedStorageUpgrades[storageUpgradeLevel-1].capacity
+    : 100;
   sites.push({
     name: generateRandomSiteName(),
-    barge: { feed:100, feedCapacity:100, siloCapacity:1000, staffCapacity:2, upgrades:[] },
+    barge: { feed: defaultCapacity, feedCapacity: defaultCapacity, siloCapacity:1000, staffCapacity:2, upgrades:[] },
     licenses:['shrimp'],
     pens:[{ species:"shrimp", fishCount:500, averageWeight:0.01 }]
   });
