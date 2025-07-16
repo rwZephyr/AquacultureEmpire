@@ -1,7 +1,6 @@
 // Core Game State
 let cash = 200;
 let harvestCapacity = 50;
-let storageUpgradeLevel = 0;
 let penPurchaseCost = 1000;
 let currentPenIndex = 0;
 let currentSiteIndex = 0;
@@ -15,7 +14,8 @@ let sites = [
       feedCapacity: 100,
       siloCapacity: 1000,
       staffCapacity: 2,
-      upgrades: []
+      upgrades: [],
+      storageUpgradeLevel: 0
     },
     licenses: ['shrimp'],
     pens: [
@@ -63,9 +63,9 @@ function updateDisplay(){
   document.getElementById('bargeStaffCapacity').innerText= site.barge.staffCapacity;
 
   // shop panel info
-  if(storageUpgradeLevel < feedStorageUpgrades.length){
+  if(site.barge.storageUpgradeLevel < feedStorageUpgrades.length){
     document.getElementById('storageUpgradeInfo').innerText =
-      `Next Feed Storage Upgrade: $${feedStorageUpgrades[storageUpgradeLevel].cost}`;
+      `Next Feed Storage Upgrade: $${feedStorageUpgrades[site.barge.storageUpgradeLevel].cost}`;
   } else {
     document.getElementById('storageUpgradeInfo').innerText = 'Feed Storage Fully Upgraded';
   }
@@ -157,11 +157,12 @@ function buyFeed(){
   cash-=5; site.barge.feed+=20; updateDisplay();
 }
 function buyFeedStorageUpgrade(){
-  if(storageUpgradeLevel>=feedStorageUpgrades.length) return openModal("Max feed storage reached!");
-  const up = feedStorageUpgrades[storageUpgradeLevel];
+  const site = sites[currentSiteIndex];
+  if(site.barge.storageUpgradeLevel>=feedStorageUpgrades.length) return openModal("Max feed storage reached!");
+  const up = feedStorageUpgrades[site.barge.storageUpgradeLevel];
   if(cash<up.cost) return openModal("Not enough cash to upgrade feed storage!");
-  cash-=up.cost; sites[currentSiteIndex].barge.feedCapacity=up.capacity;
-  storageUpgradeLevel++; updateDisplay();
+  cash-=up.cost; site.barge.feedCapacity=up.capacity;
+  site.barge.storageUpgradeLevel++; updateDisplay();
 }
 function buyLicense(sp){
   const site = sites[currentSiteIndex];
@@ -174,7 +175,14 @@ function buyNewSite(){
   cash-=20000;
   sites.push({
     name: generateRandomSiteName(),
-    barge: { feed:100, feedCapacity:100, siloCapacity:1000, staffCapacity:2, upgrades:[] },
+    barge: {
+      feed:100,
+      feedCapacity:100,
+      siloCapacity:1000,
+      staffCapacity:2,
+      upgrades:[],
+      storageUpgradeLevel: 0
+    },
     licenses:['shrimp'],
     pens:[{ species:"shrimp", fishCount:500, averageWeight:0.01 }]
   });
