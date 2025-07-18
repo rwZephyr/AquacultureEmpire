@@ -221,6 +221,15 @@ button:active {
   background-color: #4be0ff;
   color: #142027;
 }
+#mapCanvas {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  background: #14375a;
+  border: 1px solid #4be0ff;
+  margin-top: 10px;
+  border-radius: 8px;
+}
 #feedPurchaseButtons button {
   display: inline-block;
 }

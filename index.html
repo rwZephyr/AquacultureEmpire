@@ -11,6 +11,7 @@
     <div id="sidebarContent">
       <button id="toggleShop" onclick="togglePanel('shop')">&#128722;</button>
       <button id="toggleDevMenu" onclick="togglePanel('devMenu')">🛠</button>
+      <button id="toggleMap" onclick="togglePanel('map')">🗺️</button>
       <div id="shop" class="panel">
         <h2>Shop</h2>
         <div id="feedPurchaseButtons">
@@ -35,6 +36,10 @@
         <button onclick="addDevCash()">+ $1M</button>
         <button onclick="saveGame()">Save Game</button>
         <button onclick="resetGame()">Reset Game</button>
+      </div>
+      <div id="map" class="panel">
+        <h2>Map</h2>
+        <canvas id="mapCanvas" width="400" height="300"></canvas>
       </div>
     </div>
   </div>
