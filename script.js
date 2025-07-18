@@ -95,6 +95,25 @@ function getLocationByName(n){
   return null;
 }
 
+function estimateTravelTime(fromName, destLoc, vessel){
+  const start = getLocationByName(fromName) || sites[currentSiteIndex].location;
+  if(!start || !destLoc) return 0;
+  const dx = start.x - destLoc.x;
+  const dy = start.y - destLoc.y;
+  const distance = Math.hypot(dx, dy);
+  return (distance / vessel.speed * TRAVEL_TIME_FACTOR) / 1000; // seconds
+}
+
+function estimateSellPrice(vessel, market){
+  let total = 0;
+  for(const sp in vessel.cargo){
+    const weight = vessel.cargo[sp];
+    const price = speciesData[sp].marketPrice * (market.modifiers[sp]||1);
+    total += weight * price;
+  }
+  return total;
+}
+
 // --- UPDATE UI ---
 function updateDisplay(){
   const site = sites[currentSiteIndex];
@@ -399,9 +418,12 @@ function confirmHarvest(){
 function openSellModal(){
   const optionsDiv = document.getElementById('sellOptions');
   optionsDiv.innerHTML = '';
+  const vessel = vessels[currentVesselIndex];
   markets.forEach((m,idx)=>{
     const btn = document.createElement('button');
-    btn.innerText = `${m.name}`;
+    const price = estimateSellPrice(vessel, m);
+    const secs = estimateTravelTime(vessel.location, m.location, vessel);
+    btn.innerText = `${m.name} - $${price.toFixed(2)} (${secs.toFixed(1)}s)`;
     btn.onclick = ()=>sellCargo(idx);
     optionsDiv.appendChild(btn);
   });
@@ -645,15 +667,18 @@ function renameVessel(){
 function openMoveVesselModal(){
   const optionsDiv = document.getElementById('moveOptions');
   optionsDiv.innerHTML = '';
+  const vessel = vessels[currentVesselIndex];
   sites.forEach((s, idx)=>{
     const btn = document.createElement('button');
-    btn.innerText = s.name;
+    const secs = estimateTravelTime(vessel.location, s.location, vessel);
+    btn.innerText = `${s.name} (${secs.toFixed(1)}s)`;
     btn.onclick = ()=>moveVesselTo('site', idx);
     optionsDiv.appendChild(btn);
   });
   markets.forEach((m, idx)=>{
     const btn = document.createElement('button');
-    btn.innerText = m.name;
+    const secs = estimateTravelTime(vessel.location, m.location, vessel);
+    btn.innerText = `${m.name} (${secs.toFixed(1)}s)`;
     btn.onclick = ()=>moveVesselTo('market', idx);
     optionsDiv.appendChild(btn);
   });
