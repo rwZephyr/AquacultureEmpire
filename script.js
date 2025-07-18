@@ -168,10 +168,11 @@ function updateHarvestInfo(){
   const pen  = site.pens[currentPenIndex];
   const infoDiv = document.getElementById('harvestInfo');
   if(pen.fishCount>0){
+    const vessel = vessels[currentVesselIndex];
+    const remaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
     const totalBiomass = pen.fishCount * pen.averageWeight;
-    const harvestableBiomass = Math.min(getSiteHarvestCapacity(site), totalBiomass);
-    const earnings = harvestableBiomass * speciesData[pen.species].marketPrice;
-    infoDiv.innerText = `Next harvest: ~${harvestableBiomass.toFixed(2)} kg for ~$${earnings.toFixed(2)}`;
+    const harvestableBiomass = Math.min(getSiteHarvestCapacity(site), totalBiomass, remaining);
+    infoDiv.innerText = `Harvest up to ${harvestableBiomass.toFixed(2)} kg (vessel capacity ${remaining.toFixed(2)} kg)`;
   } else {
     infoDiv.innerText = "No fish to harvest.";
   }
@@ -239,6 +240,31 @@ function openRestockModal(){
   document.getElementById('restockModal').classList.add('visible');
 }
 function closeRestockModal(){ document.getElementById('restockModal').classList.remove('visible'); }
+
+function openHarvestModal(i){
+  currentPenIndex = i;
+  const site = sites[currentSiteIndex];
+  const pen  = site.pens[currentPenIndex];
+  const vessel = vessels[currentVesselIndex];
+  const remaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
+  const maxHarvest = Math.min(
+    getSiteHarvestCapacity(site),
+    pen.fishCount * pen.averageWeight,
+    remaining
+  );
+  document.getElementById('harvestMax').innerText = maxHarvest.toFixed(2);
+  const input = document.getElementById('harvestAmount');
+  input.max = maxHarvest;
+  input.value = maxHarvest.toFixed(2);
+  document.getElementById('harvestModal').classList.add('visible');
+}
+function closeHarvestModal(){ document.getElementById('harvestModal').classList.remove('visible'); }
+function confirmHarvest(){
+  const amount = parseFloat(document.getElementById('harvestAmount').value);
+  harvestPen(amount);
+  closeHarvestModal();
+  updateDisplay();
+}
 
 // --- PURCHASES & ACTIONS ---
 function buyFeed(amount=20){
@@ -418,19 +444,26 @@ function feedFish(){
   const gain = 1 / speciesData[pen.species].fcr;
   pen.averageWeight += gain/pen.fishCount;
 }
-function harvestPen(){
+function harvestPen(amount=null){
   const site = sites[currentSiteIndex];
   const pen  = site.pens[currentPenIndex];
+  const vessel = vessels[currentVesselIndex];
   if(pen.fishCount===0) return;
   const totalBiomass = pen.fishCount * pen.averageWeight;
-  const harvestable = Math.min(getSiteHarvestCapacity(site), totalBiomass);
-  let fishNum = Math.floor(harvestable/pen.averageWeight);
+  const maxHarvest = Math.min(
+    getSiteHarvestCapacity(site),
+    totalBiomass,
+    vessel.maxBiomassCapacity - vessel.currentBiomassLoad
+  );
+  if(maxHarvest <= 0) return openModal("Vessel capacity full.");
+  let desired = amount === null ? maxHarvest : Math.max(0, Math.min(amount, maxHarvest));
+  let fishNum = Math.floor(desired / pen.averageWeight);
   fishNum = Math.min(fishNum, pen.fishCount);
   const biomass = fishNum * pen.averageWeight;
-  cash += biomass * speciesData[pen.species].marketPrice;
+  vessel.currentBiomassLoad += biomass;
   pen.fishCount -= fishNum;
   if(pen.fishCount===0) pen.averageWeight = 0;
-  openModal(`Harvested ${biomass.toFixed(2)} kg and earned $${(biomass*speciesData[pen.species].marketPrice).toFixed(2)}!`);
+  openModal(`Harvested ${biomass.toFixed(2)} kg loaded onto ${vessel.name}.`);
 }
 function restockPen(sp){
   const site = sites[currentSiteIndex];
@@ -480,7 +513,7 @@ document.getElementById('toggleSidebar').addEventListener('click',()=>{
 
 // pen buttons helper
 function feedFishPen(i){ currentPenIndex=i; feedFish(); updateDisplay(); }
-function harvestPenIndex(i){ currentPenIndex=i; harvestPen(); updateDisplay(); }
+function harvestPenIndex(i){ openHarvestModal(i); }
 function restockPenUI(i){ currentPenIndex=i; openRestockModal(); }
 function upgradeFeeder(i){
   const site = sites[currentSiteIndex];
@@ -634,6 +667,9 @@ Object.assign(window, {
   closeModal,
   openRestockModal,
   closeRestockModal,
+  openHarvestModal,
+  closeHarvestModal,
+  confirmHarvest,
   feedFishPen,
   harvestPenIndex,
   restockPenUI,
