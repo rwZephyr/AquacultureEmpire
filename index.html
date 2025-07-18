@@ -22,12 +22,6 @@
         <button onclick="buyNewBarge()">Buy Barge</button>
         <button onclick="upgradeBarge()">Upgrade Barge</button>
         <button onclick="buyNewPen()">+ Pen</button>
-        <button onclick="hireStaff()">Hire Staff ($500)</button>
-        <button onclick="assignStaff('feeder')">Assign Feeder</button>
-        <button onclick="assignStaff('harvester')">Assign Harvester</button>
-        <button onclick="assignStaff('feedManager')">Assign Feed Manager</button>
-        <button onclick="unassignStaff('feedManager')">Unassign Feed Manager</button>
-        <button onclick="upgradeStaffHousing()">Upgrade Housing</button>
         <div id="storageUpgradeInfo"></div>
         <div id="housingUpgradeInfo"></div>
         <div id="bargeUpgradeInfo"></div>
@@ -61,20 +55,39 @@
     </div>
 
 
-    <!-- Barge card -->
-    <div id="bargeCard" class="bargeCard">
-      <h2>Barge Status</h2>
-      <div>
-        <button onclick="previousBarge()">⟵</button>
-        Barge <span id="bargeIndex">1</span>/<span id="bargeCount">1</span>
-        <button onclick="nextBarge()">⟶</button>
+    <!-- Status cards -->
+    <div id="cardContainer" class="cardContainer">
+      <div id="bargeCard" class="bargeCard">
+        <h2>Barge Status</h2>
+        <div>
+          <button onclick="previousBarge()">⟵</button>
+          Barge <span id="bargeIndex">1</span>/<span id="bargeCount">1</span>
+          <button onclick="nextBarge()">⟶</button>
+        </div>
+        <div>Barge Tier: <span id="bargeTierName">Small</span></div>
+        <div>Feeders: <span id="bargeFeedersUsed">0</span>/<span id="bargeFeederLimit">0</span> (Max Tier <span id="bargeMaxFeederTier">0</span>)</div>
+        <div>Feed: <span id="bargeFeed">0</span> / <span id="bargeFeedCapacity">0</span> kg</div>
+        <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
+        <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
+        <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
       </div>
-      <div>Barge Tier: <span id="bargeTierName">Small</span></div>
-      <div>Feeders: <span id="bargeFeedersUsed">0</span>/<span id="bargeFeederLimit">0</span> (Max Tier <span id="bargeMaxFeederTier">0</span>)</div>
-      <div>Feed: <span id="bargeFeed">0</span> / <span id="bargeFeedCapacity">0</span> kg</div>
-      <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
-      <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
-      <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
+      <div id="staffCard" class="staffCard">
+        <h2>Staffing</h2>
+        <div>Total: <span id="staffTotal">0</span> / <span id="staffCapacity">0</span></div>
+        <div>Unassigned: <span id="staffUnassigned">0</span></div>
+        <div>Feeders: <span id="staffFeeders">0</span></div>
+        <div>Harvesters: <span id="staffHarvesters">0</span></div>
+        <div>Feed Managers: <span id="staffManagers">0</span></div>
+        <button onclick="hireStaff()">Hire Staff ($500)</button>
+        <button onclick="fireStaff()">Fire Unassigned</button>
+        <button onclick="assignStaff('feeder')">Assign Feeder</button>
+        <button onclick="unassignStaff('feeder')">Remove Feeder</button>
+        <button onclick="assignStaff('harvester')">Assign Harvester</button>
+        <button onclick="unassignStaff('harvester')">Remove Harvester</button>
+        <button onclick="assignStaff('feedManager')">Assign Feed Manager</button>
+        <button onclick="unassignStaff('feedManager')">Remove Feed Manager</button>
+        <button onclick="upgradeStaffHousing()">Upgrade Housing</button>
+      </div>
     </div>
 
     <!-- Harvest info (single-pen harvest preview) -->
