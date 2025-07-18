@@ -16,7 +16,12 @@
         <button onclick="buyFeed()">+20kg Feed</button>
         <button onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
         <button onclick="buyNewPen()">+ Pen</button>
+        <button onclick="hireStaff()">Hire Staff ($500)</button>
+        <button onclick="assignStaff('feeder')">Assign Feeder</button>
+        <button onclick="assignStaff('harvester')">Assign Harvester</button>
+        <button onclick="upgradeStaffHousing()">Upgrade Housing</button>
         <div id="storageUpgradeInfo"></div>
+        <div id="housingUpgradeInfo"></div>
         <div id="penPurchaseInfo"></div>
         <div id="licenseShop"></div>
       </div>
@@ -48,7 +53,8 @@
       <h2>Barge Status</h2>
       <div>Feed: <span id="bargeFeed">0</span> / <span id="bargeFeedCapacity">0</span> kg</div>
       <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
-      <div>Staff Capacity: <span id="bargeStaffCapacity">0</span></div>
+      <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
+      <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
     </div>
 
     <!-- Harvest info (single-pen harvest preview) -->
