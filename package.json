@@ -1,0 +1,8 @@
+{
+  "name": "aquaculture-empire",
+  "version": "1.0.0",
+  "description": "Dummy package file to silence npm test",
+  "scripts": {
+    "test": "echo \"No tests defined\""
+  }
+}
