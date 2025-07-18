@@ -11,6 +11,7 @@ Aquaculture Empire is a small browser-based aquaculture management game written 
   underwater systems with individual upgrade costs.
 - Expand your business by buying entirely new sites.
 - Development menu with a helper button to add cash instantly.
+- Progress is automatically saved every 30 seconds.
 
 ## Getting Started
 No build steps are required. Open `index.html` in any modern web browser to start the game. Everything runs locally in the browser.
