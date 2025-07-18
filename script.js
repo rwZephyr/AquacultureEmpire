@@ -84,6 +84,16 @@ function generateRandomSiteName(){
   return `${p} ${s}`;
 }
 function findSiteByName(n){ return sites.find(s=>s.name===n); }
+function findMarketByName(n){ return markets.find(m=>m.name===n); }
+function getLocationByName(n){
+  if(!n) return null;
+  if(n.startsWith('Traveling to ')) n = n.replace('Traveling to ','');
+  const site = findSiteByName(n);
+  if(site) return site.location;
+  const market = findMarketByName(n);
+  if(market) return market.location;
+  return null;
+}
 
 // --- UPDATE UI ---
 function updateDisplay(){
@@ -176,6 +186,10 @@ function updateHarvestInfo(){
   const infoDiv = document.getElementById('harvestInfo');
   if(pen.fishCount>0){
     const vessel = vessels[currentVesselIndex];
+    if(vessel.currentBiomassLoad>0 && !vessel.cargo[pen.species]){
+      infoDiv.innerText = 'Vessel carrying other species.';
+      return;
+    }
     const remaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
     const totalBiomass = pen.fishCount * pen.averageWeight;
     const harvestableBiomass = Math.min(getSiteHarvestCapacity(site), totalBiomass, remaining);
@@ -300,6 +314,9 @@ function openHarvestModal(i){
   const site = sites[currentSiteIndex];
   const pen  = site.pens[currentPenIndex];
   const vessel = vessels[currentVesselIndex];
+  if(vessel.currentBiomassLoad>0 && !vessel.cargo[pen.species]){
+    return openModal('Vessel already contains a different species.');
+  }
   const remaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
   const maxHarvest = Math.min(
     getSiteHarvestCapacity(site),
@@ -339,13 +356,11 @@ function sellCargo(idx){
   const vessel = vessels[currentVesselIndex];
   if(vessel.currentBiomassLoad<=0) return openModal('No biomass to sell.');
   const market = markets[idx];
-  const site = findSiteByName(vessel.location) || sites[currentSiteIndex];
-  const dx = site.location.x - market.location.x;
-  const dy = site.location.y - market.location.y;
-  const distance = Math.hypot(dx, dy);
-  vessel.location = `Traveling to ${market.name}`;
-  closeSellModal();
-  setTimeout(()=>{
+  if(vessel.location === `Traveling to ${market.name}`){
+    closeSellModal();
+    return openModal('Vessel already en route to this market.');
+  }
+  const completeSale = ()=>{
     let total = 0;
     for(const sp in vessel.cargo){
       const weight = vessel.cargo[sp];
@@ -358,7 +373,19 @@ function sellCargo(idx){
     vessel.location = market.name;
     openModal(`Sold cargo for $${total.toFixed(2)} at ${market.name}.`);
     updateDisplay();
-  }, distance / vessel.speed * TRAVEL_TIME_FACTOR);
+  };
+  if(vessel.location === market.name){
+    closeSellModal();
+    completeSale();
+  } else {
+    const startLoc = getLocationByName(vessel.location) || market.location;
+    const dx = startLoc.x - market.location.x;
+    const dy = startLoc.y - market.location.y;
+    const distance = Math.hypot(dx, dy);
+    vessel.location = `Traveling to ${market.name}`;
+    closeSellModal();
+    setTimeout(completeSale, distance / vessel.speed * TRAVEL_TIME_FACTOR);
+  }
 }
 
 // --- PURCHASES & ACTIONS ---
@@ -579,7 +606,6 @@ function closeMoveModal(){
 
 function moveVesselTo(type, idx){
   const vessel = vessels[currentVesselIndex];
-  const startSite = findSiteByName(vessel.location) || sites[currentSiteIndex];
   let destName;
   let destLoc;
   if(type==='site'){
@@ -591,8 +617,17 @@ function moveVesselTo(type, idx){
     destName = market.name;
     destLoc = market.location;
   }
-  const dx = startSite.location.x - destLoc.x;
-  const dy = startSite.location.y - destLoc.y;
+  if(vessel.location === destName){
+    closeMoveModal();
+    return openModal(`Vessel already at ${destName}.`);
+  }
+  if(vessel.location === `Traveling to ${destName}`){
+    closeMoveModal();
+    return openModal(`Vessel already en route to ${destName}.`);
+  }
+  const startLoc = getLocationByName(vessel.location) || sites[currentSiteIndex].location;
+  const dx = startLoc.x - destLoc.x;
+  const dy = startLoc.y - destLoc.y;
   const distance = Math.hypot(dx, dy);
   vessel.location = `Traveling to ${destName}`;
   closeMoveModal();
@@ -618,6 +653,9 @@ function harvestPen(amount=null){
   const pen  = site.pens[currentPenIndex];
   const vessel = vessels[currentVesselIndex];
   if(pen.fishCount===0) return;
+  if(vessel.currentBiomassLoad>0 && !vessel.cargo[pen.species]){
+    return openModal('Vessel already contains a different species.');
+  }
   const totalBiomass = pen.fishCount * pen.averageWeight;
   const maxHarvest = Math.min(
     getSiteHarvestCapacity(site),
@@ -629,13 +667,29 @@ function harvestPen(amount=null){
   let fishNum = Math.floor(desired / pen.averageWeight);
   fishNum = Math.min(fishNum, pen.fishCount);
   const biomass = fishNum * pen.averageWeight;
-  vessel.currentBiomassLoad += biomass;
-  if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
-  vessel.cargo[pen.species] += biomass;
-  vessel.location = site.name;
-  pen.fishCount -= fishNum;
-  if(pen.fishCount===0) pen.averageWeight = 0;
-  openModal(`Harvested ${biomass.toFixed(2)} kg loaded onto ${vessel.name}.`);
+  const performHarvest = ()=>{
+    vessel.currentBiomassLoad += biomass;
+    if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
+    vessel.cargo[pen.species] += biomass;
+    vessel.location = site.name;
+    pen.fishCount -= fishNum;
+    if(pen.fishCount===0) pen.averageWeight = 0;
+    openModal(`Harvested ${biomass.toFixed(2)} kg loaded onto ${vessel.name}.`);
+    updateDisplay();
+  };
+  if(vessel.location !== site.name){
+    const startLoc = getLocationByName(vessel.location) || site.location;
+    const dx = startLoc.x - site.location.x;
+    const dy = startLoc.y - site.location.y;
+    const distance = Math.hypot(dx, dy);
+    vessel.location = `Traveling to ${site.name}`;
+    setTimeout(()=>{
+      vessel.location = site.name;
+      performHarvest();
+    }, distance / vessel.speed * TRAVEL_TIME_FACTOR);
+  } else {
+    performHarvest();
+  }
 }
 function restockPen(sp){
   const site = sites[currentSiteIndex];
