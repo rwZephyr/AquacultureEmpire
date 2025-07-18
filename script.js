@@ -292,15 +292,20 @@ function addDevCash() {
 function togglePanel(id){
   const sb = document.getElementById('sidebar');
   const p  = document.getElementById(id);
-  if(!sb.classList.contains('open')) sb.classList.add('open');
+  if(!sb.classList.contains('open')) {
+    sb.classList.add('open');
+    document.body.classList.add('sidebar-open');
+  }
   document.querySelectorAll('#sidebar .panel').forEach(x=>x.classList.remove('visible'));
   document.querySelectorAll('#sidebarContent button').forEach(x=>x.classList.remove('active'));
   p.classList.add('visible');
   document.getElementById('toggle'+capitalizeFirstLetter(id)).classList.add('active');
 }
 document.getElementById('toggleSidebar').addEventListener('click',()=>{
-  document.getElementById('sidebar').classList.toggle('open');
-  if(!document.getElementById('sidebar').classList.contains('open')){
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('open');
+  document.body.classList.toggle('sidebar-open', sidebar.classList.contains('open'));
+  if(!sidebar.classList.contains('open')){
     document.querySelectorAll('#sidebar .panel').forEach(x=>x.classList.remove('visible'));
     document.querySelectorAll('#sidebarContent button').forEach(x=>x.classList.remove('active'));
   }

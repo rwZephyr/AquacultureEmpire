@@ -5,11 +5,13 @@ body {
   color: #dbe5ed;
   text-align: center;
   margin-top: 30px;
+  overflow-x: hidden; /* prevent horizontal scroll on mobile */
 }
 .container {
   max-width: 900px;
   margin: 0 auto;
   padding: 0 20px;
+  transition: transform 0.3s;
 }
 button {
   margin: 8px;
@@ -38,7 +40,7 @@ button:active {
   height: 100%;
   width: 60px;
   background: #142027;
-  transition: width 0.3s;
+  transition: width 0.3s, transform 0.3s;
   overflow: hidden;
   z-index: 10;
 }
@@ -46,13 +48,22 @@ button:active {
   width: 200px;
 }
 #toggleSidebar {
-  width: 100%;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  width: 48px;
+  height: 48px;
   background: #1a272e;
   border: none;
   color: #8899a6;
   font-size: 24px;
   cursor: pointer;
-  padding: 10px 0;
+  border-radius: 8px;
+  z-index: 20;
+  transition: background-color 0.3s;
+}
+#toggleSidebar:hover {
+  background-color: #1f2d35;
 }
 #sidebarContent {
   overflow-y: auto;
@@ -245,4 +256,30 @@ button:active {
 .top-left button:hover, .top-right button:hover {
   background-color: #4be0ff;
   color: #142027;
+}
+
+/* Mobile sidebar behavior */
+@media (max-width: 700px) {
+  #sidebar {
+    transform: translateX(-100%);
+    width: 200px;
+  }
+  #sidebar.open {
+    transform: translateX(0);
+  }
+  body.sidebar-open .container {
+    transform: translateX(200px);
+  }
+  body {
+    font-size: 17px;
+  }
+  button {
+    font-size: 17px;
+  }
+  .penCard h3 {
+    font-size: 20px;
+  }
+  .penCard .stat, .bargeCard div {
+    font-size: 16px;
+  }
 }
