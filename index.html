@@ -15,6 +15,8 @@
         <h2>Shop</h2>
         <button onclick="buyFeed()">+20kg Feed</button>
         <button onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
+        <button onclick="buyNewBarge()">Buy Barge</button>
+        <button onclick="upgradeBarge()">Upgrade Barge</button>
         <button onclick="buyNewPen()">+ Pen</button>
         <button onclick="hireStaff()">Hire Staff ($500)</button>
         <button onclick="assignStaff('feeder')">Assign Feeder</button>
@@ -22,6 +24,8 @@
         <button onclick="upgradeStaffHousing()">Upgrade Housing</button>
         <div id="storageUpgradeInfo"></div>
         <div id="housingUpgradeInfo"></div>
+        <div id="bargeUpgradeInfo"></div>
+        <div id="bargePurchaseInfo"></div>
         <div id="penPurchaseInfo"></div>
         <div id="licenseShop"></div>
       </div>
@@ -51,6 +55,13 @@
     <!-- Barge card -->
     <div id="bargeCard" class="bargeCard">
       <h2>Barge Status</h2>
+      <div>
+        <button onclick="previousBarge()">⟵</button>
+        Barge <span id="bargeIndex">1</span>/<span id="bargeCount">1</span>
+        <button onclick="nextBarge()">⟶</button>
+      </div>
+      <div>Barge Tier: <span id="bargeTierName">Small</span></div>
+      <div>Feeders: <span id="bargeFeedersUsed">0</span>/<span id="bargeFeederLimit">0</span> (Max Tier <span id="bargeMaxFeederTier">0</span>)</div>
       <div>Feed: <span id="bargeFeed">0</span> / <span id="bargeFeedCapacity">0</span> kg</div>
       <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
       <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>

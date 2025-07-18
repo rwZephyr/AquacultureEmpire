@@ -4,24 +4,38 @@ const BASE_HARVEST_CAPACITY = 50;
 let penPurchaseCost = 1000;
 let currentPenIndex = 0;
 let currentSiteIndex = 0;
+let currentBargeIndex = 0;
+
+// Barge tiers
+const bargeTiers = [
+  { name: 'Small',  feedCapacity: 200, feederLimit: 2, maxFeederTier: 1, cost: 0 },
+  { name: 'Medium', feedCapacity: 500, feederLimit: 4, maxFeederTier: 2, cost: 5000 },
+  { name: 'Large',  feedCapacity: 1000, feederLimit: 8, maxFeederTier: 3, cost: 15000 }
+];
+const NEW_BARGE_COST = 8000;
 
 // Game Data
 let sites = [
   {
     name: "Mernan Inlet",
-    barge: {
-      feed: 100,
-      feedCapacity: 100,
-      siloCapacity: 1000,
-      staffCapacity: 2,
-      upgrades: [],
-      storageUpgradeLevel: 0,
-      housingUpgradeLevel: 0
-    },
+    barges: [
+      {
+        feed: 100,
+        feedCapacity: bargeTiers[0].feedCapacity,
+        siloCapacity: 1000,
+        staffCapacity: 2,
+        tier: 0,
+        feederLimit: bargeTiers[0].feederLimit,
+        maxFeederTier: bargeTiers[0].maxFeederTier,
+        upgrades: [],
+        storageUpgradeLevel: 0,
+        housingUpgradeLevel: 0
+      }
+    ],
     staff: [],
     licenses: ['shrimp'],
     pens: [
-      { species: "shrimp", fishCount: 500, averageWeight: 0.01 }
+      { species: "shrimp", fishCount: 500, averageWeight: 0.01, bargeIndex: 0 }
     ]
   }
 ];
@@ -76,26 +90,43 @@ function updateDisplay(){
   document.getElementById('cashCount').innerText = cash.toFixed(2);
 
   // barge card
-  document.getElementById('bargeFeed').innerText         = site.barge.feed.toFixed(1);
-  document.getElementById('bargeFeedCapacity').innerText = site.barge.feedCapacity;
-  document.getElementById('bargeSiloCapacity').innerText = site.barge.siloCapacity;
+  const barge = site.barges[currentBargeIndex];
+  const tierData = bargeTiers[barge.tier];
+  document.getElementById('bargeIndex').innerText = currentBargeIndex + 1;
+  document.getElementById('bargeCount').innerText = site.barges.length;
+  document.getElementById('bargeTierName').innerText   = tierData.name;
+  document.getElementById('bargeFeedersUsed').innerText = site.pens.filter(p=>p.feeder && p.bargeIndex===currentBargeIndex).length;
+  document.getElementById('bargeFeederLimit').innerText = tierData.feederLimit;
+  document.getElementById('bargeMaxFeederTier').innerText = tierData.maxFeederTier;
+  document.getElementById('bargeFeed').innerText         = barge.feed.toFixed(1);
+  document.getElementById('bargeFeedCapacity').innerText = barge.feedCapacity;
+  document.getElementById('bargeSiloCapacity').innerText = barge.siloCapacity;
   document.getElementById('bargeStaffCount').innerText    = site.staff.length;
-  document.getElementById('bargeStaffCapacity').innerText = site.barge.staffCapacity;
+  const totalCapacity = site.barges.reduce((t,b)=>t+b.staffCapacity,0);
+  document.getElementById('bargeStaffCapacity').innerText = totalCapacity;
   document.getElementById('bargeStaffUnassigned').innerText = site.staff.filter(s=>!s.role).length;
 
   // shop panel info
-  if(site.barge.storageUpgradeLevel < feedStorageUpgrades.length){
+  if(barge.storageUpgradeLevel < feedStorageUpgrades.length){
     document.getElementById('storageUpgradeInfo').innerText =
-      `Next Feed Storage Upgrade: $${feedStorageUpgrades[site.barge.storageUpgradeLevel].cost}`;
+      `Next Feed Storage Upgrade: $${feedStorageUpgrades[barge.storageUpgradeLevel].cost}`;
   } else {
     document.getElementById('storageUpgradeInfo').innerText = 'Feed Storage Fully Upgraded';
   }
-  if(site.barge.housingUpgradeLevel < staffHousingUpgrades.length){
+  if(barge.housingUpgradeLevel < staffHousingUpgrades.length){
     document.getElementById('housingUpgradeInfo').innerText =
-      `Next Housing Upgrade: $${staffHousingUpgrades[site.barge.housingUpgradeLevel].cost}`;
+      `Next Housing Upgrade: $${staffHousingUpgrades[barge.housingUpgradeLevel].cost}`;
   } else {
     document.getElementById('housingUpgradeInfo').innerText = 'Housing Fully Upgraded';
   }
+  if(barge.tier < bargeTiers.length - 1){
+    const next = bargeTiers[barge.tier + 1];
+    document.getElementById('bargeUpgradeInfo').innerText =
+      `Next Barge Upgrade (${next.name}): $${next.cost}`;
+  } else {
+    document.getElementById('bargeUpgradeInfo').innerText = 'Barge Fully Upgraded';
+  }
+  document.getElementById('bargePurchaseInfo').innerText = `New Barge Cost: $${NEW_BARGE_COST}`;
   document.getElementById('penPurchaseInfo').innerText = `Next Pen Purchase: $${penPurchaseCost.toFixed(0)}`;
 
   updateHarvestInfo();
@@ -150,11 +181,13 @@ function renderPenGrid(site){
       <div class="stat">Avg Weight: ${pen.averageWeight.toFixed(2)} kg</div>
       <div class="stat">Biomass: ${biomass.toFixed(2)} kg</div>
       <div class="stat">Feeder: ${capitalizeFirstLetter(feederType)} (Tier ${feederTier})</div>
+      <div class="stat">Barge: ${pen.bargeIndex+1}</div>
       <div class="stat">${nextCostText}</div>
       <button onclick="feedFishPen(${idx})">Feed</button>
       <button onclick="harvestPenIndex(${idx})">Harvest</button>
       <button onclick="restockPenUI(${idx})">Restock</button>
       <button onclick="upgradeFeeder(${idx})">Upgrade Feeder</button>
+      <button onclick="assignBarge(${idx})">Assign Barge</button>
     `;
     grid.appendChild(card);
   });
@@ -182,17 +215,19 @@ function closeRestockModal(){ document.getElementById('restockModal').classList.
 // --- PURCHASES & ACTIONS ---
 function buyFeed(){
   const site = sites[currentSiteIndex];
+  const barge = site.barges[currentBargeIndex];
   if(cash<5) return;
-  if(site.barge.feed+20>site.barge.feedCapacity) return openModal("Not enough feed storage space!");
-  cash-=5; site.barge.feed+=20; updateDisplay();
+  if(barge.feed+20>barge.feedCapacity) return openModal("Not enough feed storage space!");
+  cash-=5; barge.feed+=20; updateDisplay();
 }
 function buyFeedStorageUpgrade(){
   const site = sites[currentSiteIndex];
-  if(site.barge.storageUpgradeLevel>=feedStorageUpgrades.length) return openModal("Max feed storage reached!");
-  const up = feedStorageUpgrades[site.barge.storageUpgradeLevel];
+  const barge = site.barges[currentBargeIndex];
+  if(barge.storageUpgradeLevel>=feedStorageUpgrades.length) return openModal("Max feed storage reached!");
+  const up = feedStorageUpgrades[barge.storageUpgradeLevel];
   if(cash<up.cost) return openModal("Not enough cash to upgrade feed storage!");
-  cash-=up.cost; site.barge.feedCapacity=up.capacity;
-  site.barge.storageUpgradeLevel++; updateDisplay();
+  cash-=up.cost; barge.feedCapacity=up.capacity;
+  barge.storageUpgradeLevel++; updateDisplay();
 }
 function buyLicense(sp){
   const site = sites[currentSiteIndex];
@@ -205,18 +240,21 @@ function buyNewSite(){
   cash-=20000;
   sites.push({
     name: generateRandomSiteName(),
-    barge: {
+    barges:[{
       feed:100,
-      feedCapacity:100,
+      feedCapacity: bargeTiers[0].feedCapacity,
       siloCapacity:1000,
       staffCapacity:2,
+      tier:0,
+      feederLimit: bargeTiers[0].feederLimit,
+      maxFeederTier: bargeTiers[0].maxFeederTier,
       upgrades:[],
       storageUpgradeLevel: 0,
       housingUpgradeLevel: 0
-    },
+    }],
     staff: [],
     licenses:['shrimp'],
-    pens:[{ species:"shrimp", fishCount:500, averageWeight:0.01 }]
+    pens:[{ species:"shrimp", fishCount:500, averageWeight:0.01, bargeIndex:0 }]
   });
   updateDisplay();
   openModal("New site purchased!");
@@ -224,13 +262,35 @@ function buyNewSite(){
 function buyNewPen(){
   if(cash<penPurchaseCost) return openModal("Not enough cash to buy a new pen!");
   cash -= penPurchaseCost;
-  sites[currentSiteIndex].pens.push({ species:"shrimp", fishCount:0, averageWeight:0 });
+  sites[currentSiteIndex].pens.push({ species:"shrimp", fishCount:0, averageWeight:0, bargeIndex: currentBargeIndex });
   penPurchaseCost *= 1.5;
   updateDisplay();
 }
+
+function buyNewBarge(){
+  const site = sites[currentSiteIndex];
+  if(cash < NEW_BARGE_COST) return openModal("Not enough cash to buy a new barge!");
+  cash -= NEW_BARGE_COST;
+  site.barges.push({
+    feed:100,
+    feedCapacity: bargeTiers[0].feedCapacity,
+    siloCapacity:1000,
+    staffCapacity:2,
+    tier:0,
+    feederLimit: bargeTiers[0].feederLimit,
+    maxFeederTier: bargeTiers[0].maxFeederTier,
+    upgrades:[],
+    storageUpgradeLevel:0,
+    housingUpgradeLevel:0
+  });
+  currentBargeIndex = site.barges.length-1;
+  updateDisplay();
+  openModal("New barge purchased!");
+}
 function hireStaff(){
   const site = sites[currentSiteIndex];
-  if(site.staff.length >= site.barge.staffCapacity)
+  const capacity = site.barges.reduce((t,b)=>t+b.staffCapacity,0);
+  if(site.staff.length >= capacity)
     return openModal("No staff housing available.");
   if(cash < STAFF_HIRE_COST) return openModal("Not enough cash to hire staff.");
   cash -= STAFF_HIRE_COST;
@@ -247,13 +307,31 @@ function assignStaff(role){
 }
 function upgradeStaffHousing(){
   const site = sites[currentSiteIndex];
-  if(site.barge.housingUpgradeLevel >= staffHousingUpgrades.length)
+  const barge = site.barges[currentBargeIndex];
+  if(barge.housingUpgradeLevel >= staffHousingUpgrades.length)
     return openModal("Staff housing fully upgraded!");
-  const up = staffHousingUpgrades[site.barge.housingUpgradeLevel];
+  const up = staffHousingUpgrades[barge.housingUpgradeLevel];
   if(cash < up.cost) return openModal("Not enough cash to upgrade housing.");
   cash -= up.cost;
-  site.barge.staffCapacity += up.extraCapacity;
-  site.barge.housingUpgradeLevel++;
+  barge.staffCapacity += up.extraCapacity;
+  barge.housingUpgradeLevel++;
+  updateDisplay();
+}
+
+function upgradeBarge(){
+  const site = sites[currentSiteIndex];
+  const barge = site.barges[currentBargeIndex];
+  const currentTier = barge.tier;
+  if(currentTier >= bargeTiers.length - 1)
+    return openModal("Barge already at max tier.");
+  const next = bargeTiers[currentTier + 1];
+  if(cash < next.cost) return openModal("Not enough cash to upgrade barge.");
+  cash -= next.cost;
+  barge.tier++;
+  barge.feedCapacity = Math.max(barge.feedCapacity, next.feedCapacity);
+  barge.feederLimit = next.feederLimit;
+  barge.maxFeederTier = next.maxFeederTier;
+  openModal(`Barge upgraded to ${next.name}!`);
   updateDisplay();
 }
 function buyDevCash(){ cash+=100000; updateDisplay(); }
@@ -262,8 +340,9 @@ function buyDevCash(){ cash+=100000; updateDisplay(); }
 function feedFish(){
   const site = sites[currentSiteIndex];
   const pen  = site.pens[currentPenIndex];
-  if(site.barge.feed<1 || pen.fishCount===0) return;
-  site.barge.feed--;
+  const barge = site.barges[pen.bargeIndex];
+  if(barge.feed<1 || pen.fishCount===0) return;
+  barge.feed--;
   const gain = 1 / speciesData[pen.species].fcr;
   pen.averageWeight += gain/pen.fishCount;
 }
@@ -332,14 +411,27 @@ function feedFishPen(i){ currentPenIndex=i; feedFish(); updateDisplay(); }
 function harvestPenIndex(i){ currentPenIndex=i; harvestPen(); updateDisplay(); }
 function restockPenUI(i){ currentPenIndex=i; openRestockModal(); }
 function upgradeFeeder(i){
-  const pen = sites[currentSiteIndex].pens[i];
+  const site = sites[currentSiteIndex];
+  const pen = site.pens[i];
   const currentTier = pen.feeder?.tier || 0;
   if(currentTier >= feederUpgrades.length) return openModal("Feeder already at max tier.");
+  const nextTier = currentTier + 1;
+  const barge = site.barges[pen.bargeIndex];
+  if(nextTier > barge.maxFeederTier) return openModal("Barge tier too low for this feeder upgrade.");
+  if(!pen.feeder && site.pens.filter(p=>p.feeder && p.bargeIndex===pen.bargeIndex).length >= barge.feederLimit)
+    return openModal("Barge cannot support more feeders.");
   const up = feederUpgrades[currentTier];
   if(cash < up.cost) return openModal("Not enough cash for upgrade.");
   cash -= up.cost;
-  pen.feeder = { type: up.type, tier: currentTier + 1 };
-  openModal(`Feeder upgraded to ${capitalizeFirstLetter(up.type)} (Tier ${currentTier + 1}).`);
+  pen.feeder = { type: up.type, tier: nextTier };
+  openModal(`Feeder upgraded to ${capitalizeFirstLetter(up.type)} (Tier ${nextTier}).`);
+  updateDisplay();
+}
+
+function assignBarge(i){
+  const site = sites[currentSiteIndex];
+  const pen = site.pens[i];
+  pen.bargeIndex = (pen.bargeIndex + 1) % site.barges.length;
   updateDisplay();
 }
 function getFeederRate(f){
@@ -359,23 +451,35 @@ function getSiteHarvestCapacity(site){
 setInterval(()=>{
   sites.forEach(site=>{
     const staffRate = getStaffFeedRate(site);
-    site.pens.forEach(pen=>{
-      const rate = getFeederRate(pen.feeder) + staffRate;
-      for(let i=0;i<rate;i++){
-        if(site.barge.feed>=1 && pen.fishCount>0){
-          site.barge.feed--;
-          const gain = 1 / speciesData[pen.species].fcr;
-          pen.averageWeight += gain/pen.fishCount;
+    site.barges.forEach((barge,bIdx)=>{
+      let activeFeeders = 0;
+      site.pens.forEach(pen=>{
+        if(pen.bargeIndex!==bIdx) return;
+        let rate = staffRate;
+        const feederRate = getFeederRate(pen.feeder);
+        if(feederRate>0 && activeFeeders < barge.feederLimit){
+          rate += feederRate;
+          activeFeeders++;
         }
-      }
+        for(let i=0;i<rate;i++){
+          if(barge.feed>=1 && pen.fishCount>0){
+            barge.feed--;
+            const gain = 1 / speciesData[pen.species].fcr;
+            pen.averageWeight += gain/pen.fishCount;
+          }
+        }
+      });
     });
   });
   updateDisplay();
 },1000);
 
 // site/pen nav
-function previousSite(){ if(currentSiteIndex>0) currentSiteIndex--; currentPenIndex=0; updateDisplay(); }
-function nextSite(){ if(currentSiteIndex<sites.length-1) currentSiteIndex++; currentPenIndex=0; updateDisplay(); }
+function previousSite(){ if(currentSiteIndex>0) currentSiteIndex--; currentPenIndex=0; currentBargeIndex=0; updateDisplay(); }
+function nextSite(){ if(currentSiteIndex<sites.length-1) currentSiteIndex++; currentPenIndex=0; currentBargeIndex=0; updateDisplay(); }
+
+function previousBarge(){ if(currentBargeIndex>0) currentBargeIndex--; updateDisplay(); }
+function nextBarge(){ const site = sites[currentSiteIndex]; if(currentBargeIndex<site.barges.length-1) currentBargeIndex++; updateDisplay(); }
 
 // Initialize
 document.addEventListener("DOMContentLoaded",()=>updateDisplay());
