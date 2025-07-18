@@ -6,6 +6,16 @@ let currentPenIndex = 0;
 let currentSiteIndex = 0;
 let currentBargeIndex = 0;
 
+const FEED_COST_PER_KG = 0.25;
+const FEED_THRESHOLD_PERCENT = 0.2;
+
+let statusMessage = '';
+function addStatusMessage(msg){
+  statusMessage = msg;
+  const el = document.getElementById('statusMessages');
+  if(el) el.innerText = msg;
+}
+
 // Barge tiers
 const bargeTiers = [
   { name: 'Small',  feedCapacity: 200, feederLimit: 2, maxFeederTier: 1, cost: 0 },
@@ -50,7 +60,8 @@ const feedStorageUpgrades = [
 const STAFF_HIRE_COST = 500;
 const staffRoles = {
   feeder:    { cost: 500,  description: 'Boosts auto feed rate' },
-  harvester: { cost: 800,  description: 'Increases harvest capacity' }
+  harvester: { cost: 800,  description: 'Increases harvest capacity' },
+  feedManager:{ cost: 1000, description: 'Automatically buys feed' }
 };
 const staffHousingUpgrades = [
   { extraCapacity: 2, cost: 1000 },
@@ -132,6 +143,8 @@ function updateDisplay(){
   updateHarvestInfo();
   updateLicenseShop();
   renderPenGrid(site);
+  const statusEl = document.getElementById('statusMessages');
+  if(statusEl) statusEl.innerText = statusMessage;
 }
 
 // harvest preview
@@ -213,12 +226,27 @@ function openRestockModal(){
 function closeRestockModal(){ document.getElementById('restockModal').classList.remove('visible'); }
 
 // --- PURCHASES & ACTIONS ---
-function buyFeed(){
+function buyFeed(amount=20){
   const site = sites[currentSiteIndex];
   const barge = site.barges[currentBargeIndex];
-  if(cash<5) return;
-  if(barge.feed+20>barge.feedCapacity) return openModal("Not enough feed storage space!");
-  cash-=5; barge.feed+=20; updateDisplay();
+  amount = Math.max(0, amount);
+  const cost = amount * FEED_COST_PER_KG;
+  if(cash < cost) return openModal("Not enough cash to buy feed.");
+  if(barge.feed + amount > barge.feedCapacity)
+    return openModal("Not enough feed storage space!");
+  cash -= cost;
+  barge.feed += amount;
+  updateDisplay();
+}
+
+function buyMaxFeed(){
+  const site = sites[currentSiteIndex];
+  const barge = site.barges[currentBargeIndex];
+  const maxAffordable = Math.floor(cash / FEED_COST_PER_KG);
+  const available = barge.feedCapacity - barge.feed;
+  const qty = Math.min(maxAffordable, available);
+  if(qty <= 0) return openModal("Cannot purchase feed right now.");
+  buyFeed(qty);
 }
 function buyFeedStorageUpgrade(){
   const site = sites[currentSiteIndex];
@@ -303,6 +331,13 @@ function assignStaff(role){
   if(!member) return openModal("No unassigned staff available.");
   if(!staffRoles[role]) return;
   member.role = role;
+  updateDisplay();
+}
+function unassignStaff(role){
+  const site = sites[currentSiteIndex];
+  const member = site.staff.find(s=>s.role===role);
+  if(!member) return openModal(`No staff assigned as ${role}.`);
+  member.role = null;
   updateDisplay();
 }
 function upgradeStaffHousing(){
@@ -473,6 +508,27 @@ setInterval(()=>{
   });
   updateDisplay();
 },1000);
+
+// --- AUTO FEED MANAGER ---
+function checkFeedManagers(){
+  sites.forEach(site=>{
+    if(!site.staff.some(s=>s.role==='feedManager')) return;
+    site.barges.forEach(barge=>{
+      if(barge.feed/barge.feedCapacity < FEED_THRESHOLD_PERCENT){
+        const maxAffordable = Math.floor(cash / FEED_COST_PER_KG);
+        const available = barge.feedCapacity - barge.feed;
+        const qty = Math.min(maxAffordable, available);
+        if(qty > 0){
+          cash -= qty * FEED_COST_PER_KG;
+          barge.feed += qty;
+          addStatusMessage(`Feed Manager purchased ${qty}kg of feed for ${site.name}.`);
+        }
+      }
+    });
+  });
+  updateDisplay();
+}
+setInterval(checkFeedManagers, 5000);
 
 // site/pen nav
 function previousSite(){ if(currentSiteIndex>0) currentSiteIndex--; currentPenIndex=0; currentBargeIndex=0; updateDisplay(); }

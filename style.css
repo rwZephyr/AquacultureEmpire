@@ -212,6 +212,14 @@ button:active {
   background-color: #4be0ff;
   color: #142027;
 }
+#feedPurchaseButtons button {
+  display: inline-block;
+}
+#statusMessages {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #4be0ff;
+}
 .bargeCard {
   background: #1f2d35;
   border-radius: 10px;
