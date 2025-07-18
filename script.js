@@ -8,9 +8,10 @@ import {
   speciesData,
   feederUpgrades,
   siteNamePrefixes,
-  siteNameSuffixes
+  siteNameSuffixes,
+  vesselTiers
 } from './data.js';
-import { Site, Barge, Pen } from './models.js';
+import { Site, Barge, Pen, Vessel } from './models.js';
 
 // Core Game State
 let cash = 200;
@@ -19,6 +20,7 @@ let penPurchaseCost = 1000;
 let currentPenIndex = 0;
 let currentSiteIndex = 0;
 let currentBargeIndex = 0;
+let currentVesselIndex = 0;
 
 const FEED_COST_PER_KG = 0.25;
 const FEED_THRESHOLD_PERCENT = 0.2;
@@ -57,6 +59,17 @@ let sites = [
   })
 ];
 
+let vessels = [
+  new Vessel({
+    name: 'Hauler 1',
+    maxBiomassCapacity: vesselTiers[0].maxBiomassCapacity,
+    currentBiomassLoad: 0,
+    speed: vesselTiers[0].speed,
+    location: 'Dock',
+    tier: 0
+  })
+];
+
 // Upgrades & Species constants are imported from data.js
 
 // UTILITIES
@@ -92,6 +105,24 @@ function updateDisplay(){
   const totalCapacity = site.barges.reduce((t,b)=>t+b.staffCapacity,0);
   document.getElementById('bargeStaffCapacity').innerText = totalCapacity;
   document.getElementById('bargeStaffUnassigned').innerText = site.staff.filter(s=>!s.role).length;
+
+  // vessel card
+  const vessel = vessels[currentVesselIndex];
+  const vesselTier = vesselTiers[vessel.tier];
+  document.getElementById('vesselIndex').innerText = currentVesselIndex + 1;
+  document.getElementById('vesselCount').innerText = vessels.length;
+  document.getElementById('vesselName').innerText = vessel.name;
+  document.getElementById('vesselTierName').innerText = vesselTier.name;
+  document.getElementById('vesselLoad').innerText = vessel.currentBiomassLoad.toFixed(1);
+  document.getElementById('vesselCapacity').innerText = vessel.maxBiomassCapacity;
+  document.getElementById('vesselLocation').innerText = vessel.location;
+  if(vessel.tier < vesselTiers.length - 1){
+    const nextVessel = vesselTiers[vessel.tier + 1];
+    document.getElementById('vesselUpgradeInfo').innerText =
+      `Next Vessel Upgrade (${nextVessel.name}): $${nextVessel.cost}`;
+  } else {
+    document.getElementById('vesselUpgradeInfo').innerText = 'Vessel Fully Upgraded';
+  }
 
   // staff card info
   document.getElementById('staffTotal').innerText = site.staff.length;
@@ -360,6 +391,21 @@ function upgradeBarge(){
   openModal(`Barge upgraded to ${next.name}!`);
   updateDisplay();
 }
+
+function upgradeVessel(){
+  const vessel = vessels[currentVesselIndex];
+  const currentTier = vessel.tier;
+  if(currentTier >= vesselTiers.length - 1)
+    return openModal("Vessel already at max tier.");
+  const next = vesselTiers[currentTier + 1];
+  if(cash < next.cost) return openModal("Not enough cash to upgrade vessel.");
+  cash -= next.cost;
+  vessel.tier++;
+  vessel.maxBiomassCapacity = Math.max(vessel.maxBiomassCapacity, next.maxBiomassCapacity);
+  vessel.speed = next.speed;
+  openModal(`Vessel upgraded to ${next.name} tier!`);
+  updateDisplay();
+}
 function buyDevCash(){ cash+=100000; updateDisplay(); }
 
 // feed / harvest / restock
@@ -526,7 +572,8 @@ function saveGame() {
   const data = {
     cash,
     penPurchaseCost,
-    sites
+    sites,
+    vessels
   };
   try {
     localStorage.setItem('aquacultureEmpireSave', JSON.stringify(data));
@@ -545,6 +592,7 @@ function loadGame() {
       cash = obj.cash ?? cash;
       penPurchaseCost = obj.penPurchaseCost ?? penPurchaseCost;
       sites = obj.sites;
+      vessels = obj.vessels ?? vessels;
     }
   } catch (e) {
     console.error('Load failed', e);
@@ -562,6 +610,8 @@ function nextSite(){ if(currentSiteIndex<sites.length-1) currentSiteIndex++; cur
 
 function previousBarge(){ if(currentBargeIndex>0) currentBargeIndex--; updateDisplay(); }
 function nextBarge(){ const site = sites[currentSiteIndex]; if(currentBargeIndex<site.barges.length-1) currentBargeIndex++; updateDisplay(); }
+function previousVessel(){ if(currentVesselIndex>0) currentVesselIndex--; updateDisplay(); }
+function nextVessel(){ if(currentVesselIndex<vessels.length-1) currentVesselIndex++; updateDisplay(); }
 
 // Expose functions for HTML event handlers
 Object.assign(window, {
@@ -594,7 +644,10 @@ Object.assign(window, {
   previousSite,
   nextSite,
   previousBarge,
-  nextBarge
+  nextBarge,
+  previousVessel,
+  nextVessel,
+  upgradeVessel
 });
 
 // Initialize
