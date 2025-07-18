@@ -1,6 +1,6 @@
 // Core Game State
 let cash = 200;
-let harvestCapacity = 50;
+const BASE_HARVEST_CAPACITY = 50;
 let penPurchaseCost = 1000;
 let currentPenIndex = 0;
 let currentSiteIndex = 0;
@@ -15,8 +15,10 @@ let sites = [
       siloCapacity: 1000,
       staffCapacity: 2,
       upgrades: [],
-      storageUpgradeLevel: 0
+      storageUpgradeLevel: 0,
+      housingUpgradeLevel: 0
     },
+    staff: [],
     licenses: ['shrimp'],
     pens: [
       { species: "shrimp", fishCount: 500, averageWeight: 0.01 }
@@ -30,6 +32,16 @@ const feedStorageUpgrades = [
   { capacity: 1000, cost: 500 }, { capacity: 2000, cost: 1000 },
   { capacity: 5000, cost: 2500 }, { capacity: 10000, cost: 6000 },
   { capacity: 20000, cost: 12000 }, { capacity: 30000, cost: 20000 }
+];
+const STAFF_HIRE_COST = 500;
+const staffRoles = {
+  feeder:    { cost: 500,  description: 'Boosts auto feed rate' },
+  harvester: { cost: 800,  description: 'Increases harvest capacity' }
+};
+const staffHousingUpgrades = [
+  { extraCapacity: 2, cost: 1000 },
+  { extraCapacity: 2, cost: 2000 },
+  { extraCapacity: 4, cost: 4000 }
 ];
 const speciesData = {
   shrimp: { marketPrice:8, fcr:1.25, startingWeight:0.01, restockCount:500, restockCost:200, licenseCost:0 },
@@ -60,7 +72,9 @@ function updateDisplay(){
   document.getElementById('bargeFeed').innerText         = site.barge.feed.toFixed(1);
   document.getElementById('bargeFeedCapacity').innerText = site.barge.feedCapacity;
   document.getElementById('bargeSiloCapacity').innerText = site.barge.siloCapacity;
-  document.getElementById('bargeStaffCapacity').innerText= site.barge.staffCapacity;
+  document.getElementById('bargeStaffCount').innerText    = site.staff.length;
+  document.getElementById('bargeStaffCapacity').innerText = site.barge.staffCapacity;
+  document.getElementById('bargeStaffUnassigned').innerText = site.staff.filter(s=>!s.role).length;
 
   // shop panel info
   if(site.barge.storageUpgradeLevel < feedStorageUpgrades.length){
@@ -68,6 +82,12 @@ function updateDisplay(){
       `Next Feed Storage Upgrade: $${feedStorageUpgrades[site.barge.storageUpgradeLevel].cost}`;
   } else {
     document.getElementById('storageUpgradeInfo').innerText = 'Feed Storage Fully Upgraded';
+  }
+  if(site.barge.housingUpgradeLevel < staffHousingUpgrades.length){
+    document.getElementById('housingUpgradeInfo').innerText =
+      `Next Housing Upgrade: $${staffHousingUpgrades[site.barge.housingUpgradeLevel].cost}`;
+  } else {
+    document.getElementById('housingUpgradeInfo').innerText = 'Housing Fully Upgraded';
   }
   document.getElementById('penPurchaseInfo').innerText = `Next Pen Purchase: $${penPurchaseCost.toFixed(0)}`;
 
@@ -83,7 +103,7 @@ function updateHarvestInfo(){
   const infoDiv = document.getElementById('harvestInfo');
   if(pen.fishCount>0){
     const totalBiomass = pen.fishCount * pen.averageWeight;
-    const harvestableBiomass = Math.min(harvestCapacity, totalBiomass);
+    const harvestableBiomass = Math.min(getSiteHarvestCapacity(site), totalBiomass);
     const earnings = harvestableBiomass * speciesData[pen.species].marketPrice;
     infoDiv.innerText = `Next harvest: ~${harvestableBiomass.toFixed(2)} kg for ~$${earnings.toFixed(2)}`;
   } else {
@@ -181,8 +201,10 @@ function buyNewSite(){
       siloCapacity:1000,
       staffCapacity:2,
       upgrades:[],
-      storageUpgradeLevel: 0
+      storageUpgradeLevel: 0,
+      housingUpgradeLevel: 0
     },
+    staff: [],
     licenses:['shrimp'],
     pens:[{ species:"shrimp", fishCount:500, averageWeight:0.01 }]
   });
@@ -194,6 +216,34 @@ function buyNewPen(){
   cash -= penPurchaseCost;
   sites[currentSiteIndex].pens.push({ species:"shrimp", fishCount:0, averageWeight:0 });
   penPurchaseCost *= 1.5;
+  updateDisplay();
+}
+function hireStaff(){
+  const site = sites[currentSiteIndex];
+  if(site.staff.length >= site.barge.staffCapacity)
+    return openModal("No staff housing available.");
+  if(cash < STAFF_HIRE_COST) return openModal("Not enough cash to hire staff.");
+  cash -= STAFF_HIRE_COST;
+  site.staff.push({ role: null });
+  updateDisplay();
+}
+function assignStaff(role){
+  const site = sites[currentSiteIndex];
+  const member = site.staff.find(s=>!s.role);
+  if(!member) return openModal("No unassigned staff available.");
+  if(!staffRoles[role]) return;
+  member.role = role;
+  updateDisplay();
+}
+function upgradeStaffHousing(){
+  const site = sites[currentSiteIndex];
+  if(site.barge.housingUpgradeLevel >= staffHousingUpgrades.length)
+    return openModal("Staff housing fully upgraded!");
+  const up = staffHousingUpgrades[site.barge.housingUpgradeLevel];
+  if(cash < up.cost) return openModal("Not enough cash to upgrade housing.");
+  cash -= up.cost;
+  site.barge.staffCapacity += up.extraCapacity;
+  site.barge.housingUpgradeLevel++;
   updateDisplay();
 }
 function buyDevCash(){ cash+=100000; updateDisplay(); }
@@ -212,7 +262,7 @@ function harvestPen(){
   const pen  = site.pens[currentPenIndex];
   if(pen.fishCount===0) return;
   const totalBiomass = pen.fishCount * pen.averageWeight;
-  const harvestable = Math.min(harvestCapacity, totalBiomass);
+  const harvestable = Math.min(getSiteHarvestCapacity(site), totalBiomass);
   let fishNum = Math.floor(harvestable/pen.averageWeight);
   fishNum = Math.min(fishNum, pen.fishCount);
   const biomass = fishNum * pen.averageWeight;
@@ -274,12 +324,20 @@ function upgradeFeeder(i){
   }
 }
 function getFeederRate(f){ return f?.type==='spreader'?2:(f?.type==='underwater'?3:(f?.type==='floating'?1:0)); }
+function getStaffFeedRate(site){
+  return site.staff.filter(s=>s.role==='feeder').length;
+}
+function getSiteHarvestCapacity(site){
+  const harvesters = site.staff.filter(s=>s.role==='harvester').length;
+  return BASE_HARVEST_CAPACITY + harvesters * 10;
+}
 
 // --- AUTO-FEED ALL SITES & PENS EVERY SECOND ---
 setInterval(()=>{
   sites.forEach(site=>{
+    const staffRate = getStaffFeedRate(site);
     site.pens.forEach(pen=>{
-      const rate = getFeederRate(pen.feeder);
+      const rate = getFeederRate(pen.feeder) + staffRate;
       for(let i=0;i<rate;i++){
         if(site.barge.feed>=1 && pen.fishCount>0){
           site.barge.feed--;
