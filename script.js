@@ -48,6 +48,13 @@ const speciesData = {
   salmon: { marketPrice:5, fcr:1.5, startingWeight:0.05, restockCount:250, restockCost:400, licenseCost:500 },
   tuna:   { marketPrice:10,fcr:2.0, startingWeight:0.2,  restockCount:100, restockCost:800, licenseCost:1500 }
 };
+
+// Auto feeder upgrade tiers
+const feederUpgrades = [
+  { type: 'floating',   rate: 1, cost: 500  }, // manual floating feeder
+  { type: 'spreader',   rate: 2, cost: 1200 }, // air-assisted spreader
+  { type: 'underwater', rate: 3, cost: 2500 }  // submersible feeder
+];
 const siteNamePrefixes = ["Driftwood","Stormreach","Gullrock","Cedar","Misty","Haven","Breakwater","Whispering","Duskwater","Salmonstone","SeaLion"];
 const siteNameSuffixes = ["Sound","Inlet","Bay","Island","Channel","Passage","Lagoon","Rock"];
 
@@ -132,6 +139,8 @@ function renderPenGrid(site){
     const biomass = pen.fishCount * pen.averageWeight;
     const feederType = pen.feeder?.type||'None';
     const feederTier = pen.feeder?.tier||0;
+    const nextUpgrade = feederUpgrades[feederTier];
+    const nextCostText = nextUpgrade ? `Upgrade Cost: $${nextUpgrade.cost}` : 'Feeder Maxed';
     const card = document.createElement('div');
     card.className = 'penCard';
     card.innerHTML = `
@@ -141,6 +150,7 @@ function renderPenGrid(site){
       <div class="stat">Avg Weight: ${pen.averageWeight.toFixed(2)} kg</div>
       <div class="stat">Biomass: ${biomass.toFixed(2)} kg</div>
       <div class="stat">Feeder: ${capitalizeFirstLetter(feederType)} (Tier ${feederTier})</div>
+      <div class="stat">${nextCostText}</div>
       <button onclick="feedFishPen(${idx})">Feed</button>
       <button onclick="harvestPenIndex(${idx})">Harvest</button>
       <button onclick="restockPenUI(${idx})">Restock</button>
@@ -323,18 +333,20 @@ function harvestPenIndex(i){ currentPenIndex=i; harvestPen(); updateDisplay(); }
 function restockPenUI(i){ currentPenIndex=i; openRestockModal(); }
 function upgradeFeeder(i){
   const pen = sites[currentSiteIndex].pens[i];
-  if(!pen.feeder){
-    pen.feeder = { type:'floating', tier:1 };
-    openModal("Installed floating feeder (Tier 1).");
-  } else if(pen.feeder.tier<3){
-    pen.feeder.tier++;
-    pen.feeder.type = pen.feeder.tier===2?'spreader':'underwater';
-    openModal(`Feeder upgraded to ${capitalizeFirstLetter(pen.feeder.type)} Tier ${pen.feeder.tier}.`);
-  } else {
-    openModal("Feeder already at max tier.");
-  }
+  const currentTier = pen.feeder?.tier || 0;
+  if(currentTier >= feederUpgrades.length) return openModal("Feeder already at max tier.");
+  const up = feederUpgrades[currentTier];
+  if(cash < up.cost) return openModal("Not enough cash for upgrade.");
+  cash -= up.cost;
+  pen.feeder = { type: up.type, tier: currentTier + 1 };
+  openModal(`Feeder upgraded to ${capitalizeFirstLetter(up.type)} (Tier ${currentTier + 1}).`);
+  updateDisplay();
 }
-function getFeederRate(f){ return f?.type==='spreader'?2:(f?.type==='underwater'?3:(f?.type==='floating'?1:0)); }
+function getFeederRate(f){
+  if(!f) return 0;
+  const data = feederUpgrades[f.tier - 1];
+  return data ? data.rate : 0;
+}
 function getStaffFeedRate(site){
   return site.staff.filter(s=>s.role==='feeder').length;
 }
