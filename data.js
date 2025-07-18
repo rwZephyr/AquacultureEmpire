@@ -55,12 +55,12 @@ export const siteNameSuffixes = ['Sound','Inlet','Bay','Island','Channel','Passa
 export const markets = [
   {
     name: 'Capital Wharf',
-    location: { x: 0, y: 0 },
+    location: { x: 10, y: 80 },
     modifiers: { shrimp: 1.0, salmon: 1.1, tuna: 0.9 }
   },
   {
     name: 'East Bay Processing',
-    location: { x: 80, y: 60 },
+    location: { x: 80, y: 85 },
     modifiers: { shrimp: 1.2, salmon: 0.9, tuna: 1.1 }
   }
 ];

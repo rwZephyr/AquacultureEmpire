@@ -164,6 +164,7 @@ function updateDisplay(){
   updateHarvestInfo();
   updateLicenseShop();
   renderPenGrid(site);
+  renderMap();
   const statusEl = document.getElementById('statusMessages');
   if(statusEl) statusEl.innerText = statusMessage;
 }
@@ -225,6 +226,53 @@ function renderPenGrid(site){
       <button onclick="assignBarge(${idx})">Assign Barge</button>
     `;
     grid.appendChild(card);
+  });
+}
+
+// simple map renderer
+function renderMap(){
+  const canvas = document.getElementById('mapCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+  // draw background (water top, land bottom)
+  ctx.fillStyle = '#1c4979';
+  ctx.fillRect(0,0,w,h*0.6);
+  ctx.fillStyle = '#406536';
+  ctx.fillRect(0,h*0.6,w,h*0.4);
+  // grid lines
+  ctx.strokeStyle = '#2a3f55';
+  for(let i=0;i<=10;i++){
+    const x=i*w/10; ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+    const y=i*h/10; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+  }
+  // helper to convert coords
+  const toPixel = p=>({x:p.x/100*w, y:p.y/100*h});
+  // draw markets
+  markets.forEach(m=>{
+    const pos = toPixel(m.location);
+    ctx.fillStyle = '#e2aa00';
+    ctx.fillRect(pos.x-5,pos.y-5,10,10);
+  });
+  // draw sites
+  sites.forEach(s=>{
+    const pos = toPixel(s.location);
+    ctx.fillStyle = '#4be0ff';
+    ctx.beginPath(); ctx.arc(pos.x,pos.y,6,0,Math.PI*2); ctx.fill();
+  });
+  // draw vessels
+  vessels.forEach(v=>{
+    let locName=v.location;
+    if(locName.startsWith('Traveling to ')) locName=locName.replace('Traveling to ','');
+    const site = sites.find(s=>s.name===locName);
+    const market = markets.find(m=>m.name===locName);
+    const loc = site?site.location:market?market.location:null;
+    if(loc){
+      const pos=toPixel(loc);
+      ctx.fillStyle='#ffffff';
+      ctx.beginPath();ctx.moveTo(pos.x,pos.y-6);ctx.lineTo(pos.x+5,pos.y+6);ctx.lineTo(pos.x-5,pos.y+6);ctx.closePath();ctx.fill();
+    }
   });
 }
 
@@ -356,7 +404,8 @@ function buyNewSite(){
   cash-=20000;
   sites.push(new Site({
     name: generateRandomSiteName(),
-    location: { x: Math.random()*100, y: Math.random()*100 },
+    // ensure farms spawn in water (upper portion of map)
+    location: { x: Math.random()*100, y: Math.random()*60 },
     barges:[new Barge({
       feed:100,
       feedCapacity: bargeTiers[0].feedCapacity,
