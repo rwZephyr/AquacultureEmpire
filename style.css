@@ -11,6 +11,7 @@ body {
   max-width: 900px;
   margin: 0 auto;
   padding: 0 20px;
+  transition: transform 0.3s ease;
 }
 button {
   margin: 8px;
@@ -45,6 +46,12 @@ button:active {
 }
 #sidebar.open {
   width: 200px;
+}
+
+@media (min-width: 701px) {
+  .container.shifted {
+    transform: translateX(200px);
+  }
 }
 #toggleSidebar {
   position: fixed;

@@ -291,16 +291,27 @@ function addDevCash() {
 // sidebar nav
 function togglePanel(id){
   const sb = document.getElementById('sidebar');
+  const container = document.querySelector('.container');
   const p  = document.getElementById(id);
-  if(!sb.classList.contains('open')) sb.classList.add('open');
+  if(!sb.classList.contains('open')) {
+    sb.classList.add('open');
+    container.classList.add('shifted');
+  } else {
+    container.classList.add('shifted');
+  }
   document.querySelectorAll('#sidebar .panel').forEach(x=>x.classList.remove('visible'));
   document.querySelectorAll('#sidebarContent button').forEach(x=>x.classList.remove('active'));
   p.classList.add('visible');
   document.getElementById('toggle'+capitalizeFirstLetter(id)).classList.add('active');
 }
 document.getElementById('toggleSidebar').addEventListener('click',()=>{
-  document.getElementById('sidebar').classList.toggle('open');
-  if(!document.getElementById('sidebar').classList.contains('open')){
+  const sb = document.getElementById('sidebar');
+  const container = document.querySelector('.container');
+  sb.classList.toggle('open');
+  if(sb.classList.contains('open')){
+    container.classList.add('shifted');
+  } else {
+    container.classList.remove('shifted');
     document.querySelectorAll('#sidebar .panel').forEach(x=>x.classList.remove('visible'));
     document.querySelectorAll('#sidebarContent button').forEach(x=>x.classList.remove('active'));
   }
