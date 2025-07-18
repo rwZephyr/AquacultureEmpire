@@ -505,6 +505,41 @@ function checkFeedManagers(){
 }
 setInterval(checkFeedManagers, 5000);
 
+// --- SAVE SYSTEM ---
+function saveGame() {
+  const data = {
+    cash,
+    penPurchaseCost,
+    sites
+  };
+  try {
+    localStorage.setItem('aquacultureEmpireSave', JSON.stringify(data));
+    addStatusMessage('Game saved!');
+  } catch (e) {
+    console.error('Save failed', e);
+  }
+}
+
+function loadGame() {
+  const raw = localStorage.getItem('aquacultureEmpireSave');
+  if (!raw) return;
+  try {
+    const obj = JSON.parse(raw);
+    if (obj && obj.sites) {
+      cash = obj.cash ?? cash;
+      penPurchaseCost = obj.penPurchaseCost ?? penPurchaseCost;
+      sites = obj.sites;
+    }
+  } catch (e) {
+    console.error('Load failed', e);
+  }
+}
+
+function resetGame() {
+  localStorage.removeItem('aquacultureEmpireSave');
+  location.reload();
+}
+
 // site/pen nav
 function previousSite(){ if(currentSiteIndex>0) currentSiteIndex--; currentPenIndex=0; currentBargeIndex=0; updateDisplay(); }
 function nextSite(){ if(currentSiteIndex<sites.length-1) currentSiteIndex++; currentPenIndex=0; currentBargeIndex=0; updateDisplay(); }
@@ -537,6 +572,8 @@ Object.assign(window, {
   restockPenUI,
   upgradeFeeder,
   assignBarge,
+  saveGame,
+  resetGame,
   previousSite,
   nextSite,
   previousBarge,
@@ -544,4 +581,4 @@ Object.assign(window, {
 });
 
 // Initialize
-document.addEventListener("DOMContentLoaded",()=>updateDisplay());
+document.addEventListener("DOMContentLoaded",()=>{ loadGame(); updateDisplay(); });
