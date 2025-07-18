@@ -243,37 +243,61 @@ function renderPenGrid(site){
   });
 }
 
-// simple map renderer
+// store map marker data for tooltips
+let mapMarkers = [];
+
+// simple map renderer with emoji icons and curved coastline
 function renderMap(){
   const canvas = document.getElementById('mapCanvas');
   if(!canvas) return;
   const ctx = canvas.getContext('2d');
   const w = canvas.width;
   const h = canvas.height;
-  // draw background (water top, land bottom)
+  mapMarkers = [];
+
+  // draw water background
+  ctx.clearRect(0,0,w,h);
   ctx.fillStyle = '#1c4979';
-  ctx.fillRect(0,0,w,h*0.6);
+  ctx.fillRect(0,0,w,h);
+
+  // compute and draw land shape
+  const base = h * 0.6;
+  const amp  = h * 0.05;
+  ctx.beginPath();
+  ctx.moveTo(0,h);
+  for(let x=0;x<=w;x+=w/20){
+    const y = base + Math.sin((x/w)*Math.PI*2)*amp;
+    ctx.lineTo(x,y);
+  }
+  ctx.lineTo(w,h);
+  ctx.closePath();
   ctx.fillStyle = '#406536';
-  ctx.fillRect(0,h*0.6,w,h*0.4);
+  ctx.fill();
+
   // grid lines
   ctx.strokeStyle = '#2a3f55';
   for(let i=0;i<=10;i++){
     const x=i*w/10; ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
     const y=i*h/10; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
   }
+
   // helper to convert coords
   const toPixel = p=>({x:p.x/100*w, y:p.y/100*h});
+  ctx.font = '20px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
   // draw markets
   markets.forEach(m=>{
     const pos = toPixel(m.location);
-    ctx.fillStyle = '#e2aa00';
-    ctx.fillRect(pos.x-5,pos.y-5,10,10);
+    ctx.fillText('🏪', pos.x, pos.y);
+    mapMarkers.push({x:pos.x, y:pos.y, name:m.name});
   });
   // draw sites
   sites.forEach(s=>{
     const pos = toPixel(s.location);
-    ctx.fillStyle = '#4be0ff';
-    ctx.beginPath(); ctx.arc(pos.x,pos.y,6,0,Math.PI*2); ctx.fill();
+    ctx.fillText('🐟', pos.x, pos.y);
+    mapMarkers.push({x:pos.x, y:pos.y, name:s.name});
   });
   // draw vessels
   vessels.forEach(v=>{
@@ -284,10 +308,45 @@ function renderMap(){
     const loc = site?site.location:market?market.location:null;
     if(loc){
       const pos=toPixel(loc);
-      ctx.fillStyle='#ffffff';
-      ctx.beginPath();ctx.moveTo(pos.x,pos.y-6);ctx.lineTo(pos.x+5,pos.y+6);ctx.lineTo(pos.x-5,pos.y+6);ctx.closePath();ctx.fill();
+      ctx.fillText('🚢', pos.x, pos.y);
+      mapMarkers.push({x:pos.x, y:pos.y, name:v.name});
     }
   });
+}
+
+// setup tooltip interactions for the map
+function setupMapInteractions(){
+  const canvas = document.getElementById('mapCanvas');
+  const tooltip = document.getElementById('mapTooltip');
+  if(!canvas || !tooltip) return;
+  let hideTimeout;
+  const show = marker => {
+    tooltip.textContent = marker.name;
+    tooltip.style.display = 'block';
+    tooltip.style.left = `${marker.x + 10}px`;
+    tooltip.style.top  = `${marker.y - 25}px`;
+    clearTimeout(hideTimeout);
+  };
+  const handle = evt => {
+    const rect = canvas.getBoundingClientRect();
+    const cX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+    const cY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+    const x = cX - rect.left;
+    const y = cY - rect.top;
+    const marker = mapMarkers.find(m => Math.hypot(x-m.x, y-m.y) < 12);
+    if(marker){
+      show(marker);
+      if(evt.type === 'click' || evt.type === 'touchstart'){
+        hideTimeout = setTimeout(()=>{ tooltip.style.display='none'; },1500);
+      }
+    } else if(evt.type === 'mousemove'){
+      tooltip.style.display='none';
+    }
+  };
+  canvas.addEventListener('mousemove', handle);
+  canvas.addEventListener('click', handle);
+  canvas.addEventListener('touchstart', handle);
+  canvas.addEventListener('mouseleave', ()=>{ tooltip.style.display='none'; });
 }
 
 // --- MODALS ---
@@ -926,5 +985,6 @@ Object.assign(window, {
 document.addEventListener("DOMContentLoaded",()=>{
   loadGame();
   updateDisplay();
+  setupMapInteractions();
   setInterval(saveGame, AUTO_SAVE_INTERVAL_MS);
 });
