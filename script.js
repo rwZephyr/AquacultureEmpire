@@ -93,6 +93,14 @@ function updateDisplay(){
   document.getElementById('bargeStaffCapacity').innerText = totalCapacity;
   document.getElementById('bargeStaffUnassigned').innerText = site.staff.filter(s=>!s.role).length;
 
+  // staff card info
+  document.getElementById('staffTotal').innerText = site.staff.length;
+  document.getElementById('staffCapacity').innerText = totalCapacity;
+  document.getElementById('staffUnassigned').innerText = site.staff.filter(s=>!s.role).length;
+  document.getElementById('staffFeeders').innerText = site.staff.filter(s=>s.role==='feeder').length;
+  document.getElementById('staffHarvesters').innerText = site.staff.filter(s=>s.role==='harvester').length;
+  document.getElementById('staffManagers').innerText = site.staff.filter(s=>s.role==='feedManager').length;
+
   // shop panel info
   if(barge.storageUpgradeLevel < feedStorageUpgrades.length){
     document.getElementById('storageUpgradeInfo').innerText =
@@ -299,6 +307,13 @@ function hireStaff(){
   if(cash < STAFF_HIRE_COST) return openModal("Not enough cash to hire staff.");
   cash -= STAFF_HIRE_COST;
   site.staff.push({ role: null });
+  updateDisplay();
+}
+function fireStaff(role=null){
+  const site = sites[currentSiteIndex];
+  const idx = site.staff.findIndex(s => role ? s.role===role : !s.role);
+  if(idx === -1) return openModal("No staff member available to fire.");
+  site.staff.splice(idx,1);
   updateDisplay();
 }
 function assignStaff(role){
@@ -558,6 +573,7 @@ Object.assign(window, {
   buyNewPen,
   buyNewBarge,
   hireStaff,
+  fireStaff,
   assignStaff,
   unassignStaff,
   upgradeStaffHousing,
