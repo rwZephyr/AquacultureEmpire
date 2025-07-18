@@ -43,12 +43,14 @@ export class Pen {
 export class Site {
   constructor({
     name,
+    location = { x: 0, y: 0 },
     barges = [],
     staff = [],
     licenses = [],
     pens = []
   } = {}) {
     this.name = name;
+    this.location = location;
     this.barges = barges;
     this.staff = staff;
     this.licenses = licenses;
@@ -61,6 +63,7 @@ export class Vessel {
     name,
     maxBiomassCapacity = 1000,
     currentBiomassLoad = 0,
+    cargo = {},
     speed = 10,
     location = '',
     tier = 0
@@ -68,6 +71,7 @@ export class Vessel {
     this.name = name;
     this.maxBiomassCapacity = maxBiomassCapacity;
     this.currentBiomassLoad = currentBiomassLoad;
+    this.cargo = cargo;
     this.speed = speed;
     this.location = location;
     this.tier = tier;

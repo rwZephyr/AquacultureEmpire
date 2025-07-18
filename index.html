@@ -84,6 +84,7 @@
         <div>Location: <span id="vesselLocation">Dock</span></div>
         <button onclick="upgradeVessel()">Upgrade Vessel</button>
         <div id="vesselUpgradeInfo"></div>
+        <button onclick="openSellModal()">Sell Cargo</button>
       </div>
       <div id="staffCard" class="staffCard">
         <h2>Staffing</h2>
@@ -134,6 +135,13 @@
         <input type="number" id="harvestAmount" min="0" step="0.1">
         <button onclick="confirmHarvest()">Harvest</button>
         <button onclick="closeHarvestModal()">Cancel</button>
+      </div>
+    </div>
+    <div id="sellModal">
+      <div id="sellModalContent">
+        <h2>Select Market</h2>
+        <div id="sellOptions"></div>
+        <button onclick="closeSellModal()">Cancel</button>
       </div>
     </div>
   </div>
