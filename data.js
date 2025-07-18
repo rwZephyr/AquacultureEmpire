@@ -45,6 +45,8 @@ export const vesselTiers = [
   { name: 'Large',  maxBiomassCapacity: 5000, speed: 6,  cost: 30000 }
 ];
 
+export const NEW_VESSEL_COST = 12000;
+
 export const siteNamePrefixes = [
   'Driftwood','Stormreach','Gullrock','Cedar','Misty','Haven','Breakwater','Whispering','Duskwater','Salmonstone','SeaLion'
 ];

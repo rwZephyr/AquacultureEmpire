@@ -1,6 +1,7 @@
 import {
   bargeTiers,
   NEW_BARGE_COST,
+  NEW_VESSEL_COST,
   feedStorageUpgrades,
   STAFF_HIRE_COST,
   staffRoles,
@@ -127,6 +128,7 @@ function updateDisplay(){
   } else {
     document.getElementById('vesselUpgradeInfo').innerText = 'Vessel Fully Upgraded';
   }
+  document.getElementById('vesselPurchaseInfo').innerText = `New Vessel Cost: $${NEW_VESSEL_COST}`;
 
   // staff card info
   document.getElementById('staffTotal').innerText = site.staff.length;
@@ -478,6 +480,78 @@ function upgradeVessel(){
   openModal(`Vessel upgraded to ${next.name} tier!`);
   updateDisplay();
 }
+
+function buyNewVessel(){
+  if(cash < NEW_VESSEL_COST) return openModal("Not enough cash to buy a new vessel!");
+  cash -= NEW_VESSEL_COST;
+  vessels.push(new Vessel({
+    name: `Vessel ${vessels.length + 1}`,
+    maxBiomassCapacity: vesselTiers[0].maxBiomassCapacity,
+    currentBiomassLoad: 0,
+    speed: vesselTiers[0].speed,
+    location: 'Dock',
+    tier: 0,
+    cargo: {}
+  }));
+  currentVesselIndex = vessels.length - 1;
+  updateDisplay();
+  openModal('New vessel purchased!');
+}
+
+function renameVessel(){
+  const vessel = vessels[currentVesselIndex];
+  const newName = prompt('Enter vessel name:', vessel.name);
+  if(newName){
+    vessel.name = newName.trim();
+    updateDisplay();
+  }
+}
+
+function openMoveVesselModal(){
+  const optionsDiv = document.getElementById('moveOptions');
+  optionsDiv.innerHTML = '';
+  sites.forEach((s, idx)=>{
+    const btn = document.createElement('button');
+    btn.innerText = s.name;
+    btn.onclick = ()=>moveVesselTo('site', idx);
+    optionsDiv.appendChild(btn);
+  });
+  markets.forEach((m, idx)=>{
+    const btn = document.createElement('button');
+    btn.innerText = m.name;
+    btn.onclick = ()=>moveVesselTo('market', idx);
+    optionsDiv.appendChild(btn);
+  });
+  document.getElementById('moveModal').classList.add('visible');
+}
+function closeMoveModal(){
+  document.getElementById('moveModal').classList.remove('visible');
+}
+
+function moveVesselTo(type, idx){
+  const vessel = vessels[currentVesselIndex];
+  const startSite = findSiteByName(vessel.location) || sites[currentSiteIndex];
+  let destName;
+  let destLoc;
+  if(type==='site'){
+    const site = sites[idx];
+    destName = site.name;
+    destLoc = site.location;
+  } else {
+    const market = markets[idx];
+    destName = market.name;
+    destLoc = market.location;
+  }
+  const dx = startSite.location.x - destLoc.x;
+  const dy = startSite.location.y - destLoc.y;
+  const distance = Math.hypot(dx, dy);
+  vessel.location = `Traveling to ${destName}`;
+  closeMoveModal();
+  setTimeout(()=>{
+    vessel.location = destName;
+    updateDisplay();
+  }, distance / vessel.speed * TRAVEL_TIME_FACTOR);
+}
 function buyDevCash(){ cash+=100000; updateDisplay(); }
 
 // feed / harvest / restock
@@ -737,7 +811,12 @@ Object.assign(window, {
   nextBarge,
   previousVessel,
   nextVessel,
-  upgradeVessel
+  upgradeVessel,
+  buyNewVessel,
+  renameVessel,
+  openMoveVesselModal,
+  closeMoveModal,
+  moveVesselTo
 });
 
 // Initialize

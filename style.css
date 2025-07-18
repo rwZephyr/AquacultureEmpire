@@ -138,7 +138,8 @@ button:active {
 #modal,
 #restockModal,
 #harvestModal,
-#sellModal {
+#sellModal,
+#moveModal {
   position: fixed;
   top: 0;
   left: 0;
@@ -154,14 +155,16 @@ button:active {
 #modal.visible,
 #restockModal.visible,
 #harvestModal.visible,
-#sellModal.visible {
+#sellModal.visible,
+#moveModal.visible {
   display: flex;
 }
 
 #modalContent,
 #restockModalContent,
 #harvestModalContent,
-#sellModalContent {
+#sellModalContent,
+#moveModalContent {
   background: #293745;
   color: #dbe5ed;
   padding: 20px;
