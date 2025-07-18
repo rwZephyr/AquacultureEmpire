@@ -136,7 +136,8 @@ button:active {
 
 /* ===== MODAL OVERLAY ===== */
 #modal,
-#restockModal {
+#restockModal,
+#harvestModal {
   position: fixed;
   top: 0;
   left: 0;
@@ -150,12 +151,14 @@ button:active {
 }
 
 #modal.visible,
-#restockModal.visible {
+#restockModal.visible,
+#harvestModal.visible {
   display: flex;
 }
 
 #modalContent,
-#restockModalContent {
+#restockModalContent,
+#harvestModalContent {
   background: #293745;
   color: #dbe5ed;
   padding: 20px;
