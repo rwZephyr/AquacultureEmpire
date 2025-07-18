@@ -9,7 +9,8 @@ import {
   feederUpgrades,
   siteNamePrefixes,
   siteNameSuffixes,
-  vesselTiers
+  vesselTiers,
+  markets
 } from './data.js';
 import { Site, Barge, Pen, Vessel } from './models.js';
 
@@ -25,6 +26,7 @@ let currentVesselIndex = 0;
 const FEED_COST_PER_KG = 0.25;
 const FEED_THRESHOLD_PERCENT = 0.2;
 const AUTO_SAVE_INTERVAL_MS = 30000; // 30 seconds
+const TRAVEL_TIME_FACTOR = 1000; // ms per distance unit
 
 let statusMessage = '';
 function addStatusMessage(msg){
@@ -37,6 +39,7 @@ function addStatusMessage(msg){
 let sites = [
   new Site({
     name: 'Mernan Inlet',
+    location: { x: 20, y: 20 },
     barges: [
       new Barge({
         feed: 100,
@@ -79,6 +82,7 @@ function generateRandomSiteName(){
   const s = siteNameSuffixes[Math.floor(Math.random()*siteNameSuffixes.length)];
   return `${p} ${s}`;
 }
+function findSiteByName(n){ return sites.find(s=>s.name===n); }
 
 // --- UPDATE UI ---
 function updateDisplay(){
@@ -266,6 +270,47 @@ function confirmHarvest(){
   updateDisplay();
 }
 
+function openSellModal(){
+  const optionsDiv = document.getElementById('sellOptions');
+  optionsDiv.innerHTML = '';
+  markets.forEach((m,idx)=>{
+    const btn = document.createElement('button');
+    btn.innerText = `${m.name}`;
+    btn.onclick = ()=>sellCargo(idx);
+    optionsDiv.appendChild(btn);
+  });
+  document.getElementById('sellModal').classList.add('visible');
+}
+function closeSellModal(){
+  document.getElementById('sellModal').classList.remove('visible');
+}
+
+function sellCargo(idx){
+  const vessel = vessels[currentVesselIndex];
+  if(vessel.currentBiomassLoad<=0) return openModal('No biomass to sell.');
+  const market = markets[idx];
+  const site = findSiteByName(vessel.location) || sites[currentSiteIndex];
+  const dx = site.location.x - market.location.x;
+  const dy = site.location.y - market.location.y;
+  const distance = Math.hypot(dx, dy);
+  vessel.location = `Traveling to ${market.name}`;
+  closeSellModal();
+  setTimeout(()=>{
+    let total = 0;
+    for(const sp in vessel.cargo){
+      const weight = vessel.cargo[sp];
+      const price = speciesData[sp].marketPrice * (market.modifiers[sp]||1);
+      total += weight * price;
+    }
+    cash += total;
+    vessel.currentBiomassLoad = 0;
+    vessel.cargo = {};
+    vessel.location = market.name;
+    openModal(`Sold cargo for $${total.toFixed(2)} at ${market.name}.`);
+    updateDisplay();
+  }, distance / vessel.speed * TRAVEL_TIME_FACTOR);
+}
+
 // --- PURCHASES & ACTIONS ---
 function buyFeed(amount=20){
   const site = sites[currentSiteIndex];
@@ -307,9 +352,10 @@ function buyLicense(sp){
 function buyNewSite(){
   if(cash<20000) return openModal("Not enough cash to buy a new site!");
   cash-=20000;
-  sites.push({
+  sites.push(new Site({
     name: generateRandomSiteName(),
-    barges:[{
+    location: { x: Math.random()*100, y: Math.random()*100 },
+    barges:[new Barge({
       feed:100,
       feedCapacity: bargeTiers[0].feedCapacity,
       siloCapacity:1000,
@@ -320,11 +366,11 @@ function buyNewSite(){
       upgrades:[],
       storageUpgradeLevel: 0,
       housingUpgradeLevel: 0
-    }],
+    })],
     staff: [],
     licenses:['shrimp'],
-    pens:[{ species:"shrimp", fishCount:500, averageWeight:0.01, bargeIndex:0 }]
-  });
+    pens:[new Pen({ species:"shrimp", fishCount:500, averageWeight:0.01, bargeIndex:0 })]
+  }));
   updateDisplay();
   openModal("New site purchased!");
 }
@@ -461,6 +507,9 @@ function harvestPen(amount=null){
   fishNum = Math.min(fishNum, pen.fishCount);
   const biomass = fishNum * pen.averageWeight;
   vessel.currentBiomassLoad += biomass;
+  if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
+  vessel.cargo[pen.species] += biomass;
+  vessel.location = site.name;
   pen.fishCount -= fishNum;
   if(pen.fishCount===0) pen.averageWeight = 0;
   openModal(`Harvested ${biomass.toFixed(2)} kg loaded onto ${vessel.name}.`);
@@ -625,7 +674,9 @@ function loadGame() {
       cash = obj.cash ?? cash;
       penPurchaseCost = obj.penPurchaseCost ?? penPurchaseCost;
       sites = obj.sites;
+      sites.forEach(s => { if(!s.location) s.location = { x: Math.random()*100, y: Math.random()*100 }; });
       vessels = obj.vessels ?? vessels;
+      vessels.forEach(v => { if(!v.cargo) v.cargo = {}; });
     }
   } catch (e) {
     console.error('Load failed', e);
@@ -675,6 +726,9 @@ Object.assign(window, {
   restockPenUI,
   upgradeFeeder,
   assignBarge,
+  openSellModal,
+  closeSellModal,
+  sellCargo,
   saveGame,
   resetGame,
   previousSite,

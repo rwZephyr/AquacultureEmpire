@@ -49,3 +49,16 @@ export const siteNamePrefixes = [
   'Driftwood','Stormreach','Gullrock','Cedar','Misty','Haven','Breakwater','Whispering','Duskwater','Salmonstone','SeaLion'
 ];
 export const siteNameSuffixes = ['Sound','Inlet','Bay','Island','Channel','Passage','Lagoon','Rock'];
+
+export const markets = [
+  {
+    name: 'Capital Wharf',
+    location: { x: 0, y: 0 },
+    modifiers: { shrimp: 1.0, salmon: 1.1, tuna: 0.9 }
+  },
+  {
+    name: 'East Bay Processing',
+    location: { x: 80, y: 60 },
+    modifiers: { shrimp: 1.2, salmon: 0.9, tuna: 1.1 }
+  }
+];
