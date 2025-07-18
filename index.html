@@ -13,7 +13,11 @@
       <button id="toggleDevMenu" onclick="togglePanel('devMenu')">🛠</button>
       <div id="shop" class="panel">
         <h2>Shop</h2>
-        <button onclick="buyFeed()">+20kg Feed</button>
+        <div id="feedPurchaseButtons">
+          <button onclick="buyFeed(20)">+20kg Feed</button>
+          <button onclick="buyFeed(100)">+100kg Feed</button>
+          <button onclick="buyMaxFeed()">Buy Max</button>
+        </div>
         <button onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
         <button onclick="buyNewBarge()">Buy Barge</button>
         <button onclick="upgradeBarge()">Upgrade Barge</button>
@@ -21,6 +25,8 @@
         <button onclick="hireStaff()">Hire Staff ($500)</button>
         <button onclick="assignStaff('feeder')">Assign Feeder</button>
         <button onclick="assignStaff('harvester')">Assign Harvester</button>
+        <button onclick="assignStaff('feedManager')">Assign Feed Manager</button>
+        <button onclick="unassignStaff('feedManager')">Unassign Feed Manager</button>
         <button onclick="upgradeStaffHousing()">Upgrade Housing</button>
         <div id="storageUpgradeInfo"></div>
         <div id="housingUpgradeInfo"></div>
@@ -28,6 +34,7 @@
         <div id="bargePurchaseInfo"></div>
         <div id="penPurchaseInfo"></div>
         <div id="licenseShop"></div>
+        <div id="statusMessages"></div>
       </div>
       <div id="devMenu" class="panel">
         <h2>Dev</h2>
