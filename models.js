@@ -55,3 +55,21 @@ export class Site {
     this.pens = pens;
   }
 }
+
+export class Vessel {
+  constructor({
+    name,
+    maxBiomassCapacity = 1000,
+    currentBiomassLoad = 0,
+    speed = 10,
+    location = '',
+    tier = 0
+  } = {}) {
+    this.name = name;
+    this.maxBiomassCapacity = maxBiomassCapacity;
+    this.currentBiomassLoad = currentBiomassLoad;
+    this.speed = speed;
+    this.location = location;
+    this.tier = tier;
+  }
+}

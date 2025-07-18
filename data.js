@@ -39,6 +39,12 @@ export const feederUpgrades = [
   { type: 'underwater', rate: 3, cost: 2500 }
 ];
 
+export const vesselTiers = [
+  { name: 'Small',  maxBiomassCapacity: 1000, speed: 10, cost: 0 },
+  { name: 'Medium', maxBiomassCapacity: 2500, speed: 8,  cost: 10000 },
+  { name: 'Large',  maxBiomassCapacity: 5000, speed: 6,  cost: 30000 }
+];
+
 export const siteNamePrefixes = [
   'Driftwood','Stormreach','Gullrock','Cedar','Misty','Haven','Breakwater','Whispering','Duskwater','Salmonstone','SeaLion'
 ];
