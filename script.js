@@ -22,6 +22,7 @@ let currentBargeIndex = 0;
 
 const FEED_COST_PER_KG = 0.25;
 const FEED_THRESHOLD_PERCENT = 0.2;
+const AUTO_SAVE_INTERVAL_MS = 30000; // 30 seconds
 
 let statusMessage = '';
 function addStatusMessage(msg){
@@ -581,4 +582,8 @@ Object.assign(window, {
 });
 
 // Initialize
-document.addEventListener("DOMContentLoaded",()=>{ loadGame(); updateDisplay(); });
+document.addEventListener("DOMContentLoaded",()=>{
+  loadGame();
+  updateDisplay();
+  setInterval(saveGame, AUTO_SAVE_INTERVAL_MS);
+});
