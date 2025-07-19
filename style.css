@@ -32,6 +32,26 @@ button:active {
   transform: scale(0.97);
 }
 
+/* Tab Bar */
+#tabBar {
+  margin-top: 10px;
+}
+
+#tabBar button {
+  background-color: #2b3b4a;
+  color: #dbe5ed;
+  border: none;
+  border-radius: 6px 6px 0 0;
+  padding: 6px 12px;
+  margin: 0 2px;
+  cursor: pointer;
+}
+
+#tabBar button.active {
+  background-color: #4be0ff;
+  color: #343b43;
+}
+
 /* Sidebar Layout */
 #sidebar {
   position: fixed;
