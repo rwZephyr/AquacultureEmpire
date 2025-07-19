@@ -857,6 +857,8 @@ function showTab(tab){
       document.getElementById('staffCard').style.display='block';
       break;
     case 'pens':
+      document.getElementById('cardContainer').style.display='block';
+      document.getElementById('bargeCard').style.display='block';
       document.getElementById('penGrid').style.display='block';
       break;
     case 'barges':
