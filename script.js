@@ -27,6 +27,7 @@ let currentVesselIndex = 0;
 const FEED_COST_PER_KG = 0.25;
 const FEED_THRESHOLD_PERCENT = 0.2;
 const AUTO_SAVE_INTERVAL_MS = 30000; // 30 seconds
+const SAVE_KEY = 'aquacultureEmpireSave';
 const TRAVEL_TIME_FACTOR = 1000; // ms per distance unit
 
 // --- Game Time System ---
@@ -75,6 +76,7 @@ function advanceDay(){
 }
 
 let statusMessage = '';
+let lastOfflineInfo = null;
 function addStatusMessage(msg){
   statusMessage = msg;
   const el = document.getElementById('statusMessages');
@@ -1034,6 +1036,65 @@ function checkFeedManagers(){
 }
 setInterval(checkFeedManagers, 5000);
 
+// simplified feed manager logic for offline simulation
+function simulateFeedManagers(){
+  sites.forEach(site=>{
+    if(!site.staff.some(s=>s.role==='feedManager')) return;
+    site.barges.forEach(barge=>{
+      if(barge.feed/barge.feedCapacity < FEED_THRESHOLD_PERCENT){
+        const maxAffordable = Math.floor(cash / FEED_COST_PER_KG);
+        const available = barge.feedCapacity - barge.feed;
+        const qty = Math.min(maxAffordable, available);
+        if(qty>0){
+          cash -= qty * FEED_COST_PER_KG;
+          barge.feed += qty;
+        }
+      }
+    });
+  });
+}
+
+// Run simplified game ticks to account for offline progress
+function simulateOfflineProgress(ms){
+  const seconds = Math.floor(ms/1000);
+  let feedUsed = 0;
+  let daysPassed = 0;
+  for(let i=0;i<seconds;i++){
+    // auto feed logic
+    sites.forEach(site=>{
+      const staffRate = getStaffFeedRate(site);
+      site.barges.forEach((barge,bIdx)=>{
+        let activeFeeders = 0;
+        site.pens.forEach(pen=>{
+          if(pen.bargeIndex!==bIdx) return;
+          let rate = staffRate;
+          const fr = getFeederRate(pen.feeder);
+          if(fr>0 && activeFeeders < barge.feederLimit){
+            rate += fr;
+            activeFeeders++;
+          }
+          for(let j=0;j<rate;j++){
+            if(barge.feed>=1 && pen.fishCount>0){
+              barge.feed--;
+              feedUsed++;
+              const gain = 1 / speciesData[pen.species].fcr;
+              pen.averageWeight += gain/pen.fishCount;
+            }
+          }
+        });
+      });
+    });
+
+    if((i+1)%5===0) simulateFeedManagers();
+
+    if((i+1)%(DAY_DURATION_MS/1000)===0){
+      advanceDay();
+      daysPassed++;
+    }
+  }
+  return {daysPassed, feedUsed};
+}
+
 // --- GAME TIME LOOP ---
 setInterval(()=>{
   if(!timePaused){
@@ -1048,6 +1109,7 @@ function saveGame() {
     penPurchaseCost,
     sites,
     vessels,
+    lastSaved: Date.now(),
     time: {
       totalDaysElapsed,
       dayInSeason,
@@ -1056,7 +1118,7 @@ function saveGame() {
     }
   };
   try {
-    localStorage.setItem('aquacultureEmpireSave', JSON.stringify(data));
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     addStatusMessage('Game saved!');
   } catch (e) {
     console.error('Save failed', e);
@@ -1064,7 +1126,7 @@ function saveGame() {
 }
 
 function loadGame() {
-  const raw = localStorage.getItem('aquacultureEmpireSave');
+  const raw = localStorage.getItem(SAVE_KEY);
   if (!raw) return;
   try {
     const obj = JSON.parse(raw);
@@ -1081,6 +1143,13 @@ function loadGame() {
         seasonIndex = obj.time.seasonIndex ?? seasonIndex;
         year = obj.time.year ?? year;
       }
+      if(obj.lastSaved){
+        const diff = Date.now() - obj.lastSaved;
+        if(diff > 1000){
+          lastOfflineInfo = simulateOfflineProgress(diff);
+          lastOfflineInfo.elapsedMs = diff;
+        }
+      }
     }
   } catch (e) {
     console.error('Load failed', e);
@@ -1088,7 +1157,7 @@ function loadGame() {
 }
 
 function resetGame() {
-  localStorage.removeItem('aquacultureEmpireSave');
+  localStorage.removeItem(SAVE_KEY);
   location.reload();
 }
 
@@ -1159,5 +1228,12 @@ document.addEventListener("DOMContentLoaded",()=>{
   updateDisplay();
   setupMapInteractions();
   showTab('overview');
+  if(lastOfflineInfo){
+    const days = lastOfflineInfo.daysPassed;
+    const feed = lastOfflineInfo.feedUsed.toFixed(0);
+    const hrs = (lastOfflineInfo.elapsedMs/3600000).toFixed(1);
+    openModal(`Welcome back! ${hrs}h passed while you were away. `+
+              `${days} in-game days progressed and about ${feed}kg feed was used.`);
+  }
   setInterval(saveGame, AUTO_SAVE_INTERVAL_MS);
 });
