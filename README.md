@@ -17,6 +17,7 @@ Aquaculture Empire is a small browser-based aquaculture management game written 
 - Operate harvest vessels, move them between sites and markets and sell cargo.
 - Interactive map displays sites, markets and vessel locations.
 - Game state is saved in local storage so progress persists across sessions.
+- In-game time tracks days, seasons and years that advance automatically.
 
 ## Getting Started
 No build steps are required. Open `index.html` in any modern web browser to start the game. Everything runs locally in the browser.
