@@ -265,6 +265,14 @@ button:active {
   background-color: #4be0ff;
   color: #142027;
 }
+
+.newPenControls {
+  margin-bottom: 10px;
+}
+
+.selectedBargeDisplay {
+  margin-left: 8px;
+}
 #mapCanvas {
   width: 100%;
   max-width: 400px;
