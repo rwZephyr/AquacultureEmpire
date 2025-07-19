@@ -134,6 +134,25 @@ button:active {
   transition: background-color 0.3s;
 }
 
+/* Shop collapsible sections */
+.shopSection {
+  margin-top: 8px;
+  padding: 6px;
+  background-color: #2b3b4a;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.shopSection-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.shopSection-content.visible {
+  max-height: 500px;
+  overflow: hidden;
+}
+
 /* ===== MODAL OVERLAY ===== */
 #modal,
 #restockModal,

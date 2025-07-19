@@ -19,10 +19,37 @@
           <button onclick="buyFeed(100)">+100kg Feed</button>
           <button onclick="buyMaxFeed()">Buy Max</button>
         </div>
-        <button onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
-        <button onclick="buyNewBarge()">Buy Barge</button>
-        <button onclick="upgradeBarge()">Upgrade Barge</button>
-        <button onclick="buyNewPen()">+ Pen</button>
+
+        <div class="shopSection" onclick="toggleSection('bargeOptions')">Barge Upgrades</div>
+        <div id="bargeOptions" class="shopSection-content">
+          <button onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
+          <button onclick="buyNewBarge()">Buy Barge</button>
+          <button onclick="upgradeBarge()">Upgrade Barge</button>
+          <button onclick="buyNewPen()">+ Pen</button>
+        </div>
+
+        <div class="shopSection" onclick="toggleSection('staffOptions')">Staff</div>
+        <div id="staffOptions" class="shopSection-content">
+          <button onclick="hireStaff()">Hire Staff ($500)</button>
+          <button onclick="fireStaff()">Fire Unassigned</button>
+          <button onclick="assignStaff('feeder')">Assign Feeder</button>
+          <button onclick="unassignStaff('feeder')">Remove Feeder</button>
+          <button onclick="assignStaff('harvester')">Assign Harvester</button>
+          <button onclick="unassignStaff('harvester')">Remove Harvester</button>
+          <button onclick="assignStaff('feedManager')">Assign Feed Manager</button>
+          <button onclick="unassignStaff('feedManager')">Remove Feed Manager</button>
+          <button onclick="upgradeStaffHousing()">Upgrade Housing</button>
+        </div>
+
+        <div class="shopSection" onclick="toggleSection('vesselOptions')">Vessels</div>
+        <div id="vesselOptions" class="shopSection-content">
+          <button onclick="renameVessel()">Rename Vessel</button>
+          <button onclick="upgradeVessel()">Upgrade Vessel</button>
+          <button onclick="buyNewVessel()">Buy Vessel</button>
+          <button onclick="openMoveVesselModal()">Move Vessel</button>
+          <button onclick="openSellModal()">Sell Cargo</button>
+        </div>
+
         <div id="storageUpgradeInfo"></div>
         <div id="housingUpgradeInfo"></div>
         <div id="bargeUpgradeInfo"></div>
@@ -90,13 +117,9 @@
         <div>Tier: <span id="vesselTierName">Small</span></div>
         <div>Load: <span id="vesselLoad">0</span> / <span id="vesselCapacity">0</span> kg</div>
         <div>Location: <span id="vesselLocation">Dock</span></div>
-        <button onclick="renameVessel()">Rename Vessel</button>
-        <button onclick="upgradeVessel()">Upgrade Vessel</button>
         <div id="vesselUpgradeInfo"></div>
         <div id="vesselPurchaseInfo"></div>
-        <button onclick="buyNewVessel()">Buy Vessel</button>
-        <button onclick="openMoveVesselModal()">Move Vessel</button>
-        <button onclick="openSellModal()">Sell Cargo</button>
+        <div id="vesselActionPlaceholder"></div>
       </div>
       <div id="staffCard" class="staffCard">
         <h2>Staffing</h2>
@@ -105,15 +128,7 @@
         <div>Feeders: <span id="staffFeeders">0</span></div>
         <div>Harvesters: <span id="staffHarvesters">0</span></div>
         <div>Feed Managers: <span id="staffManagers">0</span></div>
-        <button onclick="hireStaff()">Hire Staff ($500)</button>
-        <button onclick="fireStaff()">Fire Unassigned</button>
-        <button onclick="assignStaff('feeder')">Assign Feeder</button>
-        <button onclick="unassignStaff('feeder')">Remove Feeder</button>
-        <button onclick="assignStaff('harvester')">Assign Harvester</button>
-        <button onclick="unassignStaff('harvester')">Remove Harvester</button>
-        <button onclick="assignStaff('feedManager')">Assign Feed Manager</button>
-        <button onclick="unassignStaff('feedManager')">Remove Feed Manager</button>
-        <button onclick="upgradeStaffHousing()">Upgrade Housing</button>
+        <div id="staffActionPlaceholder"></div>
       </div>
     </div>
 
