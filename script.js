@@ -826,6 +826,57 @@ function toggleSection(id){
   if(el) el.classList.toggle('visible');
 }
 
+function closeSidebar(){
+  const sb = document.getElementById('sidebar');
+  const container = document.querySelector('.container');
+  sb.classList.remove('open');
+  container.classList.remove('shifted');
+  document.querySelectorAll('#sidebar .panel').forEach(x=>x.classList.remove('visible'));
+  document.querySelectorAll('#sidebarContent button').forEach(x=>x.classList.remove('active'));
+}
+
+function showTab(tab){
+  closeSidebar();
+  document.querySelectorAll('#tabBar button').forEach(b=>b.classList.remove('active'));
+  const btn = document.getElementById(tab+'Tab');
+  if(btn) btn.classList.add('active');
+  const hide = id => { const el=document.getElementById(id); if(el) el.style.display='none'; };
+  hide('cardContainer');
+  hide('penGrid');
+  hide('harvestInfo');
+  hide('bargeCard');
+  hide('vesselCard');
+  hide('staffCard');
+
+  switch(tab){
+    case 'overview':
+      document.getElementById('cardContainer').style.display='block';
+      document.getElementById('harvestInfo').style.display='block';
+      document.getElementById('bargeCard').style.display='block';
+      document.getElementById('vesselCard').style.display='block';
+      document.getElementById('staffCard').style.display='block';
+      break;
+    case 'pens':
+      document.getElementById('penGrid').style.display='block';
+      break;
+    case 'barges':
+      document.getElementById('cardContainer').style.display='block';
+      document.getElementById('bargeCard').style.display='block';
+      break;
+    case 'vessels':
+      document.getElementById('cardContainer').style.display='block';
+      document.getElementById('vesselCard').style.display='block';
+      break;
+    case 'staffing':
+      document.getElementById('cardContainer').style.display='block';
+      document.getElementById('staffCard').style.display='block';
+      break;
+    case 'shop':
+      togglePanel('shop');
+      break;
+  }
+}
+
 // pen buttons helper
 function feedFishPen(i){ currentPenIndex=i; feedFish(); updateDisplay(); }
 function harvestPenIndex(i){ openHarvestModal(i); }
@@ -1009,7 +1060,8 @@ Object.assign(window, {
   renameVessel,
   openMoveVesselModal,
   closeMoveModal,
-  moveVesselTo
+  moveVesselTo,
+  showTab
 });
 
 // Initialize
@@ -1017,5 +1069,6 @@ document.addEventListener("DOMContentLoaded",()=>{
   loadGame();
   updateDisplay();
   setupMapInteractions();
+  showTab('overview');
   setInterval(saveGame, AUTO_SAVE_INTERVAL_MS);
 });
