@@ -39,6 +39,23 @@ let dayInSeason = 1;
 let seasonIndex = 0;
 let year = 1;
 
+// Expose read-only accessors for external logic
+Object.defineProperties(window, {
+  currentDayInSeason: { get: () => dayInSeason },
+  currentSeason:      { get: () => SEASONS[seasonIndex] },
+  currentYear:        { get: () => year },
+  totalDaysElapsed:   { get: () => totalDaysElapsed }
+});
+
+function getTimeState(){
+  return {
+    currentDayInSeason: dayInSeason,
+    currentSeason: SEASONS[seasonIndex],
+    currentYear: year,
+    totalDaysElapsed
+  };
+}
+
 function getDateString(){
   return `${SEASONS[seasonIndex]} ${dayInSeason}, Year ${year}`;
 }
@@ -1132,7 +1149,8 @@ Object.assign(window, {
   closeMoveModal,
   moveVesselTo,
   showTab,
-  updateSelectedBargeDisplay
+  updateSelectedBargeDisplay,
+  getTimeState
 });
 
 // Initialize

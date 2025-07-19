@@ -19,6 +19,17 @@ Aquaculture Empire is a small browser-based aquaculture management game written 
 - Game state is saved in local storage so progress persists across sessions.
 - In-game time tracks days, seasons and years that advance automatically.
 
+### Time Data
+Several read-only time values are exposed on the global `window` object:
+
+- `currentDayInSeason` – day number within the season (1–30)
+- `currentSeason` – season name such as "Spring"
+- `currentYear` – the current year count
+- `totalDaysElapsed` – total days since starting the game
+
+You can also call `getTimeState()` to retrieve these values as an object for
+use in mods or custom event hooks.
+
 ## Getting Started
 No build steps are required. Open `index.html` in any modern web browser to start the game. Everything runs locally in the browser.
 
