@@ -729,7 +729,6 @@ function moveVesselTo(type, idx){
     updateDisplay();
   }, distance / vessel.speed * TRAVEL_TIME_FACTOR);
 }
-function buyDevCash(){ cash+=100000; updateDisplay(); }
 
 // feed / harvest / restock
 function feedFish(){
