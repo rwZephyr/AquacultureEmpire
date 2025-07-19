@@ -147,6 +147,12 @@
     <!-- Pen grid -->
     <div id="penGrid">
       <h2>Pen Status</h2>
+      <div id="newPenControls" class="newPenControls">
+        <label for="newPenBargeSelect">Add Pen to Barge:</label>
+        <select id="newPenBargeSelect" onchange="updateSelectedBargeDisplay()"></select>
+        <button onclick="buyNewPen(document.getElementById('newPenBargeSelect').value)">+ Pen</button>
+        <span id="selectedBargeDisplay"></span>
+      </div>
       <div id="penGridContainer" class="grid"></div>
     </div>
 

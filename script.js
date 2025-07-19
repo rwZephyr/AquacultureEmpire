@@ -235,7 +235,15 @@ function updateLicenseShop(){
 function renderPenGrid(site){
   const grid = document.getElementById('penGridContainer');
   grid.innerHTML = '';
+  const select = document.getElementById('newPenBargeSelect');
+  if(select){
+    select.innerHTML = site.barges.map((b,i)=>`<option value="${i}">${i+1}</option>`).join('');
+    select.value = currentBargeIndex;
+    const disp = document.getElementById('selectedBargeDisplay');
+    if(disp) disp.innerText = `Selected: ${Number(select.value)+1}`;
+  }
   site.pens.forEach((pen, idx)=>{
+    const bargeOptions = site.barges.map((b,i)=>`<option value="${i}" ${pen.bargeIndex===i?'selected':''}>${i+1}</option>`).join('');
     const biomass = pen.fishCount * pen.averageWeight;
     const feederType = pen.feeder?.type||'None';
     const feederTier = pen.feeder?.tier||0;
@@ -250,13 +258,12 @@ function renderPenGrid(site){
       <div class="stat">Avg Weight: ${pen.averageWeight.toFixed(2)} kg</div>
       <div class="stat">Biomass: ${biomass.toFixed(2)} kg</div>
       <div class="stat">Feeder: ${capitalizeFirstLetter(feederType)} (Tier ${feederTier})</div>
-      <div class="stat">Barge: ${pen.bargeIndex+1}</div>
+      <div class="stat">Barge: <select onchange="assignBarge(${idx}, this.value)">${bargeOptions}</select></div>
       <div class="stat">${nextCostText}</div>
       <button onclick="feedFishPen(${idx})">Feed</button>
       <button onclick="harvestPenIndex(${idx})">Harvest</button>
       <button onclick="restockPenUI(${idx})">Restock</button>
       <button onclick="upgradeFeeder(${idx})">Upgrade Feeder</button>
-      <button onclick="assignBarge(${idx})">Assign Barge</button>
     `;
     grid.appendChild(card);
   });
@@ -533,10 +540,12 @@ function buyNewSite(){
   updateDisplay();
   openModal("New site purchased!");
 }
-function buyNewPen(){
-  if(cash<penPurchaseCost) return openModal("Not enough cash to buy a new pen!");
+function buyNewPen(bargeIdx = currentBargeIndex){
+  const site = sites[currentSiteIndex];
+  if(cash < penPurchaseCost) return openModal("Not enough cash to buy a new pen!");
+  if(bargeIdx < 0 || bargeIdx >= site.barges.length) return openModal("Invalid barge selected.");
   cash -= penPurchaseCost;
-  sites[currentSiteIndex].pens.push({ species:"shrimp", fishCount:0, averageWeight:0, bargeIndex: currentBargeIndex });
+  site.pens.push({ species:"shrimp", fishCount:0, averageWeight:0, bargeIndex: Number(bargeIdx) });
   penPurchaseCost *= 1.5;
   updateDisplay();
 }
@@ -901,11 +910,22 @@ function upgradeFeeder(i){
   updateDisplay();
 }
 
-function assignBarge(i){
+function assignBarge(penIdx, bargeIdx){
   const site = sites[currentSiteIndex];
-  const pen = site.pens[i];
-  pen.bargeIndex = (pen.bargeIndex + 1) % site.barges.length;
-  updateDisplay();
+  const pen = site.pens[penIdx];
+  const idx = Number(bargeIdx);
+  if(idx >= 0 && idx < site.barges.length){
+    pen.bargeIndex = idx;
+    updateDisplay();
+  }
+}
+
+function updateSelectedBargeDisplay(){
+  const select = document.getElementById('newPenBargeSelect');
+  const disp = document.getElementById('selectedBargeDisplay');
+  if(select && disp){
+    disp.innerText = `Selected: ${Number(select.value)+1}`;
+  }
 }
 function getFeederRate(f){
   if(!f) return 0;
@@ -1063,7 +1083,8 @@ Object.assign(window, {
   openMoveVesselModal,
   closeMoveModal,
   moveVesselTo,
-  showTab
+  showTab,
+  updateSelectedBargeDisplay
 });
 
 // Initialize
