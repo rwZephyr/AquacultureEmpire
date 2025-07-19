@@ -29,6 +29,34 @@ const FEED_THRESHOLD_PERCENT = 0.2;
 const AUTO_SAVE_INTERVAL_MS = 30000; // 30 seconds
 const TRAVEL_TIME_FACTOR = 1000; // ms per distance unit
 
+// --- Game Time System ---
+const SEASONS = ['Spring','Summer','Fall','Winter'];
+const DAYS_PER_SEASON = 30;
+const DAY_DURATION_MS = 10000; // 10 seconds per in-game day
+let timePaused = false;
+let totalDaysElapsed = 0;
+let dayInSeason = 1;
+let seasonIndex = 0;
+let year = 1;
+
+function getDateString(){
+  return `${SEASONS[seasonIndex]} ${dayInSeason}, Year ${year}`;
+}
+
+function advanceDay(){
+  totalDaysElapsed++;
+  dayInSeason++;
+  if(dayInSeason > DAYS_PER_SEASON){
+    dayInSeason = 1;
+    seasonIndex++;
+    if(seasonIndex >= SEASONS.length){
+      seasonIndex = 0;
+      year++;
+    }
+  }
+  updateDisplay();
+}
+
 let statusMessage = '';
 function addStatusMessage(msg){
   statusMessage = msg;
@@ -122,6 +150,8 @@ function updateDisplay(){
   // top-bar
   document.getElementById('siteName').innerText = site.name;
   document.getElementById('cashCount').innerText = cash.toFixed(2);
+  const dateEl = document.getElementById('dateDisplay');
+  if(dateEl) dateEl.innerText = getDateString();
 
   // barge card
   const barge = site.barges[currentBargeIndex];
@@ -987,13 +1017,26 @@ function checkFeedManagers(){
 }
 setInterval(checkFeedManagers, 5000);
 
+// --- GAME TIME LOOP ---
+setInterval(()=>{
+  if(!timePaused){
+    advanceDay();
+  }
+}, DAY_DURATION_MS);
+
 // --- SAVE SYSTEM ---
 function saveGame() {
   const data = {
     cash,
     penPurchaseCost,
     sites,
-    vessels
+    vessels,
+    time: {
+      totalDaysElapsed,
+      dayInSeason,
+      seasonIndex,
+      year
+    }
   };
   try {
     localStorage.setItem('aquacultureEmpireSave', JSON.stringify(data));
@@ -1015,6 +1058,12 @@ function loadGame() {
       sites.forEach(s => { if(!s.location) s.location = { x: Math.random()*100, y: Math.random()*100 }; });
       vessels = obj.vessels ?? vessels;
       vessels.forEach(v => { if(!v.cargo) v.cargo = {}; });
+      if(obj.time){
+        totalDaysElapsed = obj.time.totalDaysElapsed ?? totalDaysElapsed;
+        dayInSeason = obj.time.dayInSeason ?? dayInSeason;
+        seasonIndex = obj.time.seasonIndex ?? seasonIndex;
+        year = obj.time.year ?? year;
+      }
     }
   } catch (e) {
     console.error('Load failed', e);
