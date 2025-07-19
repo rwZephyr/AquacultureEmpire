@@ -821,6 +821,11 @@ document.getElementById('toggleSidebar').addEventListener('click',()=>{
   }
 });
 
+function toggleSection(id){
+  const el = document.getElementById(id);
+  if(el) el.classList.toggle('visible');
+}
+
 // pen buttons helper
 function feedFishPen(i){ currentPenIndex=i; feedFish(); updateDisplay(); }
 function harvestPenIndex(i){ openHarvestModal(i); }
@@ -990,6 +995,7 @@ Object.assign(window, {
   openSellModal,
   closeSellModal,
   sellCargo,
+  toggleSection,
   saveGame,
   resetGame,
   previousSite,
