@@ -472,6 +472,36 @@ function confirmHarvest(){
   updateDisplay();
 }
 
+function openVesselHarvestModal(){
+  const site = sites[currentSiteIndex];
+  const vessel = vessels[currentVesselIndex];
+  let species = vessel.currentBiomassLoad>0 ? Object.keys(vessel.cargo)[0] : null;
+  let available = 0;
+  site.pens.forEach(pen=>{
+    if(pen.fishCount===0) return;
+    if(species && pen.species!==species) return;
+    if(!species) species = pen.species;
+    if(pen.species===species) available += pen.fishCount * pen.averageWeight;
+  });
+  const remaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
+  const maxHarvest = Math.min(getSiteHarvestCapacity(site), remaining, available);
+  if(maxHarvest<=0) return openModal('No biomass available.');
+  document.getElementById('vesselHarvestMax').innerText = maxHarvest.toFixed(2);
+  const input = document.getElementById('vesselHarvestAmount');
+  input.max = maxHarvest;
+  input.value = maxHarvest.toFixed(3);
+  document.getElementById('vesselHarvestModal').classList.add('visible');
+}
+function closeVesselHarvestModal(){
+  document.getElementById('vesselHarvestModal').classList.remove('visible');
+}
+function confirmVesselHarvest(){
+  const amount = parseFloat(document.getElementById('vesselHarvestAmount').value);
+  harvestWithVessel(currentVesselIndex, amount);
+  closeVesselHarvestModal();
+  updateDisplay();
+}
+
 function openSellModal(){
   const optionsDiv = document.getElementById('sellOptions');
   optionsDiv.innerHTML = '';
@@ -832,6 +862,53 @@ function harvestPen(amount=null){
     }, distance / vessel.speed * TRAVEL_TIME_FACTOR);
   } else {
     performHarvest();
+  }
+}
+
+function harvestWithVessel(vIndex, amount){
+  const vessel = vessels[vIndex];
+  const site = sites[currentSiteIndex];
+  let remaining = Math.min(
+    amount,
+    vessel.maxBiomassCapacity - vessel.currentBiomassLoad,
+    getSiteHarvestCapacity(site)
+  );
+  if(remaining<=0) return openModal('Vessel capacity full.');
+  let species = vessel.currentBiomassLoad>0 ? Object.keys(vessel.cargo)[0] : null;
+  const perform = ()=>{
+    let harvested = 0;
+    for(const pen of site.pens){
+      if(remaining<=0) break;
+      if(pen.fishCount===0) continue;
+      if(species && pen.species!==species) continue;
+      if(!species) species = pen.species;
+      const penBiomass = pen.fishCount * pen.averageWeight;
+      let take = Math.min(penBiomass, remaining);
+      let fishNum = Math.floor((take + pen.averageWeight * 0.0001)/pen.averageWeight);
+      if(fishNum===0 && take>0) fishNum = 1;
+      fishNum = Math.min(fishNum, pen.fishCount);
+      const biomass = fishNum * pen.averageWeight;
+      pen.fishCount -= fishNum;
+      if(pen.fishCount===0) pen.averageWeight = 0;
+      vessel.currentBiomassLoad += biomass;
+      if(!vessel.cargo[species]) vessel.cargo[species]=0;
+      vessel.cargo[species]+=biomass;
+      harvested += biomass;
+      remaining -= biomass;
+    }
+    vessel.location = site.name;
+    openModal(`Harvested ${harvested.toFixed(2)} kg loaded onto ${vessel.name}.`);
+    updateDisplay();
+  };
+  if(vessel.location !== site.name){
+    const startLoc = getLocationByName(vessel.location) || site.location;
+    const dx = startLoc.x - site.location.x;
+    const dy = startLoc.y - site.location.y;
+    const distance = Math.hypot(dx, dy);
+    vessel.location = `Traveling to ${site.name}`;
+    setTimeout(()=>{ vessel.location = site.name; perform(); }, distance / vessel.speed * TRAVEL_TIME_FACTOR);
+  } else {
+    perform();
   }
 }
 function restockPen(sp){
@@ -1196,8 +1273,12 @@ Object.assign(window, {
   openHarvestModal,
   closeHarvestModal,
   confirmHarvest,
+  openVesselHarvestModal,
+  closeVesselHarvestModal,
+  confirmVesselHarvest,
   feedFishPen,
   harvestPenIndex,
+  harvestWithVessel,
   restockPenUI,
   upgradeFeeder,
   assignBarge,
