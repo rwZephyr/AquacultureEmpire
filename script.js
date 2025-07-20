@@ -18,6 +18,7 @@ import { Site, Barge, Pen, Vessel } from './models.js';
 // Core Game State
 let cash = 200;
 const BASE_HARVEST_CAPACITY = 50;
+const HARVESTER_RATE = 10; // kg per second per harvester
 let penPurchaseCost = 1000;
 let currentPenIndex = 0;
 let currentSiteIndex = 0;
@@ -984,9 +985,9 @@ function getFeederRate(f){
 function getStaffFeedRate(site){
   return site.staff.filter(s=>s.role==='feeder').length;
 }
-function getSiteHarvestCapacity(site){
+function getSiteHarvestCapacity(site, elapsedSeconds = 1){
   const harvesters = site.staff.filter(s=>s.role==='harvester').length;
-  return BASE_HARVEST_CAPACITY + harvesters * 10;
+  return BASE_HARVEST_CAPACITY + (HARVESTER_RATE * harvesters * elapsedSeconds);
 }
 
 // --- AUTO-FEED ALL SITES & PENS EVERY SECOND ---
