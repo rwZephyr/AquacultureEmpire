@@ -127,6 +127,7 @@
         <div>Tier: <span id="vesselTierName">Small</span></div>
         <div>Load: <span id="vesselLoad">0</span> / <span id="vesselCapacity">0</span> kg</div>
         <div>Location: <span id="vesselLocation">Dock</span></div>
+        <button onclick="openVesselHarvestModal()">Harvest</button>
         <div id="vesselUpgradeInfo"></div>
         <div id="vesselPurchaseInfo"></div>
         <div id="vesselActionPlaceholder"></div>
@@ -178,6 +179,15 @@
         <input type="number" id="harvestAmount" min="0" step="0.01">
         <button onclick="confirmHarvest()">Harvest</button>
         <button onclick="closeHarvestModal()">Cancel</button>
+      </div>
+    </div>
+    <div id="vesselHarvestModal">
+      <div id="vesselHarvestModalContent">
+        <h2>Select Biomass to Harvest</h2>
+        <div>Max: <span id="vesselHarvestMax">0</span> kg</div>
+        <input type="number" id="vesselHarvestAmount" min="0" step="0.01">
+        <button onclick="confirmVesselHarvest()">Harvest</button>
+        <button onclick="closeVesselHarvestModal()">Cancel</button>
       </div>
     </div>
     <div id="sellModal">
