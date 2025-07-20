@@ -460,7 +460,7 @@ function openHarvestModal(i){
   document.getElementById('harvestMax').innerText = maxHarvest.toFixed(2);
   const input = document.getElementById('harvestAmount');
   input.max = maxHarvest;
-  input.value = maxHarvest.toFixed(2);
+  input.value = maxHarvest.toFixed(3);
   document.getElementById('harvestModal').classList.add('visible');
 }
 function closeHarvestModal(){ document.getElementById('harvestModal').classList.remove('visible'); }
@@ -805,7 +805,8 @@ function harvestPen(amount=null){
   );
   if(maxHarvest <= 0) return openModal("Vessel capacity full.");
   let desired = amount === null ? maxHarvest : Math.max(0, Math.min(amount, maxHarvest));
-  let fishNum = Math.floor(desired / pen.averageWeight);
+  let fishNum = Math.floor((desired + pen.averageWeight * 0.0001) / pen.averageWeight);
+  if(fishNum === 0 && desired > 0) fishNum = 1;
   fishNum = Math.min(fishNum, pen.fishCount);
   const biomass = fishNum * pen.averageWeight;
   const performHarvest = ()=>{
