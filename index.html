@@ -6,73 +6,6 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <button id="toggleSidebar">☰</button>
-  <div id="sidebar">
-    <div id="sidebarContent">
-      <button id="toggleShop" onclick="togglePanel('shop')">&#128722;</button>
-      <button id="toggleDevMenu" onclick="togglePanel('devMenu')">🛠</button>
-      <button id="toggleMap" onclick="togglePanel('map')">🗺️</button>
-      <div id="shop" class="panel">
-        <h2>Shop</h2>
-        <div id="feedPurchaseButtons">
-          <button onclick="buyFeed(20)">+20kg Feed</button>
-          <button onclick="buyFeed(100)">+100kg Feed</button>
-          <button onclick="buyMaxFeed()">Buy Max</button>
-        </div>
-
-        <div class="shopSection" onclick="toggleSection('bargeOptions')">Barge Upgrades</div>
-        <div id="bargeOptions" class="shopSection-content">
-          <button onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
-          <button onclick="buyNewBarge()">Buy Barge</button>
-          <button onclick="upgradeBarge()">Upgrade Barge</button>
-          <button onclick="buyNewPen()">+ Pen</button>
-        </div>
-
-        <div class="shopSection" onclick="toggleSection('staffOptions')">Staff</div>
-        <div id="staffOptions" class="shopSection-content">
-          <button onclick="hireStaff()">Hire Staff ($500)</button>
-          <button onclick="fireStaff()">Fire Unassigned</button>
-          <button onclick="assignStaff('feeder')">Assign Feeder</button>
-          <button onclick="unassignStaff('feeder')">Remove Feeder</button>
-          <button onclick="assignStaff('harvester')">Assign Harvester</button>
-          <button onclick="unassignStaff('harvester')">Remove Harvester</button>
-          <button onclick="assignStaff('feedManager')">Assign Feed Manager</button>
-          <button onclick="unassignStaff('feedManager')">Remove Feed Manager</button>
-          <button onclick="upgradeStaffHousing()">Upgrade Housing</button>
-        </div>
-
-        <div class="shopSection" onclick="toggleSection('vesselOptions')">Vessels</div>
-        <div id="vesselOptions" class="shopSection-content">
-          <button onclick="renameVessel()">Rename Vessel</button>
-          <button onclick="upgradeVessel()">Upgrade Vessel</button>
-          <button onclick="buyNewVessel()">Buy Vessel</button>
-          <button onclick="openMoveVesselModal()">Move Vessel</button>
-          <button onclick="openSellModal()">Sell Cargo</button>
-        </div>
-
-        <div id="storageUpgradeInfo"></div>
-        <div id="housingUpgradeInfo"></div>
-        <div id="bargeUpgradeInfo"></div>
-        <div id="bargePurchaseInfo"></div>
-        <div id="penPurchaseInfo"></div>
-        <div id="licenseShop"></div>
-        <div id="statusMessages"></div>
-      </div>
-      <div id="devMenu" class="panel">
-        <h2>Dev</h2>
-        <button onclick="addDevCash()">+ $1M</button>
-        <button onclick="saveGame()">Save Game</button>
-        <button onclick="resetGame()">Reset Game</button>
-      </div>
-      <div id="map" class="panel">
-        <h2>Map</h2>
-        <div id="mapContainer">
-          <canvas id="mapCanvas" width="400" height="300"></canvas>
-          <div id="mapTooltip"></div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div class="container">
     <!-- Top bar: site nav on left, cash on right -->
@@ -90,18 +23,10 @@
       </div>
     </div>
 
-    <div id="tabBar" class="tabBar">
-      <button id="overviewTab" onclick="showTab('overview')" class="active">Overview</button>
-      <button id="pensTab" onclick="showTab('pens')">Pens</button>
-      <button id="bargesTab" onclick="showTab('barges')">Barges</button>
-      <button id="vesselsTab" onclick="showTab('vessels')">Vessels</button>
-      <button id="staffingTab" onclick="showTab('staffing')">Staffing</button>
-      <button id="shopTab" onclick="showTab('shop')">Shop</button>
-    </div>
-
-
-    <!-- Status cards -->
-    <div id="cardContainer" class="cardContainer">
+    <div id="mainLayout">
+      <div id="rightPanel">
+        <!-- Status cards -->
+        <div id="cardContainer" class="cardContainer">
       <div id="bargeCard" class="bargeCard">
         <h2>Barge Status</h2>
         <div>
@@ -143,8 +68,56 @@
       </div>
     </div>
 
-    <!-- Harvest info (single-pen harvest preview) -->
-    <div id="harvestInfo" class="harvestInfo"></div>
+    <div id="shop" class="shopPanel">
+      <h2>Shop</h2>
+      <div id="feedPurchaseButtons">
+        <button onclick="buyFeed(20)">+20kg Feed</button>
+        <button onclick="buyFeed(100)">+100kg Feed</button>
+        <button onclick="buyMaxFeed()">Buy Max</button>
+      </div>
+
+      <div class="shopSection" onclick="toggleSection('bargeOptions')">Barge Upgrades</div>
+      <div id="bargeOptions" class="shopSection-content">
+        <button onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
+        <button onclick="buyNewBarge()">Buy Barge</button>
+        <button onclick="upgradeBarge()">Upgrade Barge</button>
+        <button onclick="buyNewPen()">+ Pen</button>
+      </div>
+
+      <div class="shopSection" onclick="toggleSection('staffOptions')">Staff</div>
+      <div id="staffOptions" class="shopSection-content">
+        <button onclick="hireStaff()">Hire Staff ($500)</button>
+        <button onclick="fireStaff()">Fire Unassigned</button>
+        <button onclick="assignStaff('feeder')">Assign Feeder</button>
+        <button onclick="unassignStaff('feeder')">Remove Feeder</button>
+        <button onclick="assignStaff('harvester')">Assign Harvester</button>
+        <button onclick="unassignStaff('harvester')">Remove Harvester</button>
+        <button onclick="assignStaff('feedManager')">Assign Feed Manager</button>
+        <button onclick="unassignStaff('feedManager')">Remove Feed Manager</button>
+        <button onclick="upgradeStaffHousing()">Upgrade Housing</button>
+      </div>
+
+      <div class="shopSection" onclick="toggleSection('vesselOptions')">Vessels</div>
+      <div id="vesselOptions" class="shopSection-content">
+        <button onclick="renameVessel()">Rename Vessel</button>
+        <button onclick="upgradeVessel()">Upgrade Vessel</button>
+        <button onclick="buyNewVessel()">Buy Vessel</button>
+        <button onclick="openMoveVesselModal()">Move Vessel</button>
+        <button onclick="openSellModal()">Sell Cargo</button>
+      </div>
+
+      <div id="storageUpgradeInfo"></div>
+      <div id="housingUpgradeInfo"></div>
+      <div id="bargeUpgradeInfo"></div>
+      <div id="bargePurchaseInfo"></div>
+      <div id="penPurchaseInfo"></div>
+      <div id="licenseShop"></div>
+      <div id="statusMessages"></div>
+    </div>
+      </div>
+      <div id="leftPanel">
+        <!-- Harvest info (single-pen harvest preview) -->
+        <div id="harvestInfo" class="harvestInfo"></div>
 
     <!-- Pen grid -->
     <div id="penGrid">
@@ -156,6 +129,8 @@
         <span id="selectedBargeDisplay"></span>
       </div>
       <div id="penGridContainer" class="grid"></div>
+    </div>
+      </div>
     </div>
 
     <!-- Modals -->

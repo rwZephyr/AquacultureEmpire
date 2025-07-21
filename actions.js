@@ -404,32 +404,25 @@ function addDevCash() {
 
 // sidebar nav
 function togglePanel(id){
-  const sb = document.getElementById('sidebar');
-  const container = document.querySelector('.container');
-  const p  = document.getElementById(id);
-  if(!sb.classList.contains('open')) {
-    sb.classList.add('open');
-    container.classList.add('shifted');
-  } else {
-    container.classList.add('shifted');
-  }
-  document.querySelectorAll('#sidebar .panel').forEach(x=>x.classList.remove('visible'));
-  document.querySelectorAll('#sidebarContent button').forEach(x=>x.classList.remove('active'));
-  p.classList.add('visible');
-  document.getElementById('toggle'+state.capitalizeFirstLetter(id)).classList.add('active');
+  const p = document.getElementById(id);
+  if(p) p.classList.toggle('visible');
 }
-document.getElementById('toggleSidebar').addEventListener('click',()=>{
-  const sb = document.getElementById('sidebar');
-  const container = document.querySelector('.container');
-  sb.classList.toggle('open');
-  if(sb.classList.contains('open')){
-    container.classList.add('shifted');
-  } else {
-    container.classList.remove('shifted');
-    document.querySelectorAll('#sidebar .panel').forEach(x=>x.classList.remove('visible'));
-    document.querySelectorAll('#sidebarContent button').forEach(x=>x.classList.remove('active'));
-  }
-});
+const toggleSidebarBtn = document.getElementById('toggleSidebar');
+if(toggleSidebarBtn){
+  toggleSidebarBtn.addEventListener('click', () => {
+    const sb = document.getElementById('sidebar');
+    const container = document.querySelector('.container');
+    if(!sb) return;
+    sb.classList.toggle('open');
+    if(sb.classList.contains('open')){
+      container.classList.add('shifted');
+    } else {
+      container.classList.remove('shifted');
+      document.querySelectorAll('#sidebar .panel').forEach(x=>x.classList.remove('visible'));
+      document.querySelectorAll('#sidebarContent button').forEach(x=>x.classList.remove('active'));
+    }
+  });
+}
 
 function toggleSection(id){
   const el = document.getElementById(id);
@@ -439,54 +432,14 @@ function toggleSection(id){
 function closeSidebar(){
   const sb = document.getElementById('sidebar');
   const container = document.querySelector('.container');
-  sb.classList.remove('open');
-  container.classList.remove('shifted');
+  if(sb) sb.classList.remove('open');
+  if(container) container.classList.remove('shifted');
   document.querySelectorAll('#sidebar .panel').forEach(x=>x.classList.remove('visible'));
   document.querySelectorAll('#sidebarContent button').forEach(x=>x.classList.remove('active'));
 }
 
 function showTab(tab){
-  closeSidebar();
-  document.querySelectorAll('#tabBar button').forEach(b=>b.classList.remove('active'));
-  const btn = document.getElementById(tab+'Tab');
-  if(btn) btn.classList.add('active');
-  const hide = id => { const el=document.getElementById(id); if(el) el.style.display='none'; };
-  hide('cardContainer');
-  hide('penGrid');
-  hide('harvestInfo');
-  hide('bargeCard');
-  hide('vesselCard');
-  hide('staffCard');
-
-  switch(tab){
-    case 'overview':
-      document.getElementById('cardContainer').style.display='block';
-      document.getElementById('harvestInfo').style.display='block';
-      document.getElementById('bargeCard').style.display='block';
-      document.getElementById('vesselCard').style.display='block';
-      document.getElementById('staffCard').style.display='block';
-      break;
-    case 'pens':
-      document.getElementById('cardContainer').style.display='block';
-      document.getElementById('bargeCard').style.display='block';
-      document.getElementById('penGrid').style.display='block';
-      break;
-    case 'barges':
-      document.getElementById('cardContainer').style.display='block';
-      document.getElementById('bargeCard').style.display='block';
-      break;
-    case 'vessels':
-      document.getElementById('cardContainer').style.display='block';
-      document.getElementById('vesselCard').style.display='block';
-      break;
-    case 'staffing':
-      document.getElementById('cardContainer').style.display='block';
-      document.getElementById('staffCard').style.display='block';
-      break;
-    case 'shop':
-      togglePanel('shop');
-      break;
-  }
+  // Tab navigation removed in new layout
 }
 
 // pen buttons helper

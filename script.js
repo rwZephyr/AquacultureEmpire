@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
   actions.loadGame();
   ui.updateDisplay();
   ui.setupMapInteractions();
-  actions.showTab('overview');
   if(state.lastOfflineInfo){
     const days = state.lastOfflineInfo.daysPassed;
     const feed = state.lastOfflineInfo.feedUsed.toFixed(0);
