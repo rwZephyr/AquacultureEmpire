@@ -12,8 +12,7 @@ import {
   markets
 } from "./data.js";
 import { Site, Barge, Pen, Vessel } from "./models.js";
-import * as state from "./gameState.js";
-const { getTimeState } = state;
+import state, { getTimeState, addStatusMessage } from "./gameState.js";
 import {
   updateDisplay,
   openModal,
@@ -577,7 +576,7 @@ function checkFeedManagers(){
         if(qty > 0){
           state.cash -= qty * state.FEED_COST_PER_KG;
           barge.feed += qty;
-          state.addStatusMessage(`Feed Manager purchased ${qty}kg of feed for ${site.name}.`);
+          addStatusMessage(`Feed Manager purchased ${qty}kg of feed for ${site.name}.`);
         }
       }
     });
@@ -669,7 +668,7 @@ function saveGame() {
   };
   try {
     localStorage.setItem(state.SAVE_KEY, JSON.stringify(data));
-    state.addStatusMessage('Game saved!');
+    addStatusMessage('Game saved!');
   } catch (e) {
     console.error('Save failed', e);
   }
