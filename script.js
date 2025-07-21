@@ -1,4 +1,4 @@
-import * as state from './gameState.js';
+import state from './gameState.js';
 import * as ui from './ui.js';
 import * as actions from './actions.js';
 

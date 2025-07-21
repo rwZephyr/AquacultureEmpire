@@ -11,80 +11,91 @@ import {
   siteNamePrefixes,
   siteNameSuffixes,
   vesselTiers,
-  markets
+  markets,
 } from './data.js';
 import { Site, Barge, Pen, Vessel } from './models.js';
 
-// Core Game State
-let cash = 200;
-const BASE_HARVEST_CAPACITY = 50;
-const HARVESTER_RATE = 10; // kg per second per harvester
-let penPurchaseCost = 1000;
-let currentPenIndex = 0;
-let currentSiteIndex = 0;
-let currentBargeIndex = 0;
-let currentVesselIndex = 0;
+// Core Game State wrapped in a mutable object so other modules can update it
+const state = {
+  cash: 200,
+  BASE_HARVEST_CAPACITY: 50,
+  HARVESTER_RATE: 10, // kg per second per harvester
+  penPurchaseCost: 1000,
+  currentPenIndex: 0,
+  currentSiteIndex: 0,
+  currentBargeIndex: 0,
+  currentVesselIndex: 0,
 
-const FEED_COST_PER_KG = 0.25;
-const FEED_THRESHOLD_PERCENT = 0.2;
-const AUTO_SAVE_INTERVAL_MS = 30000; // 30 seconds
-const SAVE_KEY = 'aquacultureEmpireSave';
-const TRAVEL_TIME_FACTOR = 1000; // ms per distance unit
+  FEED_COST_PER_KG: 0.25,
+  FEED_THRESHOLD_PERCENT: 0.2,
+  AUTO_SAVE_INTERVAL_MS: 30000, // 30 seconds
+  SAVE_KEY: 'aquacultureEmpireSave',
+  TRAVEL_TIME_FACTOR: 1000, // ms per distance unit
 
-// --- Game Time System ---
-const SEASONS = ['Spring','Summer','Fall','Winter'];
-const DAYS_PER_SEASON = 30;
-const DAY_DURATION_MS = 10000; // 10 seconds per in-game day
-let timePaused = false;
-let totalDaysElapsed = 0;
-let dayInSeason = 1;
-let seasonIndex = 0;
-let year = 1;
+  // --- Game Time System ---
+  SEASONS: ['Spring', 'Summer', 'Fall', 'Winter'],
+  DAYS_PER_SEASON: 30,
+  DAY_DURATION_MS: 10000, // 10 seconds per in-game day
+  timePaused: false,
+  totalDaysElapsed: 0,
+  dayInSeason: 1,
+  seasonIndex: 0,
+  year: 1,
+
+  statusMessage: '',
+  lastOfflineInfo: null,
+};
 
 // Expose read-only accessors for external logic
 Object.defineProperties(window, {
-  currentDayInSeason: { get: () => dayInSeason },
-  currentSeason:      { get: () => SEASONS[seasonIndex] },
-  currentYear:        { get: () => year },
-  totalDaysElapsed:   { get: () => totalDaysElapsed }
+  currentDayInSeason: { get: () => state.dayInSeason },
+  currentSeason:      { get: () => state.SEASONS[state.seasonIndex] },
+  currentYear:        { get: () => state.year },
+  totalDaysElapsed:   { get: () => state.totalDaysElapsed },
 });
 
-function getTimeState(){
+function getTimeState() {
   return {
-    currentDayInSeason: dayInSeason,
-    currentSeason: SEASONS[seasonIndex],
-    currentYear: year,
-    totalDaysElapsed
+    currentDayInSeason: state.dayInSeason,
+    currentSeason: state.SEASONS[state.seasonIndex],
+    currentYear: state.year,
+    totalDaysElapsed: state.totalDaysElapsed,
   };
 }
 
-function getDateString(){
-  return `${SEASONS[seasonIndex]} ${dayInSeason}, Year ${year}`;
+state.getTimeState = getTimeState;
+
+function getDateString() {
+  return `${state.SEASONS[state.seasonIndex]} ${state.dayInSeason}, Year ${state.year}`;
 }
 
-function advanceDay(){
-  totalDaysElapsed++;
-  dayInSeason++;
-  if(dayInSeason > DAYS_PER_SEASON){
-    dayInSeason = 1;
-    seasonIndex++;
-    if(seasonIndex >= SEASONS.length){
-      seasonIndex = 0;
-      year++;
+state.getDateString = getDateString;
+
+function advanceDay() {
+  state.totalDaysElapsed++;
+  state.dayInSeason++;
+  if (state.dayInSeason > state.DAYS_PER_SEASON) {
+    state.dayInSeason = 1;
+    state.seasonIndex++;
+    if (state.seasonIndex >= state.SEASONS.length) {
+      state.seasonIndex = 0;
+      state.year++;
     }
   }
 }
 
-let statusMessage = '';
-let lastOfflineInfo = null;
-function addStatusMessage(msg){
-  statusMessage = msg;
+state.advanceDay = advanceDay;
+
+function addStatusMessage(msg) {
+  state.statusMessage = msg;
   const el = document.getElementById('statusMessages');
   if(el) el.innerText = msg;
 }
 
+state.addStatusMessage = addStatusMessage;
+
 // Game Data
-let sites = [
+state.sites = [
   new Site({
     name: 'Mernan Inlet',
     location: { x: 20, y: 20 },
@@ -110,7 +121,7 @@ let sites = [
   })
 ];
 
-let vessels = [
+state.vessels = [
   new Vessel({
     name: 'Hauler 1',
     maxBiomassCapacity: vesselTiers[0].maxBiomassCapacity,
@@ -130,7 +141,16 @@ function generateRandomSiteName(){
   const s = siteNameSuffixes[Math.floor(Math.random()*siteNameSuffixes.length)];
   return `${p} ${s}`;
 }
-function findSiteByName(n){ return sites.find(s=>s.name===n); }
+
+// expose utility functions on the state object for legacy callers
+state.capitalizeFirstLetter = capitalizeFirstLetter;
+state.generateRandomSiteName = generateRandomSiteName;
+state.findSiteByName = findSiteByName;
+state.findMarketByName = findMarketByName;
+state.getLocationByName = getLocationByName;
+state.estimateTravelTime = estimateTravelTime;
+state.estimateSellPrice = estimateSellPrice;
+function findSiteByName(n){ return state.sites.find(s=>s.name===n); }
 function findMarketByName(n){ return markets.find(m=>m.name===n); }
 function getLocationByName(n){
   if(!n) return null;
@@ -143,7 +163,7 @@ function getLocationByName(n){
 }
 
 function estimateTravelTime(fromName, destLoc, vessel){
-  const start = getLocationByName(fromName) || sites[currentSiteIndex].location;
+  const start = getLocationByName(fromName) || state.sites[state.currentSiteIndex].location;
   if(!start || !destLoc) return 0;
   const dx = start.x - destLoc.x;
   const dy = start.y - destLoc.y;
@@ -161,38 +181,18 @@ function estimateSellPrice(vessel, market){
   return total;
 }
 
-function getSiteHarvestCapacity(site, elapsedSeconds = 1){
-  const harvesters = site.staff.filter(s=>s.role=="harvester").length;
-  return BASE_HARVEST_CAPACITY + (HARVESTER_RATE * harvesters * elapsedSeconds);
+function getSiteHarvestCapacity(site, elapsedSeconds = 1) {
+  const harvesters = site.staff.filter((s) => s.role == 'harvester').length;
+  return (
+    state.BASE_HARVEST_CAPACITY +
+    state.HARVESTER_RATE * harvesters * elapsedSeconds
+  );
 }
 
-export {
-  cash,
-  penPurchaseCost,
+state.getSiteHarvestCapacity = getSiteHarvestCapacity;
 
-  currentPenIndex,
-  currentSiteIndex,
-  currentBargeIndex,
-  currentVesselIndex,
-  FEED_COST_PER_KG,
-  FEED_THRESHOLD_PERCENT,
-  AUTO_SAVE_INTERVAL_MS,
-  SAVE_KEY,
-  TRAVEL_TIME_FACTOR,
-  SEASONS,
-  DAYS_PER_SEASON,
-  DAY_DURATION_MS,
-  timePaused,
-  totalDaysElapsed,
-  dayInSeason,
-  seasonIndex,
-  year,
-  statusMessage,
-  lastOfflineInfo,
-  BASE_HARVEST_CAPACITY,
-  HARVESTER_RATE,
-  sites,
-  vessels,
+export default state;
+export {
   capitalizeFirstLetter,
   generateRandomSiteName,
   findSiteByName,
@@ -204,7 +204,7 @@ export {
   getDateString,
   advanceDay,
   addStatusMessage,
-  getSiteHarvestCapacity
+  getSiteHarvestCapacity,
 };
 
 

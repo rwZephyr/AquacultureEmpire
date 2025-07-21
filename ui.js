@@ -9,40 +9,32 @@ import {
   vesselTiers,
   markets
 } from "./data.js";
-import {
-  cash,
-  penPurchaseCost,
-  currentPenIndex,
-  currentSiteIndex,
-  currentBargeIndex,
-  currentVesselIndex,
-  sites,
-  vessels,
+import state, {
   capitalizeFirstLetter,
   getDateString,
   estimateSellPrice,
   estimateTravelTime,
-  getSiteHarvestCapacity
+  getSiteHarvestCapacity,
 } from "./gameState.js";
 
 // --- UPDATE UI ---
 function updateDisplay(){
-  const site = sites[currentSiteIndex];
-  const pen  = site.pens[currentPenIndex];
+  const site = state.sites[state.currentSiteIndex];
+  const pen  = site.pens[state.currentPenIndex];
 
   // top-bar
   document.getElementById('siteName').innerText = site.name;
-  document.getElementById('cashCount').innerText = cash.toFixed(2);
+  document.getElementById('cashCount').innerText = state.cash.toFixed(2);
   const dateEl = document.getElementById('dateDisplay');
   if(dateEl) dateEl.innerText = getDateString();
 
   // barge card
-  const barge = site.barges[currentBargeIndex];
+  const barge = site.barges[state.currentBargeIndex];
   const tierData = bargeTiers[barge.tier];
-  document.getElementById('bargeIndex').innerText = currentBargeIndex + 1;
+  document.getElementById('bargeIndex').innerText = state.currentBargeIndex + 1;
   document.getElementById('bargeCount').innerText = site.barges.length;
   document.getElementById('bargeTierName').innerText   = tierData.name;
-  document.getElementById('bargeFeedersUsed').innerText = site.pens.filter(p=>p.feeder && p.bargeIndex===currentBargeIndex).length;
+  document.getElementById('bargeFeedersUsed').innerText = site.pens.filter(p=>p.feeder && p.bargeIndex===state.currentBargeIndex).length;
   document.getElementById('bargeFeederLimit').innerText = tierData.feederLimit;
   document.getElementById('bargeMaxFeederTier').innerText = tierData.maxFeederTier;
   document.getElementById('bargeFeed').innerText         = barge.feed.toFixed(1);
@@ -54,10 +46,10 @@ function updateDisplay(){
   document.getElementById('bargeStaffUnassigned').innerText = site.staff.filter(s=>!s.role).length;
 
   // vessel card
-  const vessel = vessels[currentVesselIndex];
+  const vessel = state.vessels[state.currentVesselIndex];
   const vesselTier = vesselTiers[vessel.tier];
-  document.getElementById('vesselIndex').innerText = currentVesselIndex + 1;
-  document.getElementById('vesselCount').innerText = vessels.length;
+  document.getElementById('vesselIndex').innerText = state.currentVesselIndex + 1;
+  document.getElementById('vesselCount').innerText = state.vessels.length;
   document.getElementById('vesselName').innerText = vessel.name;
   document.getElementById('vesselTierName').innerText = vesselTier.name;
   document.getElementById('vesselLoad').innerText = vessel.currentBiomassLoad.toFixed(1);
@@ -101,23 +93,23 @@ function updateDisplay(){
     document.getElementById('bargeUpgradeInfo').innerText = 'Barge Fully Upgraded';
   }
   document.getElementById('bargePurchaseInfo').innerText = `New Barge Cost: $${NEW_BARGE_COST}`;
-  document.getElementById('penPurchaseInfo').innerText = `Next Pen Purchase: $${penPurchaseCost.toFixed(0)}`;
+  document.getElementById('penPurchaseInfo').innerText = `Next Pen Purchase: $${state.penPurchaseCost.toFixed(0)}`;
 
   updateHarvestInfo();
   updateLicenseShop();
   renderPenGrid(site);
   renderMap();
   const statusEl = document.getElementById('statusMessages');
-  if(statusEl) statusEl.innerText = statusMessage;
+  if(statusEl) statusEl.innerText = state.statusMessage;
 }
 
 // harvest preview
 function updateHarvestInfo(){
-  const site = sites[currentSiteIndex];
-  const pen  = site.pens[currentPenIndex];
+  const site = state.sites[state.currentSiteIndex];
+  const pen  = site.pens[state.currentPenIndex];
   const infoDiv = document.getElementById('harvestInfo');
   if(pen.fishCount>0){
-    const vessel = vessels[currentVesselIndex];
+    const vessel = state.vessels[state.currentVesselIndex];
     if(vessel.currentBiomassLoad>0 && !vessel.cargo[pen.species]){
       infoDiv.innerText = 'Vessel carrying other species.';
       return;
@@ -134,7 +126,7 @@ function updateHarvestInfo(){
 // license shop
 function updateLicenseShop(){
   const licenseDiv = document.getElementById('licenseShop');
-  const site = sites[currentSiteIndex];
+  const site = state.sites[state.currentSiteIndex];
   licenseDiv.innerHTML = '<h3>Licenses</h3>';
   for(let sp in speciesData){
     if(!site.licenses.includes(sp) && speciesData[sp].licenseCost>0){
@@ -151,7 +143,7 @@ function renderPenGrid(site){
   const select = document.getElementById('newPenBargeSelect');
   if(select){
     select.innerHTML = site.barges.map((b,i)=>`<option value="${i}">${i+1}</option>`).join('');
-    select.value = currentBargeIndex;
+    select.value = state.currentBargeIndex;
     const disp = document.getElementById('selectedBargeDisplay');
     if(disp) disp.innerText = `Selected: ${Number(select.value)+1}`;
   }
@@ -233,16 +225,16 @@ function renderMap(){
     mapMarkers.push({x:pos.x, y:pos.y, name:m.name});
   });
   // draw sites
-  sites.forEach(s=>{
+  state.sites.forEach(s=>{
     const pos = toPixel(s.location);
     ctx.fillText('🐟', pos.x, pos.y);
     mapMarkers.push({x:pos.x, y:pos.y, name:s.name});
   });
   // draw vessels
-  vessels.forEach(v=>{
+  state.vessels.forEach(v=>{
     let locName=v.location;
     if(locName.startsWith('Traveling to ')) locName=locName.replace('Traveling to ','');
-    const site = sites.find(s=>s.name===locName);
+    const site = state.sites.find(s=>s.name===locName);
     const market = markets.find(m=>m.name===locName);
     const loc = site?site.location:market?market.location:null;
     if(loc){
@@ -292,8 +284,8 @@ function setupMapInteractions(){
 function openModal(msg){ document.getElementById('modalText').innerText=msg; document.getElementById('modal').classList.add('visible'); }
 function closeModal(){ document.getElementById('modal').classList.remove('visible'); }
 function openRestockModal(){
-  const site = sites[currentSiteIndex];
-  const pen  = site.pens[currentPenIndex];
+  const site = state.sites[state.currentSiteIndex];
+  const pen  = site.pens[state.currentPenIndex];
   if(pen.fishCount>0){ return openModal("You must harvest the pen before restocking!"); }
   const optionsDiv = document.getElementById('restockOptions');
   optionsDiv.innerHTML = '';
@@ -308,10 +300,10 @@ function openRestockModal(){
 function closeRestockModal(){ document.getElementById('restockModal').classList.remove('visible'); }
 
 function openHarvestModal(i){
-  currentPenIndex = i;
-  const site = sites[currentSiteIndex];
-  const pen  = site.pens[currentPenIndex];
-  const vessel = vessels[currentVesselIndex];
+  state.currentPenIndex = i;
+  const site = state.sites[state.currentSiteIndex];
+  const pen  = site.pens[state.currentPenIndex];
+  const vessel = state.vessels[state.currentVesselIndex];
   if(vessel.currentBiomassLoad>0 && !vessel.cargo[pen.species]){
     return openModal('Vessel already contains a different species.');
   }
@@ -336,8 +328,8 @@ function confirmHarvest(){
 }
 
 function openVesselHarvestModal(){
-  const site = sites[currentSiteIndex];
-  const vessel = vessels[currentVesselIndex];
+  const site = state.sites[state.currentSiteIndex];
+  const vessel = state.vessels[state.currentVesselIndex];
   let species = vessel.currentBiomassLoad>0 ? Object.keys(vessel.cargo)[0] : null;
   let available = 0;
   site.pens.forEach(pen=>{
@@ -360,7 +352,7 @@ function closeVesselHarvestModal(){
 }
 function confirmVesselHarvest(){
   const amount = parseFloat(document.getElementById('vesselHarvestAmount').value);
-  harvestWithVessel(currentVesselIndex, amount);
+  harvestWithVessel(state.currentVesselIndex, amount);
   closeVesselHarvestModal();
   updateDisplay();
 }
@@ -368,7 +360,7 @@ function confirmVesselHarvest(){
 function openSellModal(){
   const optionsDiv = document.getElementById('sellOptions');
   optionsDiv.innerHTML = '';
-  const vessel = vessels[currentVesselIndex];
+  const vessel = state.vessels[state.currentVesselIndex];
   markets.forEach((m,idx)=>{
     const btn = document.createElement('button');
     const price = estimateSellPrice(vessel, m);
@@ -384,7 +376,7 @@ function closeSellModal(){
 }
 
 function sellCargo(idx){
-  const vessel = vessels[currentVesselIndex];
+  const vessel = state.vessels[state.currentVesselIndex];
   if(vessel.currentBiomassLoad<=0) return openModal('No biomass to sell.');
   const market = markets[idx];
   if(vessel.location === `Traveling to ${market.name}`){
@@ -398,7 +390,7 @@ function sellCargo(idx){
       const price = speciesData[sp].marketPrice * (market.modifiers[sp]||1);
       total += weight * price;
     }
-    cash += total;
+    state.cash += total;
     vessel.currentBiomassLoad = 0;
     vessel.cargo = {};
     vessel.location = market.name;
