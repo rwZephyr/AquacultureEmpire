@@ -86,6 +86,20 @@ function advanceDay() {
 
 state.advanceDay = advanceDay;
 
+function advanceDays(n){
+  if(!n || n <= 0) return;
+  const daysPerYear = state.DAYS_PER_SEASON * state.SEASONS.length;
+  // total days counted from game start
+  let total = state.totalDaysElapsed + n;
+  state.totalDaysElapsed = total;
+  const dayOfYear = total % daysPerYear;
+  state.year = Math.floor(total / daysPerYear) + 1;
+  state.seasonIndex = Math.floor(dayOfYear / state.DAYS_PER_SEASON);
+  state.dayInSeason = (dayOfYear % state.DAYS_PER_SEASON) + 1;
+}
+
+state.advanceDays = advanceDays;
+
 function addStatusMessage(msg) {
   state.statusMessage = msg;
   const el = document.getElementById('statusMessages');
@@ -203,6 +217,7 @@ export {
   getTimeState,
   getDateString,
   advanceDay,
+  advanceDays,
   addStatusMessage,
   getSiteHarvestCapacity,
 };

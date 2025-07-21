@@ -12,7 +12,9 @@ import {
   markets
 } from "./data.js";
 import { Site, Barge, Pen, Vessel } from "./models.js";
-import state, { getTimeState, addStatusMessage } from "./gameState.js";
+import state, { getTimeState, addStatusMessage, advanceDays } from "./gameState.js";
+
+const OFFLINE_STEP_SECONDS = 60; // simulation granularity for offline progress
 import {
   updateDisplay,
   openModal,
@@ -558,43 +560,54 @@ function simulateFeedManagers(){
 
 // Run simplified game ticks to account for offline progress
 function simulateOfflineProgress(ms){
-  const seconds = Math.floor(ms/1000);
+  const totalSeconds = Math.floor(ms / 1000);
+  const daySeconds = state.DAY_DURATION_MS / 1000;
   let feedUsed = 0;
-  let daysPassed = 0;
-  for(let i=0;i<seconds;i++){
-    // auto feed logic
-    state.sites.forEach(site=>{
+
+  for(let elapsed = 0; elapsed < totalSeconds; elapsed += OFFLINE_STEP_SECONDS){
+    const dt = Math.min(OFFLINE_STEP_SECONDS, totalSeconds - elapsed);
+
+    state.sites.forEach(site => {
       const staffRate = getStaffFeedRate(site);
-      site.barges.forEach((barge,bIdx)=>{
+      site.barges.forEach((barge, bIdx) => {
         let activeFeeders = 0;
-        site.pens.forEach(pen=>{
-          if(pen.bargeIndex!==bIdx) return;
+        site.pens.forEach(pen => {
+          if(pen.bargeIndex !== bIdx) return;
           let rate = staffRate;
           const fr = getFeederRate(pen.feeder);
-          if(fr>0 && activeFeeders < barge.feederLimit){
+          if(fr > 0 && activeFeeders < barge.feederLimit){
             rate += fr;
             activeFeeders++;
           }
-          for(let j=0;j<rate;j++){
-            if(barge.feed>=1 && pen.fishCount>0){
-              barge.feed--;
-              feedUsed++;
-              const gain = 1 / speciesData[pen.species].fcr;
-              pen.averageWeight += gain/pen.fishCount;
-            }
+          const need = rate * dt;
+          const used = Math.min(need, barge.feed);
+          barge.feed -= used;
+          feedUsed += used;
+          if(used > 0 && pen.fishCount > 0){
+            const gain = used / speciesData[pen.species].fcr / pen.fishCount;
+            pen.averageWeight += gain;
           }
         });
+
+        if(site.staff.some(s => s.role === 'feedManager')){
+          if(barge.feed / barge.feedCapacity < state.FEED_THRESHOLD_PERCENT){
+            const maxAffordable = Math.floor(state.cash / state.FEED_COST_PER_KG);
+            const available = barge.feedCapacity - barge.feed;
+            const qty = Math.min(maxAffordable, available);
+            if(qty > 0){
+              state.cash -= qty * state.FEED_COST_PER_KG;
+              barge.feed += qty;
+            }
+          }
+        }
       });
     });
-
-    if((i+1)%5===0) simulateFeedManagers();
-
-    if((i+1)%(state.DAY_DURATION_MS/1000)===0){
-      state.advanceDay();
-      daysPassed++;
-    }
   }
-  return {daysPassed, feedUsed};
+
+  const daysPassed = Math.floor(totalSeconds / daySeconds);
+  advanceDays(daysPassed);
+
+  return { daysPassed, feedUsed };
 }
 
 // --- GAME TIME LOOP ---
