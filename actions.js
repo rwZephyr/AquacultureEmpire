@@ -13,6 +13,7 @@ import {
 } from "./data.js";
 import { Site, Barge, Pen, Vessel } from "./models.js";
 import * as state from "./gameState.js";
+const { getTimeState } = state;
 import {
   updateDisplay,
   openModal,
@@ -569,7 +570,7 @@ function checkFeedManagers(){
   state.sites.forEach(site=>{
     if(!site.staff.some(s=>s.role==='feedManager')) return;
     site.barges.forEach(barge=>{
-      if(barge.feed/barge.feedCapacity < FEED_THRESHOLD_PERCENT){
+      if(barge.feed/barge.feedCapacity < state.FEED_THRESHOLD_PERCENT){
         const maxAffordable = Math.floor(state.cash / state.FEED_COST_PER_KG);
         const available = barge.feedCapacity - barge.feed;
         const qty = Math.min(maxAffordable, available);
@@ -590,7 +591,7 @@ function simulateFeedManagers(){
   state.sites.forEach(site=>{
     if(!site.staff.some(s=>s.role==='feedManager')) return;
     site.barges.forEach(barge=>{
-      if(barge.feed/barge.feedCapacity < FEED_THRESHOLD_PERCENT){
+      if(barge.feed/barge.feedCapacity < state.FEED_THRESHOLD_PERCENT){
         const maxAffordable = Math.floor(state.cash / state.FEED_COST_PER_KG);
         const available = barge.feedCapacity - barge.feed;
         const qty = Math.min(maxAffordable, available);
@@ -636,7 +637,7 @@ function simulateOfflineProgress(ms){
 
     if((i+1)%5===0) simulateFeedManagers();
 
-    if((i+1)%(DAY_DURATION_MS/1000)===0){
+    if((i+1)%(state.DAY_DURATION_MS/1000)===0){
       state.advanceDay();
       daysPassed++;
     }
@@ -649,7 +650,7 @@ setInterval(()=>{
   if(!state.timePaused){
     state.advanceDay();
   }
-}, DAY_DURATION_MS);
+}, state.DAY_DURATION_MS);
 
 // --- SAVE SYSTEM ---
 function saveGame() {
@@ -721,4 +722,4 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, openHarvestModal, closeHarvestModal, confirmHarvest, openVesselHarvestModal, closeVesselHarvestModal, confirmVesselHarvest, feedFishPen, harvestPenIndex, harvestWithVessel, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, state.getTimeState  };
+export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, openHarvestModal, closeHarvestModal, confirmHarvest, openVesselHarvestModal, closeVesselHarvestModal, confirmVesselHarvest, feedFishPen, harvestPenIndex, harvestWithVessel, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, getTimeState  };
