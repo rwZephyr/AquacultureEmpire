@@ -206,6 +206,5 @@ export {
   addStatusMessage,
   getSiteHarvestCapacity
 };
-};
 
 
