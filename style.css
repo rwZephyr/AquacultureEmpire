@@ -404,3 +404,32 @@ button:active {
     transform: translateX(0);
   }
 }
+
+/* New incremental layout */
+#mainLayout {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+#leftPanel {
+  flex: 2;
+}
+
+#rightPanel {
+  flex: 1;
+  min-width: 260px;
+}
+
+#shop.shopPanel {
+  background: #1f2d35;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 16px;
+  box-shadow: 0 0 4px #0005;
+}
+
+#shop button {
+  width: 100%;
+  margin: 4px 0;
+}
