@@ -1,46 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Aquaculture Empire</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
   <div class="container">
-    <!-- Top bar: site nav on left, cash on right -->
-    <div id="topBar">
-      <div class="top-left">
-        <strong>Site:</strong>
-        <span id="siteName">-</span>
-        <button onclick="previousSite()">⟵</button>
-        <button onclick="nextSite()">⟶</button>
-        <button onclick="buyNewSite()">+ New Site</button>
-      </div>
-      <div class="top-right">
-        <div><strong>Cash:</strong> $<span id="cashCount">0</span></div>
-        <div><strong>Date:</strong> <span id="dateDisplay">Spring 1, Year 1</span></div>
-      </div>
-    </div>
-
-    <div id="mainLayout">
-      <div id="rightPanel">
-        <!-- Status cards -->
-        <div id="cardContainer" class="cardContainer">
-      <div id="bargeCard" class="bargeCard">
-        <h2>Barge Status</h2>
-        <div>
-          <button onclick="previousBarge()">⟵</button>
-          Barge <span id="bargeIndex">1</span>/<span id="bargeCount">1</span>
-          <button onclick="nextBarge()">⟶</button>
+    <header id="topHeader">
+      <div id="topBar">
+        <div class="top-left">
+          <strong>Site:</strong>
+          <span id="siteName">-</span>
+          <button onclick="previousSite()">⟵</button>
+          <button onclick="nextSite()">⟶</button>
+          <button onclick="buyNewSite()">+ New Site</button>
         </div>
-        <div>Barge Tier: <span id="bargeTierName">Small</span></div>
-        <div>Feeders: <span id="bargeFeedersUsed">0</span>/<span id="bargeFeederLimit">0</span> (Max Tier <span id="bargeMaxFeederTier">0</span>)</div>
-        <div>Feed: <span id="bargeFeed">0</span> / <span id="bargeFeedCapacity">0</span> kg</div>
-        <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
-        <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
-        <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
+        <div class="top-right">
+          <div><strong>Cash:</strong> $<span id="cashCount">0</span></div>
+          <div><strong>Date:</strong> <span id="dateDisplay">Spring 1, Year 1</span></div>
+        </div>
       </div>
+    </header>
+
+    <main id="mainSection">
+      <section id="penSection">
+        <div id="harvestInfo" class="harvestInfo"></div>
+
+        <div id="penGrid">
+          <h2>Pen Status</h2>
+          <div id="newPenControls" class="newPenControls">
+            <label for="newPenBargeSelect">Add Pen to Barge:</label>
+            <select id="newPenBargeSelect" onchange="updateSelectedBargeDisplay()"></select>
+            <button onclick="buyNewPen(document.getElementById('newPenBargeSelect').value)">+ Pen</button>
+            <span id="selectedBargeDisplay"></span>
+          </div>
+          <div id="penGridContainer" class="grid"></div>
+        </div>
+      </section>
+
+      <aside id="rightSidebar">
+        <div id="cardContainer" class="cardContainer">
+          <div id="bargeCard" class="bargeCard">
+            <h2>Barge Status</h2>
+            <div>
+              <button onclick="previousBarge()">⟵</button>
+              Barge <span id="bargeIndex">1</span>/<span id="bargeCount">1</span>
+              <button onclick="nextBarge()">⟶</button>
+            </div>
+            <div>Barge Tier: <span id="bargeTierName">Small</span></div>
+            <div>Feeders: <span id="bargeFeedersUsed">0</span>/<span id="bargeFeederLimit">0</span> (Max Tier <span id="bargeMaxFeederTier">0</span>)</div>
+            <div>Feed: <span id="bargeFeed">0</span> / <span id="bargeFeedCapacity">0</span> kg</div>
+            <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
+            <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
+            <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
+          </div>
+          <div id="staffCard" class="staffCard">
+            <h2>Staffing</h2>
+            <div>Total: <span id="staffTotal">0</span> / <span id="staffCapacity">0</span></div>
+            <div>Unassigned: <span id="staffUnassigned">0</span></div>
+            <div>Feeders: <span id="staffFeeders">0</span></div>
+            <div>Harvesters: <span id="staffHarvesters">0</span></div>
+            <div>Feed Managers: <span id="staffManagers">0</span></div>
+            <div id="staffActionPlaceholder"></div>
+          </div>
+        </div>
+
+        <div id="shop" class="shopPanel">
+          <h2>Shop</h2>
+          <div id="feedPurchaseButtons">
+            <button onclick="buyFeed(20)">+20kg Feed</button>
+            <button onclick="buyFeed(100)">+100kg Feed</button>
+            <button onclick="buyMaxFeed()">Buy Max</button>
+          </div>
+
+          <div class="shopSection" onclick="toggleSection('bargeOptions')">Barge Upgrades</div>
+          <div id="bargeOptions" class="shopSection-content">
+            <button onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
+            <button onclick="buyNewBarge()">Buy Barge</button>
+            <button onclick="upgradeBarge()">Upgrade Barge</button>
+            <button onclick="buyNewPen()">+ Pen</button>
+          </div>
+
+          <div class="shopSection" onclick="toggleSection('staffOptions')">Staff</div>
+          <div id="staffOptions" class="shopSection-content">
+            <button onclick="hireStaff()">Hire Staff ($500)</button>
+            <button onclick="fireStaff()">Fire Unassigned</button>
+            <button onclick="assignStaff('feeder')">Assign Feeder</button>
+            <button onclick="unassignStaff('feeder')">Remove Feeder</button>
+            <button onclick="assignStaff('harvester')">Assign Harvester</button>
+            <button onclick="unassignStaff('harvester')">Remove Harvester</button>
+            <button onclick="assignStaff('feedManager')">Assign Feed Manager</button>
+            <button onclick="unassignStaff('feedManager')">Remove Feed Manager</button>
+            <button onclick="upgradeStaffHousing()">Upgrade Housing</button>
+          </div>
+
+          <div class="shopSection" onclick="toggleSection('vesselOptions')">Vessels</div>
+          <div id="vesselOptions" class="shopSection-content">
+            <button onclick="renameVessel()">Rename Vessel</button>
+            <button onclick="upgradeVessel()">Upgrade Vessel</button>
+            <button onclick="buyNewVessel()">Buy Vessel</button>
+            <button onclick="openMoveVesselModal()">Move Vessel</button>
+            <button onclick="openSellModal()">Sell Cargo</button>
+          </div>
+
+          <div class="shopSection" onclick="toggleSection('devMenu')">Dev Menu</div>
+          <div id="devMenu" class="shopSection-content">
+            <button onclick="addDevCash()">Add $100k</button>
+            <button onclick="devHarvestAll()">Harvest All Pens</button>
+            <button onclick="devRestockAll()">Restock All (Free)</button>
+            <button onclick="devAddBiomass()">+10kg Biomass (Pen)</button>
+          </div>
+
+          <div id="storageUpgradeInfo"></div>
+          <div id="housingUpgradeInfo"></div>
+          <div id="bargeUpgradeInfo"></div>
+          <div id="bargePurchaseInfo"></div>
+          <div id="penPurchaseInfo"></div>
+          <div id="licenseShop"></div>
+          <div id="statusMessages"></div>
+        </div>
+      </aside>
+    </main>
+
+    <footer id="bottomSection">
       <div id="vesselCard" class="vesselCard">
         <h2>Vessel Status</h2>
         <div>
@@ -60,89 +143,7 @@
         <div id="vesselPurchaseInfo"></div>
         <div id="vesselActionPlaceholder"></div>
       </div>
-      <div id="staffCard" class="staffCard">
-        <h2>Staffing</h2>
-        <div>Total: <span id="staffTotal">0</span> / <span id="staffCapacity">0</span></div>
-        <div>Unassigned: <span id="staffUnassigned">0</span></div>
-        <div>Feeders: <span id="staffFeeders">0</span></div>
-        <div>Harvesters: <span id="staffHarvesters">0</span></div>
-        <div>Feed Managers: <span id="staffManagers">0</span></div>
-        <div id="staffActionPlaceholder"></div>
-      </div>
-    </div>
-
-    <div id="shop" class="shopPanel">
-      <h2>Shop</h2>
-      <div id="feedPurchaseButtons">
-        <button onclick="buyFeed(20)">+20kg Feed</button>
-        <button onclick="buyFeed(100)">+100kg Feed</button>
-        <button onclick="buyMaxFeed()">Buy Max</button>
-      </div>
-
-      <div class="shopSection" onclick="toggleSection('bargeOptions')">Barge Upgrades</div>
-      <div id="bargeOptions" class="shopSection-content">
-        <button onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
-        <button onclick="buyNewBarge()">Buy Barge</button>
-        <button onclick="upgradeBarge()">Upgrade Barge</button>
-        <button onclick="buyNewPen()">+ Pen</button>
-      </div>
-
-      <div class="shopSection" onclick="toggleSection('staffOptions')">Staff</div>
-      <div id="staffOptions" class="shopSection-content">
-        <button onclick="hireStaff()">Hire Staff ($500)</button>
-        <button onclick="fireStaff()">Fire Unassigned</button>
-        <button onclick="assignStaff('feeder')">Assign Feeder</button>
-        <button onclick="unassignStaff('feeder')">Remove Feeder</button>
-        <button onclick="assignStaff('harvester')">Assign Harvester</button>
-        <button onclick="unassignStaff('harvester')">Remove Harvester</button>
-        <button onclick="assignStaff('feedManager')">Assign Feed Manager</button>
-        <button onclick="unassignStaff('feedManager')">Remove Feed Manager</button>
-        <button onclick="upgradeStaffHousing()">Upgrade Housing</button>
-      </div>
-
-      <div class="shopSection" onclick="toggleSection('vesselOptions')">Vessels</div>
-      <div id="vesselOptions" class="shopSection-content">
-        <button onclick="renameVessel()">Rename Vessel</button>
-        <button onclick="upgradeVessel()">Upgrade Vessel</button>
-        <button onclick="buyNewVessel()">Buy Vessel</button>
-        <button onclick="openMoveVesselModal()">Move Vessel</button>
-        <button onclick="openSellModal()">Sell Cargo</button>
-      </div>
-
-      <div class="shopSection" onclick="toggleSection('devMenu')">Dev Menu</div>
-      <div id="devMenu" class="shopSection-content">
-        <button onclick="addDevCash()">Add $100k</button>
-        <button onclick="devHarvestAll()">Harvest All Pens</button>
-        <button onclick="devRestockAll()">Restock All (Free)</button>
-        <button onclick="devAddBiomass()">+10kg Biomass (Pen)</button>
-      </div>
-
-      <div id="storageUpgradeInfo"></div>
-      <div id="housingUpgradeInfo"></div>
-      <div id="bargeUpgradeInfo"></div>
-      <div id="bargePurchaseInfo"></div>
-      <div id="penPurchaseInfo"></div>
-      <div id="licenseShop"></div>
-      <div id="statusMessages"></div>
-    </div>
-      </div>
-      <div id="leftPanel">
-        <!-- Harvest info (single-pen harvest preview) -->
-        <div id="harvestInfo" class="harvestInfo"></div>
-
-    <!-- Pen grid -->
-    <div id="penGrid">
-      <h2>Pen Status</h2>
-      <div id="newPenControls" class="newPenControls">
-        <label for="newPenBargeSelect">Add Pen to Barge:</label>
-        <select id="newPenBargeSelect" onchange="updateSelectedBargeDisplay()"></select>
-        <button onclick="buyNewPen(document.getElementById('newPenBargeSelect').value)">+ Pen</button>
-        <span id="selectedBargeDisplay"></span>
-      </div>
-      <div id="penGridContainer" class="grid"></div>
-    </div>
-      </div>
-    </div>
+    </footer>
 
     <!-- Modals -->
     <div id="modal">
@@ -162,7 +163,7 @@
       <div id="harvestModalContent">
         <h2>Select Biomass to Harvest</h2>
         <div>Max: <span id="harvestMax">0</span> kg</div>
-        <input type="number" id="harvestAmount" min="0" step="0.01">
+        <input type="number" id="harvestAmount" min="0" step="0.01" />
         <button onclick="confirmHarvest()">Harvest</button>
         <button onclick="closeHarvestModal()">Cancel</button>
       </div>
@@ -171,7 +172,7 @@
       <div id="vesselHarvestModalContent">
         <h2>Select Biomass to Harvest</h2>
         <div>Max: <span id="vesselHarvestMax">0</span> kg</div>
-        <input type="number" id="vesselHarvestAmount" min="0" step="0.01">
+        <input type="number" id="vesselHarvestAmount" min="0" step="0.01" />
         <button onclick="confirmVesselHarvest()">Harvest</button>
         <button onclick="closeVesselHarvestModal()">Cancel</button>
       </div>
@@ -195,3 +196,4 @@
   <script type="module" src="script.js"></script>
 </body>
 </html>
+

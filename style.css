@@ -430,20 +430,24 @@ button:active {
   }
 }
 
-/* New incremental layout */
-#mainLayout {
+/* Layout for new UI skeleton */
+#mainSection {
   display: flex;
   gap: 20px;
   justify-content: space-between;
 }
 
-#leftPanel {
+#penSection {
   flex: 2;
 }
 
-#rightPanel {
+#rightSidebar {
   flex: 1;
   min-width: 260px;
+}
+
+#bottomSection {
+  margin-top: 20px;
 }
 
 #shop.shopPanel {
