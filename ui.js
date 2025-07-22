@@ -14,7 +14,7 @@ import state, {
   getDateString,
   estimateSellPrice,
   estimateTravelTime,
-  getSiteHarvestCapacity,
+  getSiteHarvestRate,
 } from "./gameState.js";
 
 // --- UPDATE UI ---
@@ -55,6 +55,8 @@ function updateDisplay(){
   document.getElementById('vesselLoad').innerText = vessel.currentBiomassLoad.toFixed(1);
   document.getElementById('vesselCapacity').innerText = vessel.maxBiomassCapacity;
   document.getElementById('vesselLocation').innerText = vessel.location;
+  const vesselHarvestBtn = document.getElementById('vesselHarvestBtn');
+  if(vesselHarvestBtn) vesselHarvestBtn.disabled = vessel.isHarvesting;
   if(vessel.tier < vesselTiers.length - 1){
     const nextVessel = vesselTiers[vessel.tier + 1];
     document.getElementById('vesselUpgradeInfo').innerText =
@@ -116,8 +118,10 @@ function updateHarvestInfo(){
     }
     const remaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
     const totalBiomass = pen.fishCount * pen.averageWeight;
-    const harvestableBiomass = Math.min(getSiteHarvestCapacity(site), totalBiomass, remaining);
-    infoDiv.innerText = `Harvest up to ${harvestableBiomass.toFixed(2)} kg (vessel capacity ${remaining.toFixed(2)} kg)`;
+    const harvestableBiomass = Math.min(totalBiomass, remaining);
+    const rate = getSiteHarvestRate(site);
+    const secs  = harvestableBiomass / rate;
+    infoDiv.innerText = `Harvest up to ${harvestableBiomass.toFixed(2)} kg (~${secs.toFixed(1)}s, vessel capacity ${remaining.toFixed(2)} kg)`;
   } else {
     infoDiv.innerText = "No fish to harvest.";
   }
@@ -166,7 +170,7 @@ function renderPenGrid(site){
       <div class="stat">Barge: <select onchange="assignBarge(${idx}, this.value)">${bargeOptions}</select></div>
       <div class="stat">${nextCostText}</div>
       <button onclick="feedFishPen(${idx})">Feed</button>
-      <button onclick="harvestPenIndex(${idx})">Harvest</button>
+      <button onclick="harvestPenIndex(${idx})" ${state.vessels[state.currentVesselIndex].isHarvesting?'disabled':''}>Harvest</button>
       <button onclick="restockPenUI(${idx})">Restock</button>
       <button onclick="upgradeFeeder(${idx})">Upgrade Feeder</button>
     `;
@@ -304,19 +308,23 @@ function openHarvestModal(i){
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
   const vessel = state.vessels[state.currentVesselIndex];
+  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
   if(vessel.currentBiomassLoad>0 && !vessel.cargo[pen.species]){
     return openModal('Vessel already contains a different species.');
   }
   const remaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
   const maxHarvest = Math.min(
-    getSiteHarvestCapacity(site),
     pen.fishCount * pen.averageWeight,
     remaining
   );
+  const rate = getSiteHarvestRate(site);
+  const secs = maxHarvest / rate;
   document.getElementById('harvestMax').innerText = maxHarvest.toFixed(2);
   const input = document.getElementById('harvestAmount');
   input.max = maxHarvest;
   input.value = maxHarvest.toFixed(3);
+  document.getElementById('harvestModalContent').querySelector('h2').innerText =
+    `Select Biomass to Harvest (~${secs.toFixed(1)}s)`;
   document.getElementById('harvestModal').classList.add('visible');
 }
 function closeHarvestModal(){ document.getElementById('harvestModal').classList.remove('visible'); }
@@ -330,6 +338,7 @@ function confirmHarvest(){
 function openVesselHarvestModal(){
   const site = state.sites[state.currentSiteIndex];
   const vessel = state.vessels[state.currentVesselIndex];
+  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
   let species = vessel.currentBiomassLoad>0 ? Object.keys(vessel.cargo)[0] : null;
   let available = 0;
   site.pens.forEach(pen=>{
@@ -339,12 +348,16 @@ function openVesselHarvestModal(){
     if(pen.species===species) available += pen.fishCount * pen.averageWeight;
   });
   const remaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
-  const maxHarvest = Math.min(getSiteHarvestCapacity(site), remaining, available);
+  const maxHarvest = Math.min(remaining, available);
+  const rate = getSiteHarvestRate(site);
+  const secs = maxHarvest / rate;
   if(maxHarvest<=0) return openModal('No biomass available.');
   document.getElementById('vesselHarvestMax').innerText = maxHarvest.toFixed(2);
   const input = document.getElementById('vesselHarvestAmount');
   input.max = maxHarvest;
   input.value = maxHarvest.toFixed(3);
+  document.getElementById('vesselHarvestModalContent').querySelector('h2').innerText =
+    `Select Biomass to Harvest (~${secs.toFixed(1)}s)`;
   document.getElementById('vesselHarvestModal').classList.add('visible');
 }
 function closeVesselHarvestModal(){

@@ -66,7 +66,8 @@ export class Vessel {
     cargo = {},
     speed = 10,
     location = '',
-    tier = 0
+    tier = 0,
+    isHarvesting = false
   } = {}) {
     this.name = name;
     this.maxBiomassCapacity = maxBiomassCapacity;
@@ -75,5 +76,6 @@ export class Vessel {
     this.speed = speed;
     this.location = location;
     this.tier = tier;
+    this.isHarvesting = isHarvesting;
   }
 }

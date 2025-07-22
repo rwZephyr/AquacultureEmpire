@@ -18,8 +18,8 @@ import { Site, Barge, Pen, Vessel } from './models.js';
 // Core Game State wrapped in a mutable object so other modules can update it
 const state = {
   cash: 200,
-  BASE_HARVEST_CAPACITY: 50,
-  HARVESTER_RATE: 10, // kg per second per harvester
+  BASE_HARVEST_RATE: 5, // kg per second
+  HARVESTER_RATE: 10, // additional kg/s per harvester
   penPurchaseCost: 1000,
   currentPenIndex: 0,
   currentSiteIndex: 0,
@@ -195,15 +195,12 @@ function estimateSellPrice(vessel, market){
   return total;
 }
 
-function getSiteHarvestCapacity(site, elapsedSeconds = 1) {
+function getSiteHarvestRate(site) {
   const harvesters = site.staff.filter((s) => s.role == 'harvester').length;
-  return (
-    state.BASE_HARVEST_CAPACITY +
-    state.HARVESTER_RATE * harvesters * elapsedSeconds
-  );
+  return state.BASE_HARVEST_RATE + state.HARVESTER_RATE * harvesters;
 }
 
-state.getSiteHarvestCapacity = getSiteHarvestCapacity;
+state.getSiteHarvestRate = getSiteHarvestRate;
 
 export default state;
 export {
@@ -219,7 +216,7 @@ export {
   advanceDay,
   advanceDays,
   addStatusMessage,
-  getSiteHarvestCapacity,
+  getSiteHarvestRate,
 };
 
 
