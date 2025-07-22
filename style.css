@@ -306,61 +306,66 @@ button:active {
 #feedPurchaseButtons button {
   display: inline-block;
 }
-#statusMessages {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #4be0ff;
-}
-.bargeCard {
-  background: #1f2d35;
-  border-radius: 10px;
-  padding: 16px;
-  margin: 16px auto 8px;
-  color: #dbe5ed;
-  box-shadow: 0 0 4px #0005;
-  max-width: 300px;
-}
-.vesselCard {
-  background: #1f2d35;
-  border-radius: 10px;
-  padding: 16px;
-  margin: 16px auto;
-  color: #dbe5ed;
-  box-shadow: 0 0 4px #0005;
-  max-width: 300px;
-}
+
+
+.infoCard,
+.bargeCard,
+.vesselCard,
 .staffCard {
   background: #1f2d35;
   border-radius: 10px;
   padding: 16px;
   margin: 16px auto;
   color: #dbe5ed;
-  box-shadow: 0 0 4px #0005;
+  box-shadow: 0 0 6px #0005;
   max-width: 300px;
 }
+
 .cardContainer {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   gap: 16px;
 }
-.bargeCard h2 {
+
+.infoCard h2,
+.bargeCard h2,
+.vesselCard h2,
+.staffCard h2 {
   font-size: 18px;
   margin-bottom: 10px;
   color: #4be0ff;
 }
-.bargeCard div {
+
+.infoCard div,
+.infoCard li,
+.bargeCard div,
+.vesselCard div,
+.staffCard div {
   font-size: 14px;
   margin: 6px 0;
 }
-.vesselCard h2 {
-  font-size: 18px;
-  margin-bottom: 10px;
+
+.progress {
+  background: #2b3b4a;
+  border-radius: 6px;
+  height: 12px;
+  width: 100%;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.progress-bar {
+  background: #4be0ff;
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s;
+}
+
+.notifications {
+  margin-top: 10px;
+  font-size: 14px;
   color: #4be0ff;
-}
-.vesselCard div {
-  font-size: 14px;
-  margin: 6px 0;
 }
 #topBar {
   display: flex;

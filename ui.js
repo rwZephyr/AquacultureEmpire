@@ -40,6 +40,12 @@ function updateDisplay(){
   document.getElementById('bargeFeed').innerText         = barge.feed.toFixed(1);
   document.getElementById('bargeFeedCapacity').innerText = barge.feedCapacity;
   document.getElementById('bargeSiloCapacity').innerText = barge.siloCapacity;
+  const feedPct = Math.min(1, barge.feed / barge.feedCapacity) * 100;
+  const feedBar = document.getElementById('feedProgress');
+  if(feedBar) feedBar.style.width = feedPct + '%';
+  const siloPct = Math.min(1, barge.feed / barge.siloCapacity) * 100;
+  const siloBar = document.getElementById('siloProgress');
+  if(siloBar) siloBar.style.width = siloPct + '%';
   document.getElementById('bargeStaffCount').innerText    = site.staff.length;
   const totalCapacity = site.barges.reduce((t,b)=>t+b.staffCapacity,0);
   document.getElementById('bargeStaffCapacity').innerText = totalCapacity;
@@ -101,7 +107,7 @@ function updateDisplay(){
   updateLicenseShop();
   renderPenGrid(site);
   renderMap();
-  const statusEl = document.getElementById('statusMessages');
+  const statusEl = document.getElementById('notifications');
   if(statusEl) statusEl.innerText = state.statusMessage;
 }
 

@@ -27,20 +27,26 @@
       <div id="rightPanel">
         <!-- Status cards -->
         <div id="cardContainer" class="cardContainer">
-      <div id="bargeCard" class="bargeCard">
-        <h2>Barge Status</h2>
-        <div>
-          <button onclick="previousBarge()">⟵</button>
-          Barge <span id="bargeIndex">1</span>/<span id="bargeCount">1</span>
-          <button onclick="nextBarge()">⟶</button>
-        </div>
-        <div>Barge Tier: <span id="bargeTierName">Small</span></div>
-        <div>Feeders: <span id="bargeFeedersUsed">0</span>/<span id="bargeFeederLimit">0</span> (Max Tier <span id="bargeMaxFeederTier">0</span>)</div>
-        <div>Feed: <span id="bargeFeed">0</span> / <span id="bargeFeedCapacity">0</span> kg</div>
-        <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
-        <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
-        <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
-      </div>
+          <div id="feedStorageCard" class="infoCard">
+            <h2>Feed Storage</h2>
+            <div class="progress-label">Feed: <span id="bargeFeed">0</span> / <span id="bargeFeedCapacity">0</span> kg</div>
+            <div class="progress"><div id="feedProgress" class="progress-bar"></div></div>
+            <div class="progress-label">Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
+            <div class="progress"><div id="siloProgress" class="progress-bar"></div></div>
+          </div>
+
+          <div id="bargeMgmtCard" class="infoCard">
+            <h2>Barge Management</h2>
+            <div>
+              <button onclick="previousBarge()">⟵</button>
+              Barge <span id="bargeIndex">1</span>/<span id="bargeCount">1</span>
+              <button onclick="nextBarge()">⟶</button>
+            </div>
+            <div>Barge Tier: <span id="bargeTierName">Small</span></div>
+            <div>Feeders: <span id="bargeFeedersUsed">0</span>/<span id="bargeFeederLimit">0</span> (Max Tier <span id="bargeMaxFeederTier">0</span>)</div>
+            <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
+            <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
+          </div>
       <div id="vesselCard" class="vesselCard">
         <h2>Vessel Status</h2>
         <div>
@@ -69,6 +75,17 @@
         <div>Feed Managers: <span id="staffManagers">0</span></div>
         <div id="staffActionPlaceholder"></div>
       </div>
+
+      <div id="tipsCard" class="infoCard">
+        <h2>Operational Tips</h2>
+        <ul id="tipsList">
+          <li>Keep feed above 20% capacity.</li>
+          <li>Upgrade storage to expand operations.</li>
+          <li>Hire managers for automation.</li>
+        </ul>
+      </div>
+
+      <div id="notifications" class="notifications"></div>
     </div>
 
     <div id="shop" class="shopPanel">
@@ -123,7 +140,6 @@
       <div id="bargePurchaseInfo"></div>
       <div id="penPurchaseInfo"></div>
       <div id="licenseShop"></div>
-      <div id="statusMessages"></div>
     </div>
       </div>
       <div id="leftPanel">
