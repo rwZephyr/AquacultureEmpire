@@ -426,6 +426,14 @@ function devRestockAll(){
   updateDisplay();
 }
 
+function devAddBiomass(amount = 10){
+  const site = state.sites[state.currentSiteIndex];
+  const pen = site.pens[state.currentPenIndex];
+  if(pen.fishCount <= 0) return;
+  pen.averageWeight += amount / pen.fishCount;
+  updateDisplay();
+}
+
 // sidebar nav
 function togglePanel(id){
   const p = document.getElementById(id);
@@ -709,4 +717,4 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, openHarvestModal, closeHarvestModal, confirmHarvest, openVesselHarvestModal, closeVesselHarvestModal, confirmVesselHarvest, feedFishPen, harvestPenIndex, harvestWithVessel, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, getTimeState  };
+export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, openHarvestModal, closeHarvestModal, confirmHarvest, openVesselHarvestModal, closeVesselHarvestModal, confirmVesselHarvest, feedFishPen, harvestPenIndex, harvestWithVessel, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, getTimeState  };
