@@ -213,7 +213,8 @@ function buyNewVessel(){
     speed: vesselTiers[0].speed,
     location: 'Dock',
     tier: 0,
-    cargo: {}
+    cargo: {},
+    isHarvesting: false
   }));
   state.currentVesselIndex = state.vessels.length - 1;
   updateDisplay();
@@ -300,13 +301,13 @@ function harvestPen(amount=null){
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
   const vessel = state.vessels[state.currentVesselIndex];
+  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
   if(pen.fishCount===0) return;
   if(vessel.currentBiomassLoad>0 && !vessel.cargo[pen.species]){
     return openModal('Vessel already contains a different species.');
   }
   const totalBiomass = pen.fishCount * pen.averageWeight;
   const maxHarvest = Math.min(
-    state.getSiteHarvestCapacity(site),
     totalBiomass,
     vessel.maxBiomassCapacity - vessel.currentBiomassLoad
   );
@@ -317,14 +318,18 @@ function harvestPen(amount=null){
   fishNum = Math.min(fishNum, pen.fishCount);
   const biomass = fishNum * pen.averageWeight;
   const performHarvest = ()=>{
-    vessel.currentBiomassLoad += biomass;
-    if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
-    vessel.cargo[pen.species] += biomass;
-    vessel.location = site.name;
-    pen.fishCount -= fishNum;
-    if(pen.fishCount===0) pen.averageWeight = 0;
-    openModal(`Harvested ${biomass.toFixed(2)} kg loaded onto ${vessel.name}.`);
-    updateDisplay();
+    const harvestTime = biomass / state.getSiteHarvestRate(site) * 1000;
+    setTimeout(()=>{
+      vessel.currentBiomassLoad += biomass;
+      if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
+      vessel.cargo[pen.species] += biomass;
+      vessel.location = site.name;
+      pen.fishCount -= fishNum;
+      if(pen.fishCount===0) pen.averageWeight = 0;
+      vessel.isHarvesting = false;
+      openModal(`Harvested ${biomass.toFixed(2)} kg loaded onto ${vessel.name}.`);
+      updateDisplay();
+    }, harvestTime);
   };
   if(vessel.location !== site.name){
     const startLoc = state.getLocationByName(vessel.location) || site.location;
@@ -332,11 +337,15 @@ function harvestPen(amount=null){
     const dy = startLoc.y - site.location.y;
     const distance = Math.hypot(dx, dy);
     vessel.location = `Traveling to ${site.name}`;
+    vessel.isHarvesting = true;
+    updateDisplay();
     setTimeout(()=>{
       vessel.location = site.name;
       performHarvest();
     }, distance / vessel.speed * state.TRAVEL_TIME_FACTOR);
   } else {
+    vessel.isHarvesting = true;
+    updateDisplay();
     performHarvest();
   }
 }
@@ -344,15 +353,16 @@ function harvestPen(amount=null){
 function harvestWithVessel(vIndex, amount){
   const vessel = state.vessels[vIndex];
   const site = state.sites[state.currentSiteIndex];
+  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
   let remaining = Math.min(
     amount,
-    vessel.maxBiomassCapacity - vessel.currentBiomassLoad,
-    state.getSiteHarvestCapacity(site)
+    vessel.maxBiomassCapacity - vessel.currentBiomassLoad
   );
   if(remaining<=0) return openModal('Vessel capacity full.');
   let species = vessel.currentBiomassLoad>0 ? Object.keys(vessel.cargo)[0] : null;
   const perform = ()=>{
     let harvested = 0;
+    const plans = [];
     for(const pen of site.pens){
       if(remaining<=0) break;
       if(pen.fishCount===0) continue;
@@ -364,17 +374,25 @@ function harvestWithVessel(vIndex, amount){
       if(fishNum===0 && take>0) fishNum = 1;
       fishNum = Math.min(fishNum, pen.fishCount);
       const biomass = fishNum * pen.averageWeight;
-      pen.fishCount -= fishNum;
-      if(pen.fishCount===0) pen.averageWeight = 0;
-      vessel.currentBiomassLoad += biomass;
-      if(!vessel.cargo[species]) vessel.cargo[species]=0;
-      vessel.cargo[species]+=biomass;
+      plans.push({pen, fishNum, biomass});
       harvested += biomass;
       remaining -= biomass;
     }
-    vessel.location = site.name;
-    openModal(`Harvested ${harvested.toFixed(2)} kg loaded onto ${vessel.name}.`);
-    updateDisplay();
+    if(harvested<=0) { vessel.isHarvesting=false; updateDisplay(); return; }
+    const harvestTime = harvested / state.getSiteHarvestRate(site) * 1000;
+    setTimeout(()=>{
+      plans.forEach(p=>{
+        p.pen.fishCount -= p.fishNum;
+        if(p.pen.fishCount===0) p.pen.averageWeight = 0;
+      });
+      if(!vessel.cargo[species]) vessel.cargo[species]=0;
+      vessel.cargo[species]+=harvested;
+      vessel.currentBiomassLoad += harvested;
+      vessel.location = site.name;
+      vessel.isHarvesting = false;
+      openModal(`Harvested ${harvested.toFixed(2)} kg loaded onto ${vessel.name}.`);
+      updateDisplay();
+    }, harvestTime);
   };
   if(vessel.location !== site.name){
     const startLoc = state.getLocationByName(vessel.location) || site.location;
@@ -382,8 +400,12 @@ function harvestWithVessel(vIndex, amount){
     const dy = startLoc.y - site.location.y;
     const distance = Math.hypot(dx, dy);
     vessel.location = `Traveling to ${site.name}`;
+    vessel.isHarvesting = true;
+    updateDisplay();
     setTimeout(()=>{ vessel.location = site.name; perform(); }, distance / vessel.speed * state.TRAVEL_TIME_FACTOR);
   } else {
+    vessel.isHarvesting = true;
+    updateDisplay();
     perform();
   }
 }
@@ -681,7 +703,10 @@ function loadGame() {
       state.sites = obj.sites;
       state.sites.forEach(s => { if(!s.location) s.location = { x: Math.random()*100, y: Math.random()*100 }; });
       state.vessels = obj.vessels ?? state.vessels;
-      state.vessels.forEach(v => { if(!v.cargo) v.cargo = {}; });
+      state.vessels.forEach(v => {
+        if(!v.cargo) v.cargo = {};
+        if(v.isHarvesting === undefined) v.isHarvesting = false;
+      });
       if(obj.time){
         state.totalDaysElapsed = obj.time.totalDaysElapsed ?? state.totalDaysElapsed;
         state.dayInSeason = obj.time.dayInSeason ?? state.dayInSeason;
