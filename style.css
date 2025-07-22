@@ -252,11 +252,12 @@ button:active {
   font-size: 14px;
   margin: 4px 0;
 }
-.penCard button {
+.penCard button,
+.vesselCard button {
   display: block;
   width: 100%;
   margin-top: 4px;
-  padding:4px 6px;
+  padding: 4px 6px;
   font-size: 13px;
   background-color: #2b3b4a;
   border: none;
@@ -264,7 +265,8 @@ button:active {
   border-radius: 6px;
   cursor: pointer;
 }
-.penCard button:hover {
+.penCard button:hover,
+.vesselCard button:hover {
   background-color: #4be0ff;
   color: #142027;
 }
