@@ -401,13 +401,13 @@ function sellCargo(idx){
     closeSellModal();
     completeSale();
   } else {
-    const startLoc = getLocationByName(vessel.location) || market.location;
+    const startLoc = state.getLocationByName(vessel.location) || market.location;
     const dx = startLoc.x - market.location.x;
     const dy = startLoc.y - market.location.y;
     const distance = Math.hypot(dx, dy);
     vessel.location = `Traveling to ${market.name}`;
     closeSellModal();
-    setTimeout(completeSale, distance / vessel.speed * TRAVEL_TIME_FACTOR);
+    setTimeout(completeSale, distance / vessel.speed * state.TRAVEL_TIME_FACTOR);
   }
 }
 
