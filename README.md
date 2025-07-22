@@ -10,7 +10,7 @@ Aquaculture Empire is a small browser-based aquaculture management game written 
 - Each pen has a tiered auto-feeder path from floating rafts to
   underwater systems with individual upgrade costs.
 - Expand your business by buying entirely new sites.
-- Development menu with a helper button to add cash instantly.
+- Development menu with helper buttons to add cash, harvest all pens and restock them for free.
 - Progress is automatically saved every 30 seconds.
 - Hire and assign staff as feeders, harvesters or feed managers.
 - Upgrade staff housing and barge tiers to unlock more automation.
