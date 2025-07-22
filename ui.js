@@ -45,26 +45,33 @@ function updateDisplay(){
   document.getElementById('bargeStaffCapacity').innerText = totalCapacity;
   document.getElementById('bargeStaffUnassigned').innerText = site.staff.filter(s=>!s.role).length;
 
-  // vessel card
-  const vessel = state.vessels[state.currentVesselIndex];
-  const vesselTier = vesselTiers[vessel.tier];
-  document.getElementById('vesselIndex').innerText = state.currentVesselIndex + 1;
-  document.getElementById('vesselCount').innerText = state.vessels.length;
-  document.getElementById('vesselName').innerText = vessel.name;
-  document.getElementById('vesselTierName').innerText = vesselTier.name;
-  document.getElementById('vesselLoad').innerText = vessel.currentBiomassLoad.toFixed(1);
-  document.getElementById('vesselCapacity').innerText = vessel.maxBiomassCapacity;
-  document.getElementById('vesselLocation').innerText = vessel.location;
-  const vesselHarvestBtn = document.getElementById('vesselHarvestBtn');
-  if(vesselHarvestBtn) vesselHarvestBtn.disabled = vessel.isHarvesting;
-  if(vessel.tier < vesselTiers.length - 1){
-    const nextVessel = vesselTiers[vessel.tier + 1];
-    document.getElementById('vesselUpgradeInfo').innerText =
-      `Next Vessel Upgrade (${nextVessel.name}): $${nextVessel.cost}`;
-  } else {
-    document.getElementById('vesselUpgradeInfo').innerText = 'Vessel Fully Upgraded';
+  // vessels area
+  const vesselArea = document.getElementById('vesselArea');
+  if(vesselArea){
+    vesselArea.innerHTML = '';
+    state.vessels.forEach((v, idx)=>{
+      const vt = vesselTiers[v.tier];
+      const card = document.createElement('div');
+      card.className = 'vesselCard';
+      const upgradeText = v.tier < vesselTiers.length-1
+        ? `Next Upgrade (${vesselTiers[v.tier+1].name}): $${vesselTiers[v.tier+1].cost}`
+        : 'Vessel Fully Upgraded';
+      card.innerHTML = `
+        <h2>${v.name}</h2>
+        <div>Tier: ${vt.name}</div>
+        <div>Load: ${v.currentBiomassLoad.toFixed(1)} / ${v.maxBiomassCapacity} kg</div>
+        <progress value="${v.currentBiomassLoad}" max="${v.maxBiomassCapacity}"></progress>
+        <div>Location: ${v.location}</div>
+        <button onclick="state.currentVesselIndex=${idx}; openVesselHarvestModal()" ${v.isHarvesting?'disabled':''}>Harvest</button>
+        <button onclick="state.currentVesselIndex=${idx}; renameVessel()">Rename Vessel</button>
+        <button onclick="state.currentVesselIndex=${idx}; openMoveVesselModal()">Move Vessel</button>
+        <button onclick="state.currentVesselIndex=${idx}; openSellModal()">Sell Cargo</button>
+        <div>${upgradeText}</div>
+        <div>New Vessel Cost: $${NEW_VESSEL_COST}</div>
+      `;
+      vesselArea.appendChild(card);
+    });
   }
-  document.getElementById('vesselPurchaseInfo').innerText = `New Vessel Cost: $${NEW_VESSEL_COST}`;
 
   // staff card info
   document.getElementById('staffTotal').innerText = site.staff.length;

@@ -41,25 +41,6 @@
         <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
         <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
       </div>
-      <div id="vesselCard" class="vesselCard">
-        <h2>Vessel Status</h2>
-        <div>
-          <button onclick="previousVessel()">⟵</button>
-          Vessel <span id="vesselIndex">1</span>/<span id="vesselCount">1</span>
-          <button onclick="nextVessel()">⟶</button>
-        </div>
-        <div>Name: <span id="vesselName">-</span></div>
-        <div>Tier: <span id="vesselTierName">Small</span></div>
-        <div>Load: <span id="vesselLoad">0</span> / <span id="vesselCapacity">0</span> kg</div>
-        <div>Location: <span id="vesselLocation">Dock</span></div>
-        <button id="vesselHarvestBtn" onclick="openVesselHarvestModal()">Harvest</button>
-        <button onclick="renameVessel()">Rename Vessel</button>
-        <button onclick="openMoveVesselModal()">Move Vessel</button>
-        <button onclick="openSellModal()">Sell Cargo</button>
-        <div id="vesselUpgradeInfo"></div>
-        <div id="vesselPurchaseInfo"></div>
-        <div id="vesselActionPlaceholder"></div>
-      </div>
       <div id="staffCard" class="staffCard">
         <h2>Staffing</h2>
         <div>Total: <span id="staffTotal">0</span> / <span id="staffCapacity">0</span></div>
@@ -143,6 +124,8 @@
     </div>
       </div>
     </div>
+
+    <section id="vesselArea"></section>
 
     <!-- Modals -->
     <div id="modal">
