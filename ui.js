@@ -18,9 +18,30 @@ import state, {
 } from "./gameState.js";
 
 // --- UPDATE UI ---
+function updateSiteSelect(){
+  const select = document.getElementById('siteSelect');
+  if(!select) return;
+  select.innerHTML = '';
+  state.sites.forEach((s,i)=>{
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = s.name;
+    select.appendChild(opt);
+  });
+  select.value = state.currentSiteIndex;
+  if(!select.dataset.bound){
+    select.addEventListener('change', e=>{
+      if(window.setCurrentSite) window.setCurrentSite(Number(e.target.value));
+    });
+    select.dataset.bound = 'true';
+  }
+}
+
 function updateDisplay(){
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
+
+  updateSiteSelect();
 
   // top-bar
   document.getElementById('siteName').innerText = site.name;
@@ -426,6 +447,7 @@ function sellCargo(idx){
 
 // --- PURCHASES & ACTIONS ---
 export {
+  updateSiteSelect,
   updateDisplay,
   updateHarvestInfo,
   updateLicenseShop,

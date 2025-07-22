@@ -8,20 +8,24 @@
 <body>
 
   <div class="container">
-    <!-- Top bar: site nav on left, cash on right -->
-    <div id="topBar">
+    <!-- Header with navigation and site selector -->
+    <header id="topBar">
+      <nav class="main-nav">
+        <a href="#">Dashboard</a>
+        <a href="#">Shop</a>
+        <a href="#">Reports</a>
+        <a href="#">Sites</a>
+      </nav>
       <div class="top-left">
         <strong>Site:</strong>
-        <span id="siteName">-</span>
-        <button onclick="previousSite()">⟵</button>
-        <button onclick="nextSite()">⟶</button>
+        <select id="siteSelect"></select>
         <button onclick="buyNewSite()">+ New Site</button>
       </div>
       <div class="top-right">
         <div><strong>Cash:</strong> $<span id="cashCount">0</span></div>
         <div><strong>Date:</strong> <span id="dateDisplay">Spring 1, Year 1</span></div>
       </div>
-    </div>
+    </header>
 
     <div id="mainLayout">
       <div id="rightPanel">

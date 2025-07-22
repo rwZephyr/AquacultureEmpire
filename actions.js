@@ -735,6 +735,14 @@ function resetGame() {
 function previousSite(){ if(state.currentSiteIndex>0) state.currentSiteIndex--; state.currentPenIndex=0; state.currentBargeIndex=0; updateDisplay(); }
 function nextSite(){ if(state.currentSiteIndex<state.sites.length-1) state.currentSiteIndex++; state.currentPenIndex=0; state.currentBargeIndex=0; updateDisplay(); }
 
+function setCurrentSite(idx){
+  if(idx < 0 || idx >= state.sites.length) return;
+  state.currentSiteIndex = idx;
+  state.currentPenIndex = 0;
+  state.currentBargeIndex = 0;
+  updateDisplay();
+}
+
 function previousBarge(){ if(state.currentBargeIndex>0) state.currentBargeIndex--; updateDisplay(); }
 function nextBarge(){ const site = state.sites[state.currentSiteIndex]; if(state.currentBargeIndex<site.barges.length-1) state.currentBargeIndex++; updateDisplay(); }
 function previousVessel(){ if(state.currentVesselIndex>0) state.currentVesselIndex--; updateDisplay(); }
@@ -742,4 +750,4 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, openHarvestModal, closeHarvestModal, confirmHarvest, openVesselHarvestModal, closeVesselHarvestModal, confirmVesselHarvest, feedFishPen, harvestPenIndex, harvestWithVessel, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, getTimeState  };
+export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, openHarvestModal, closeHarvestModal, confirmHarvest, openVesselHarvestModal, closeVesselHarvestModal, confirmVesselHarvest, feedFishPen, harvestPenIndex, harvestWithVessel, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, getTimeState, setCurrentSite };
