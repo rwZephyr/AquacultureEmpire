@@ -182,7 +182,7 @@ function estimateTravelTime(fromName, destLoc, vessel){
   const dx = start.x - destLoc.x;
   const dy = start.y - destLoc.y;
   const distance = Math.hypot(dx, dy);
-  return (distance / vessel.speed * TRAVEL_TIME_FACTOR) / 1000; // seconds
+  return (distance / vessel.speed * state.TRAVEL_TIME_FACTOR) / 1000; // seconds
 }
 
 function estimateSellPrice(vessel, market){
