@@ -158,6 +158,10 @@ function renderPenGrid(site){
     const feederTier = pen.feeder?.tier||0;
     const nextUpgrade = feederUpgrades[feederTier];
     const nextCostText = nextUpgrade ? `Upgrade Cost: $${nextUpgrade.cost}` : 'Feeder Maxed';
+    const harvestTarget = 1; // arbitrary harvest weight per fish
+    const biomassPercent = Math.min(1, pen.averageWeight/harvestTarget)*100;
+    const barge = site.barges[pen.bargeIndex];
+    const feederPercent = barge ? (feederTier/barge.maxFeederTier)*100 : 0;
     const card = document.createElement('div');
     card.className = 'penCard';
     card.innerHTML = `
@@ -165,14 +169,16 @@ function renderPenGrid(site){
       <div class="stat">Species: ${capitalizeFirstLetter(pen.species)}</div>
       <div class="stat">Fish: ${pen.fishCount}</div>
       <div class="stat">Avg Weight: ${pen.averageWeight.toFixed(2)} kg</div>
+      <div class="progressBar"><div class="progressFill" style="width:${biomassPercent}%"></div></div>
       <div class="stat">Biomass: ${biomass.toFixed(2)} kg</div>
       <div class="stat">Feeder: ${capitalizeFirstLetter(feederType)} (Tier ${feederTier})</div>
+      <div class="progressBar feeder"><div class="progressFill" style="width:${feederPercent}%"></div></div>
       <div class="stat">Barge: <select onchange="assignBarge(${idx}, this.value)">${bargeOptions}</select></div>
       <div class="stat">${nextCostText}</div>
-      <button onclick="feedFishPen(${idx})">Feed</button>
-      <button onclick="harvestPenIndex(${idx})" ${state.vessels[state.currentVesselIndex].isHarvesting?'disabled':''}>Harvest</button>
-      <button onclick="restockPenUI(${idx})">Restock</button>
-      <button onclick="upgradeFeeder(${idx})">Upgrade Feeder</button>
+      <button onclick="feedFishPen(${idx})">🍤 Feed</button>
+      <button onclick="harvestPenIndex(${idx})" ${state.vessels[state.currentVesselIndex].isHarvesting?'disabled':''}>🐟 Harvest</button>
+      <button onclick="restockPenUI(${idx})">🔄 Restock</button>
+      <button onclick="upgradeFeeder(${idx})">⬆️ Upgrade</button>
     `;
     grid.appendChild(card);
   });
