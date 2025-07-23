@@ -28,6 +28,7 @@
           <span id="playButton" class="time-btn" title="Resume" onclick="resumeTime()">▶️</span>
         </div>
         <button onclick="openMarketReport()">Market Report</button>
+        <button onclick="openShipyard()">Shipyard</button>
       </div>
       </div>
     </div>
@@ -240,6 +241,13 @@
         <div id="bargePurchaseInfo"></div>
         <div id="penPurchaseInfo"></div>
         <button class="staff-button" onclick="closeBargeUpgradeModal()">Close</button>
+      </div>
+    </div>
+    <div id="shipyardModal">
+      <div id="shipyardModalContent">
+        <h2>Shipyard</h2>
+        <div id="shipyardList"></div>
+        <button onclick="closeShipyard()">Close</button>
       </div>
     </div>
     <div id="marketReportPage" class="market-report-page">

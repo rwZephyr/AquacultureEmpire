@@ -9,7 +9,8 @@ import {
   speciesData,
   feederUpgrades,
   vesselTiers,
-  markets
+  markets,
+  vesselClasses
 } from "./data.js";
 import { Site, Barge, Pen, Vessel } from "./models.js";
 import state, { getTimeState, addStatusMessage, advanceDays, setupMarketData } from "./gameState.js";
@@ -27,6 +28,8 @@ import {
   openSellModal,
   closeSellModal,
   sellCargo,
+  openShipyard as openShipyardUI,
+  closeShipyard as closeShipyardUI,
   openMarketReport,
   closeMarketReport
 } from "./ui.js";
@@ -276,6 +279,36 @@ function openBargeUpgradeModal(){
 }
 function closeBargeUpgradeModal(){
   document.getElementById('bargeUpgradeModal').classList.remove('visible');
+}
+
+function openShipyard(){
+  openShipyardUI();
+}
+function closeShipyard(){
+  closeShipyardUI();
+}
+function buyShipyardVessel(idx){
+  const item = state.shipyardInventory[idx];
+  if(!item) return;
+  if(state.cash < item.cost) return openModal('Not enough cash to buy this vessel.');
+  state.cash -= item.cost;
+  const vessel = new Vessel({
+    name: item.name,
+    maxBiomassCapacity: item.cargoCapacity,
+    currentBiomassLoad: 0,
+    cargoSpecies: null,
+    speed: item.speed,
+    location: 'Dock',
+    tier: 0,
+    upgradeSlots: item.upgradeSlots,
+    upgrades: []
+  });
+  state.vessels.push(vessel);
+  state.currentVesselIndex = state.vessels.length - 1;
+  state.generateShipyardInventory();
+  closeShipyard();
+  updateDisplay();
+  openModal(`Purchased ${item.name}!`);
 }
 
 function moveVesselTo(type, idx){
@@ -748,7 +781,7 @@ function saveGame() {
 
 function loadGame() {
   const raw = localStorage.getItem(state.SAVE_KEY);
-  if (!raw) { setupMarketData(); return; }
+  if (!raw) { setupMarketData(); state.generateShipyardInventory(); return; }
   try {
     const obj = JSON.parse(raw);
     if (obj && obj.sites) {
@@ -762,6 +795,8 @@ function loadGame() {
         if(v.cargoSpecies === undefined) v.cargoSpecies = Object.keys(v.cargo)[0] || null;
         if(v.isHarvesting === undefined) v.isHarvesting = false;
         if(v.actionEndsAt === undefined) v.actionEndsAt = 0;
+        if(v.upgradeSlots === undefined) v.upgradeSlots = vesselClasses.skiff.slots;
+        if(!v.upgrades) v.upgrades = [];
         Object.defineProperty(v, 'harvestInterval', { value: null, writable: true, enumerable: false });
         Object.defineProperty(v, 'harvestTimeout', { value: null, writable: true, enumerable: false });
         Object.defineProperty(v, 'harvestProgress', { value: 0, writable: true, enumerable: false });
@@ -806,6 +841,7 @@ function loadGame() {
     console.error('Load failed', e);
   }
   setupMarketData();
+  state.generateShipyardInventory();
 }
 
 function resetGame() {
@@ -834,4 +870,4 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openMarketReport, closeMarketReport, getTimeState, pauseTime, resumeTime };
+export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openShipyard, closeShipyard, buyShipyardVessel, openMarketReport, closeMarketReport, getTimeState, pauseTime, resumeTime };

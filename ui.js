@@ -7,7 +7,8 @@ import {
   speciesData,
   feederUpgrades,
   vesselTiers,
-  markets
+  markets,
+  vesselClasses
 } from "./data.js";
 import state, {
   capitalizeFirstLetter,
@@ -513,6 +514,28 @@ function closeSellModal(){
   document.getElementById('sellModal').classList.remove('visible');
 }
 
+function openShipyard(){
+  const list = document.getElementById('shipyardList');
+  list.innerHTML = '';
+  state.shipyardInventory.forEach((v, idx)=>{
+    const row = document.createElement('div');
+    row.className = 'shipyard-row';
+    row.innerHTML = `<strong>${v.name}</strong> - ${vesselClasses[v.class].name} `+
+      `| Cap ${v.cargoCapacity}kg | Speed ${v.speed} | Slots ${v.upgradeSlots} `+
+      `| $${v.cost}`;
+    const btn = document.createElement('button');
+    btn.innerText = 'Buy';
+    btn.onclick = ()=>buyShipyardVessel(idx);
+    if(state.cash < v.cost) btn.disabled = true;
+    row.appendChild(btn);
+    list.appendChild(row);
+  });
+  document.getElementById('shipyardModal').classList.add('visible');
+}
+function closeShipyard(){
+  document.getElementById('shipyardModal').classList.remove('visible');
+}
+
 function sellCargo(idx){
   const vessel = state.vessels[state.currentVesselIndex];
   if(vessel.isHarvesting) { closeSellModal(); return openModal('Vessel currently harvesting.'); }
@@ -739,6 +762,8 @@ export {
   openSellModal,
   closeSellModal,
   sellCargo,
+  openShipyard,
+  closeShipyard,
   openMarketReport,
   closeMarketReport
 };

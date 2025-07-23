@@ -45,6 +45,50 @@ export const vesselTiers = [
   { name: 'Large',  maxBiomassCapacity: 5000, speed: 6,  cost: 30000 }
 ];
 
+export const vesselClasses = {
+  skiff: {
+    name: 'Skiff',
+    baseCapacity: 800,
+    baseSpeed: 12,
+    slots: 2,
+    cost: 5000
+  },
+  lobsterBoat: {
+    name: 'Lobster Boat',
+    baseCapacity: 2000,
+    baseSpeed: 9,
+    slots: 3,
+    cost: 15000
+  },
+  retiredTrawler: {
+    name: 'Retired Trawler',
+    baseCapacity: 4000,
+    baseSpeed: 7,
+    slots: 4,
+    cost: 30000
+  },
+  wellboat: {
+    name: 'Wellboat',
+    baseCapacity: 6000,
+    baseSpeed: 5,
+    slots: 6,
+    cost: 60000
+  }
+};
+
+export const vesselUnlockDays = {
+  lobsterBoat: 30,
+  retiredTrawler: 60,
+  wellboat: 120
+};
+
+export const vesselNamePrefixes = [
+  'Sea', 'Wave', 'Storm', 'Lucky', 'Salty', 'Swift', 'Coral', 'Northern'
+];
+export const vesselNameSuffixes = [
+  'Runner', 'Queen', 'Voyager', 'Dream', 'Star', 'Dawn', 'Breeze', 'Spirit'
+];
+
 export const NEW_VESSEL_COST = 12000;
 
 export const siteNamePrefixes = [
