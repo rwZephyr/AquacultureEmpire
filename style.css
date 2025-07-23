@@ -422,6 +422,8 @@ button:active {
   background: var(--accent);
   height: 100%;
   width: 0;
+  display: block;
+  border-radius: inherit;
   transition: width 0.3s;
 }
 .bargeCard h2 {
