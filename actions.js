@@ -12,7 +12,7 @@ import {
   markets
 } from "./data.js";
 import { Site, Barge, Pen, Vessel } from "./models.js";
-import state, { getTimeState, addStatusMessage, advanceDays } from "./gameState.js";
+import state, { getTimeState, addStatusMessage, advanceDays, setupMarketData } from "./gameState.js";
 
 const OFFLINE_STEP_SECONDS = 60; // simulation granularity for offline progress
 import {
@@ -26,7 +26,9 @@ import {
   confirmHarvest,
   openSellModal,
   closeSellModal,
-  sellCargo
+  sellCargo,
+  openMarketReport,
+  closeMarketReport
 } from "./ui.js";
 
 function buyFeed(amount=20){
@@ -704,6 +706,13 @@ function saveGame() {
     penPurchaseCost: state.penPurchaseCost,
     sites: state.sites,
     vessels: state.vessels,
+    marketStates: markets.map(m => ({
+      name: m.name,
+      prices: m.prices,
+      priceHistory: m.priceHistory,
+      daysSinceSale: m.daysSinceSale,
+      basePrices: m.basePrices
+    })),
     lastSaved: Date.now(),
     time: {
       totalDaysElapsed: state.totalDaysElapsed,
@@ -722,7 +731,7 @@ function saveGame() {
 
 function loadGame() {
   const raw = localStorage.getItem(state.SAVE_KEY);
-  if (!raw) return;
+  if (!raw) { setupMarketData(); return; }
   try {
     const obj = JSON.parse(raw);
     if (obj && obj.sites) {
@@ -760,10 +769,22 @@ function loadGame() {
           state.lastOfflineInfo.elapsedMs = diff;
         }
       }
+      if(obj.marketStates){
+        obj.marketStates.forEach(s => {
+          const m = markets.find(x=>x.name===s.name);
+          if(m){
+            m.prices = s.prices;
+            m.priceHistory = s.priceHistory;
+            m.daysSinceSale = s.daysSinceSale;
+            m.basePrices = s.basePrices;
+          }
+        });
+      }
     }
   } catch (e) {
     console.error('Load failed', e);
   }
+  setupMarketData();
 }
 
 function resetGame() {
@@ -782,4 +803,4 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, getTimeState  };
+export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openMarketReport, closeMarketReport, getTimeState  };

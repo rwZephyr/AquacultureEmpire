@@ -71,6 +71,44 @@ function getDateString() {
 
 state.getDateString = getDateString;
 
+// ---- Market Pricing ----
+function setupMarketData(){
+  markets.forEach(m => {
+    if(!m.basePrices) m.basePrices = {};
+    if(!m.prices) m.prices = {};
+    if(!m.priceHistory) m.priceHistory = {};
+    if(!m.daysSinceSale) m.daysSinceSale = {};
+    for(const sp in speciesData){
+      const base = speciesData[sp].marketPrice * (m.modifiers[sp]||1);
+      if(m.basePrices[sp] === undefined) m.basePrices[sp] = base;
+      if(m.prices[sp] === undefined) m.prices[sp] = base;
+      if(!Array.isArray(m.priceHistory[sp])) m.priceHistory[sp] = [m.prices[sp]];
+      if(m.daysSinceSale[sp] === undefined) m.daysSinceSale[sp] = 0;
+    }
+  });
+}
+
+function updateMarketPrices(){
+  markets.forEach(m => {
+    for(const sp in m.prices){
+      const base = m.basePrices[sp];
+      let price = m.prices[sp];
+      const change = (Math.random()*0.1 - 0.05); // +/-5%
+      price *= (1 + change);
+      const min = base * 0.5;
+      const max = base * 1.5;
+      price = Math.min(max, Math.max(min, price));
+      m.prices[sp] = price;
+      m.priceHistory[sp].push(price);
+      if(m.priceHistory[sp].length > 10) m.priceHistory[sp].shift();
+      m.daysSinceSale[sp]++;
+    }
+  });
+}
+
+state.setupMarketData = setupMarketData;
+state.updateMarketPrices = updateMarketPrices;
+
 function advanceDay() {
   state.totalDaysElapsed++;
   state.dayInSeason++;
@@ -82,20 +120,16 @@ function advanceDay() {
       state.year++;
     }
   }
+  updateMarketPrices();
 }
 
 state.advanceDay = advanceDay;
 
 function advanceDays(n){
   if(!n || n <= 0) return;
-  const daysPerYear = state.DAYS_PER_SEASON * state.SEASONS.length;
-  // total days counted from game start
-  let total = state.totalDaysElapsed + n;
-  state.totalDaysElapsed = total;
-  const dayOfYear = total % daysPerYear;
-  state.year = Math.floor(total / daysPerYear) + 1;
-  state.seasonIndex = Math.floor(dayOfYear / state.DAYS_PER_SEASON);
-  state.dayInSeason = (dayOfYear % state.DAYS_PER_SEASON) + 1;
+  for(let i=0;i<n;i++){
+    advanceDay();
+  }
 }
 
 state.advanceDays = advanceDays;
@@ -191,7 +225,7 @@ function estimateSellPrice(vessel, market){
   let total = 0;
   for(const sp in vessel.cargo){
     const weight = vessel.cargo[sp];
-    const price = speciesData[sp].marketPrice * (market.modifiers[sp]||1);
+    const price = market.prices?.[sp] ?? (speciesData[sp].marketPrice * (market.modifiers[sp]||1));
     total += weight * price;
   }
   return total;
@@ -215,6 +249,8 @@ export {
   estimateSellPrice,
   getTimeState,
   getDateString,
+  setupMarketData,
+  updateMarketPrices,
   advanceDay,
   advanceDays,
   addStatusMessage,

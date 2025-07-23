@@ -506,8 +506,9 @@ function sellCargo(idx){
     let total = 0;
     for(const sp in vessel.cargo){
       const weight = vessel.cargo[sp];
-      const price = speciesData[sp].marketPrice * (market.modifiers[sp]||1);
+      const price = market.prices?.[sp] ?? (speciesData[sp].marketPrice * (market.modifiers[sp]||1));
       total += weight * price;
+      if(market.daysSinceSale) market.daysSinceSale[sp] = 0;
     }
     state.cash += total;
     vessel.currentBiomassLoad = 0;
@@ -536,6 +537,31 @@ function sellCargo(idx){
   }
 }
 
+function openMarketReport(){
+  const container = document.getElementById('marketReportContent');
+  container.innerHTML = '';
+  markets.forEach(m => {
+    const div = document.createElement('div');
+    const h = document.createElement('h3');
+    h.innerText = m.name;
+    div.appendChild(h);
+    const ul = document.createElement('ul');
+    for(const sp in m.prices){
+      const li = document.createElement('li');
+      const hist = m.priceHistory[sp].map(p=>p.toFixed(2)).join(' -> ');
+      li.innerText = `${state.capitalizeFirstLetter(sp)}: $${m.prices[sp].toFixed(2)} (${hist})`;
+      ul.appendChild(li);
+    }
+    div.appendChild(ul);
+    container.appendChild(div);
+  });
+  document.getElementById('marketReportModal').classList.add('visible');
+}
+
+function closeMarketReport(){
+  document.getElementById('marketReportModal').classList.remove('visible');
+}
+
 // --- PURCHASES & ACTIONS ---
 export {
   updateDisplay,
@@ -554,5 +580,7 @@ export {
   confirmHarvest,
   openSellModal,
   closeSellModal,
-  sellCargo
+  sellCargo,
+  openMarketReport,
+  closeMarketReport
 };
