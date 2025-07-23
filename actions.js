@@ -561,13 +561,14 @@ function getStaffFeedRate(site){
 }
 
 // --- AUTO-FEED ALL SITES & PENS EVERY SECOND ---
+// Locked pens are skipped during auto-feeding
 setInterval(()=>{
   state.sites.forEach(site=>{
     const staffRate = getStaffFeedRate(site);
     site.barges.forEach((barge,bIdx)=>{
       let activeFeeders = 0;
       site.pens.forEach(pen=>{
-        if(pen.bargeIndex!==bIdx) return;
+        if(pen.locked || pen.bargeIndex!==bIdx) return;
         let rate = staffRate;
         const feederRate = getFeederRate(pen.feeder);
         if(feederRate>0 && activeFeeders < barge.feederLimit){
@@ -627,6 +628,7 @@ function simulateFeedManagers(){
 }
 
 // Run simplified game ticks to account for offline progress
+// Locked pens are ignored when calculating feed usage
 function simulateOfflineProgress(ms){
   const totalSeconds = Math.floor(ms / 1000);
   const daySeconds = state.DAY_DURATION_MS / 1000;
@@ -640,7 +642,7 @@ function simulateOfflineProgress(ms){
       site.barges.forEach((barge, bIdx) => {
         let activeFeeders = 0;
         site.pens.forEach(pen => {
-          if(pen.bargeIndex !== bIdx) return;
+          if(pen.locked || pen.bargeIndex !== bIdx) return;
           let rate = staffRate;
           const fr = getFeederRate(pen.feeder);
           if(fr > 0 && activeFeeders < barge.feederLimit){
