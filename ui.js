@@ -531,9 +531,13 @@ function openShipyard(){
     list.appendChild(row);
   });
   document.getElementById('shipyardModal').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
 }
 function closeShipyard(){
   document.getElementById('shipyardModal').classList.remove('visible');
+  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
 }
 
 function sellCargo(idx){
