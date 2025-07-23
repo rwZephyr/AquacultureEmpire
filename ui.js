@@ -77,11 +77,14 @@ function updateDisplay(){
   } else {
     document.getElementById('storageUpgradeInfo').innerText = 'Feed Storage Fully Upgraded';
   }
-  if(barge.housingUpgradeLevel < staffHousingUpgrades.length){
-    document.getElementById('housingUpgradeInfo').innerText =
-      `Next Housing Upgrade: $${staffHousingUpgrades[barge.housingUpgradeLevel].cost}`;
-  } else {
-    document.getElementById('housingUpgradeInfo').innerText = 'Housing Fully Upgraded';
+  const housingInfoEl = document.getElementById('bargeHousingInfo');
+  if(housingInfoEl){
+    if(barge.housingUpgradeLevel < staffHousingUpgrades.length){
+      housingInfoEl.innerText =
+        `Next Housing Upgrade: $${staffHousingUpgrades[barge.housingUpgradeLevel].cost}`;
+    } else {
+      housingInfoEl.innerText = 'Housing Fully Upgraded';
+    }
   }
   if(barge.tier < bargeTiers.length - 1){
     const next = bargeTiers[barge.tier + 1];

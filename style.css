@@ -458,11 +458,32 @@ button:active {
   justify-content: space-between;
   margin: 4px 0;
 }
+.role-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .staff-buttons {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
   margin: 6px 0;
+}
+.staff-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.staff-button:hover {
+  background-color: #2980b9;
+}
+.staff-button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
 }
 .vesselCard div {
   font-size: 14px;
