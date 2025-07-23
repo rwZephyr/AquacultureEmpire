@@ -17,6 +17,11 @@ import state, {
   getSiteHarvestRate,
 } from "./gameState.js";
 
+// Track counts to avoid re-rendering lists every tick
+let lastSiteIndex = -1;
+let lastPenCount = 0;
+let lastVesselCount = 0;
+
 // --- UPDATE UI ---
 function updateDisplay(){
   const site = state.sites[state.currentSiteIndex];
@@ -90,8 +95,22 @@ function updateDisplay(){
 
   updateHarvestInfo();
   updateLicenseShop();
-  renderPenGrid(site);
-  renderVesselGrid();
+
+  if(lastSiteIndex !== state.currentSiteIndex || site.pens.length !== lastPenCount){
+    renderPenGrid(site);
+    lastPenCount = site.pens.length;
+    lastSiteIndex = state.currentSiteIndex;
+  } else {
+    updatePenCards(site);
+  }
+
+  if(state.vessels.length !== lastVesselCount){
+    renderVesselGrid();
+    lastVesselCount = state.vessels.length;
+  } else {
+    updateVesselCards();
+  }
+
   renderMap();
   const statusEl = document.getElementById('statusMessages');
   if(statusEl) statusEl.innerText = state.statusMessage;
@@ -164,6 +183,23 @@ function renderPenGrid(site){
   });
 }
 
+function updatePenCards(site){
+  const grid = document.getElementById('penGridContainer');
+  if(!grid) return;
+  site.pens.forEach((pen, idx)=>{
+    const card = grid.children[idx];
+    if(!card) return;
+    card.querySelector('.pen-name').textContent = `Pen ${idx+1}`;
+    card.querySelector('.pen-species').textContent = capitalizeFirstLetter(pen.species);
+    card.querySelector('.pen-fish').textContent = pen.fishCount;
+    card.querySelector('.pen-avg').textContent = pen.averageWeight.toFixed(2);
+    card.querySelector('.pen-biomass').textContent = (pen.fishCount * pen.averageWeight).toFixed(2);
+    const feederType = pen.feeder?.type||'None';
+    const feederTier = pen.feeder?.tier||0;
+    card.querySelector('.pen-feeder').textContent = `${capitalizeFirstLetter(feederType)} (Tier ${feederTier})`;
+  });
+}
+
 function renderVesselGrid(){
   const grid = document.getElementById('vesselGridContainer');
   if(!grid) return;
@@ -191,6 +227,29 @@ function renderVesselGrid(){
     card.querySelector('.sell-btn').onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
     card.querySelector('.upgrade-btn').onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
     grid.appendChild(clone);
+  });
+}
+
+function updateVesselCards(){
+  const grid = document.getElementById('vesselGridContainer');
+  if(!grid) return;
+  state.vessels.forEach((vessel, idx)=>{
+    const card = grid.children[idx];
+    if(!card) return;
+    card.querySelector('.vessel-name').textContent = vessel.name;
+    card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;
+    card.querySelector('.vessel-location').textContent = vessel.location;
+    const statusEl = card.querySelector('.vessel-status');
+    let status = vessel.isHarvesting ? 'Harvesting' : (vessel.location.startsWith('Traveling') ? 'Traveling' : 'Idle');
+    if(vessel.actionEndsAt && vessel.actionEndsAt > Date.now()){
+      const eta = Math.max(0, (vessel.actionEndsAt - Date.now())/1000);
+      status += ` (${eta.toFixed(0)}s)`;
+    }
+    statusEl.textContent = status;
+    const loadPercent = vessel.maxBiomassCapacity ? (vessel.currentBiomassLoad / vessel.maxBiomassCapacity)*100 : 0;
+    card.querySelector('.vessel-progress').style.width = loadPercent + '%';
+    card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1);
+    card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity;
   });
 }
 
