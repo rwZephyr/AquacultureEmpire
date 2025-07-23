@@ -231,9 +231,15 @@ function renderVesselGrid(){
     const harvestBtn = card.querySelector('.harvest-btn');
     harvestBtn.onclick = ()=>{ state.currentVesselIndex = idx; openHarvestModal(idx); };
     harvestBtn.style.display = vessel.isHarvesting ? 'none' : 'block';
-    card.querySelector('.move-btn').onclick = ()=>{ state.currentVesselIndex = idx; openMoveVesselModal(); };
-    card.querySelector('.sell-btn').onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
-    card.querySelector('.upgrade-btn').onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
+    const moveBtn = card.querySelector('.move-btn');
+    moveBtn.onclick = ()=>{ state.currentVesselIndex = idx; openMoveVesselModal(); };
+    moveBtn.disabled = vessel.isHarvesting;
+    const sellBtn = card.querySelector('.sell-btn');
+    sellBtn.onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
+    sellBtn.disabled = vessel.isHarvesting;
+    const upBtn = card.querySelector('.upgrade-btn');
+    upBtn.onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
+    upBtn.disabled = vessel.isHarvesting;
     const cancelBtn = card.querySelector('.cancel-btn');
     cancelBtn.onclick = ()=>{ state.currentVesselIndex = idx; cancelVesselHarvest(idx); };
     cancelBtn.style.display = vessel.isHarvesting ? 'block' : 'none';
@@ -266,6 +272,15 @@ function updateVesselCards(){
     const harvestBtn2 = card.querySelector('.harvest-btn');
     harvestBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openHarvestModal(idx); };
     harvestBtn2.style.display = vessel.isHarvesting ? 'none' : 'block';
+    const moveBtn2 = card.querySelector('.move-btn');
+    moveBtn2.disabled = vessel.isHarvesting;
+    moveBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openMoveVesselModal(); };
+    const sellBtn2 = card.querySelector('.sell-btn');
+    sellBtn2.disabled = vessel.isHarvesting;
+    sellBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
+    const upBtn2 = card.querySelector('.upgrade-btn');
+    upBtn2.disabled = vessel.isHarvesting;
+    upBtn2.onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
     const cancelBtn = card.querySelector('.cancel-btn');
     cancelBtn.onclick = ()=>{ state.currentVesselIndex = idx; cancelVesselHarvest(idx); };
     cancelBtn.style.display = vessel.isHarvesting ? 'block' : 'none';
@@ -450,6 +465,7 @@ function openSellModal(){
   const optionsDiv = document.getElementById('sellOptions');
   optionsDiv.innerHTML = '';
   const vessel = state.vessels[state.currentVesselIndex];
+  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
   markets.forEach((m,idx)=>{
     const btn = document.createElement('button');
     const price = estimateSellPrice(vessel, m);
@@ -466,6 +482,7 @@ function closeSellModal(){
 
 function sellCargo(idx){
   const vessel = state.vessels[state.currentVesselIndex];
+  if(vessel.isHarvesting) { closeSellModal(); return openModal('Vessel currently harvesting.'); }
   if(vessel.currentBiomassLoad<=0) return openModal('No biomass to sell.');
   const market = markets[idx];
   if(vessel.location === `Traveling to ${market.name}`){
