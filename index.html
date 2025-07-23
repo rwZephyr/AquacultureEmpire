@@ -22,6 +22,7 @@
       <div class="top-right">
         <div><strong>Cash:</strong> $<span id="cashCount">0</span></div>
         <div><strong>Date:</strong> <span id="dateDisplay">Spring 1, Year 1</span></div>
+        <button onclick="openMarketReport()">Market Report</button>
       </div>
       </div>
     </div>
@@ -235,6 +236,10 @@
         <div id="penPurchaseInfo"></div>
         <button class="staff-button" onclick="closeBargeUpgradeModal()">Close</button>
       </div>
+    </div>
+    <div id="marketReportModal">
+      <div id="marketReportContent" class="market-report"></div>
+      <button onclick="closeMarketReport()">Close</button>
     </div>
   <script type="module" src="script.js"></script>
 </body>
