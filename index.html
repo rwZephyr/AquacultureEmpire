@@ -49,6 +49,8 @@
             <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
             <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
             <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
+            <div id="bargeHousingInfo"></div>
+            <button class="staff-button" onclick="upgradeStaffHousing()">Upgrade Housing</button>
             <button onclick="buyMaxFeed()">Refill Feed</button>
             <button onclick="toggleSection('bargeOptions')">Barge Upgrades</button>
           </div>
@@ -57,21 +59,32 @@
             <div>Total: <span id="staffTotal">0</span> / <span id="staffCapacity">0</span></div>
             <div>Unassigned: <span id="staffUnassigned">0</span></div>
             <div class="staff-buttons">
-              <button onclick="hireStaff()">Hire ($500)</button>
-              <button onclick="fireStaff()">Fire</button>
-              <button onclick="upgradeStaffHousing()">Upgrade Housing</button>
+              <button class="staff-button" onclick="hireStaff()">&#x2795; Hire ($500)</button>
+              <button class="staff-button" onclick="fireStaff()">&#x1f5d1; Fire</button>
             </div>
-            <div class="staff-role">Feeders: <span id="staffFeeders">0</span>
-              <span class="assign-icon" title="Assign" onclick="assignStaff('feeder')">&#x2795;</span>
-              <span class="unassign-icon" title="Remove" onclick="unassignStaff('feeder')">&#x2796;</span>
+            <div class="staff-role">
+              <span>Feeders:</span>
+              <div class="role-controls">
+                <button class="staff-button" onclick="unassignStaff('feeder')" aria-label="Remove feeder">&#x2212;</button>
+                <span id="staffFeeders">0</span>
+                <button class="staff-button" onclick="assignStaff('feeder')" aria-label="Add feeder">&#x2b;</button>
+              </div>
             </div>
-            <div class="staff-role">Harvesters: <span id="staffHarvesters">0</span>
-              <span class="assign-icon" title="Assign" onclick="assignStaff('harvester')">&#x2795;</span>
-              <span class="unassign-icon" title="Remove" onclick="unassignStaff('harvester')">&#x2796;</span>
+            <div class="staff-role">
+              <span>Harvesters:</span>
+              <div class="role-controls">
+                <button class="staff-button" onclick="unassignStaff('harvester')" aria-label="Remove harvester">&#x2212;</button>
+                <span id="staffHarvesters">0</span>
+                <button class="staff-button" onclick="assignStaff('harvester')" aria-label="Add harvester">&#x2b;</button>
+              </div>
             </div>
-            <div class="staff-role">Feed Managers: <span id="staffManagers">0</span>
-              <span class="assign-icon" title="Assign" onclick="assignStaff('feedManager')">&#x2795;</span>
-              <span class="unassign-icon" title="Remove" onclick="unassignStaff('feedManager')">&#x2796;</span>
+            <div class="staff-role">
+              <span>Feed Managers:</span>
+              <div class="role-controls">
+                <button class="staff-button" onclick="unassignStaff('feedManager')" aria-label="Remove feed manager">&#x2212;</button>
+                <span id="staffManagers">0</span>
+                <button class="staff-button" onclick="assignStaff('feedManager')" aria-label="Add feed manager">&#x2b;</button>
+              </div>
             </div>
           </div>
           <div id="tipsCard" class="tipsCard">
@@ -107,7 +120,6 @@
       </div>
 
       <div id="storageUpgradeInfo"></div>
-      <div id="housingUpgradeInfo"></div>
       <div id="bargeUpgradeInfo"></div>
       <div id="bargePurchaseInfo"></div>
       <div id="penPurchaseInfo"></div>
