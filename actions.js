@@ -29,7 +29,9 @@ import {
   closeSellModal,
   sellCargo,
   openMarketReport,
-  closeMarketReport
+  closeMarketReport,
+  openShipyard as uiOpenShipyard,
+  closeShipyard as uiCloseShipyard
 } from "./ui.js";
 
 function buyFeed(amount=20){
@@ -280,10 +282,10 @@ function closeBargeUpgradeModal(){
 }
 
 function openShipyard(){
-  ui.openShipyard();
+  uiOpenShipyard();
 }
 function closeShipyard(){
-  ui.closeShipyard();
+  uiCloseShipyard();
 }
 function buyShipyardVessel(idx){
   const item = state.shipyardInventory[idx];
