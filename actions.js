@@ -811,10 +811,12 @@ function resetGame() {
 
 function pauseTime(){
   state.pauseTime();
+  updateDisplay();
 }
 
 function resumeTime(){
   state.resumeTime();
+  updateDisplay();
 }
 
 // site/pen nav

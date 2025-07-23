@@ -21,7 +21,12 @@
       </div>
       <div class="top-right">
         <div><strong>Cash:</strong> $<span id="cashCount">0</span></div>
-        <div><strong>Date:</strong> <span id="dateDisplay">Spring 1, Year 1</span></div>
+        <div>
+          <strong>Date:</strong>
+          <span id="dateDisplay">Spring 1, Year 1</span>
+          <span id="pauseButton" class="time-btn" title="Pause" onclick="pauseTime()">⏸️</span>
+          <span id="playButton" class="time-btn" title="Resume" onclick="resumeTime()">▶️</span>
+        </div>
         <button onclick="openMarketReport()">Market Report</button>
       </div>
       </div>

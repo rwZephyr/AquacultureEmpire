@@ -34,6 +34,8 @@ Call `pauseTime()` to halt all in-game timers and `resumeTime()` to continue.
 While paused, day progression, market prices, vessel travel and other timed
 activities are completely suspended. Resuming simply continues each task from
 the moment it was paused with no time skipped.
+Small play (▶️) and pause (⏸️) icons next to the in-game date let you control
+this without using the console.
 
 ## Getting Started
 No build steps are required. Open `index.html` in any modern web browser to start the game. Everything runs locally in the browser.
