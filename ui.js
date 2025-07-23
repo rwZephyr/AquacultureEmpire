@@ -125,7 +125,7 @@ function updateHarvestInfo(){
   const infoDiv = document.getElementById('harvestInfo');
   if(pen.fishCount>0){
     const vessel = state.vessels[state.currentVesselIndex];
-    if(vessel.currentBiomassLoad>0 && !vessel.cargo[pen.species]){
+    if(vessel.currentBiomassLoad>0 && vessel.cargoSpecies && vessel.cargoSpecies !== pen.species){
       infoDiv.innerText = 'Vessel carrying other species.';
       return;
     }
@@ -223,10 +223,10 @@ function renderVesselGrid(){
     card.querySelector('.vessel-progress').style.width = loadPercent + '%';
     card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1);
     card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity;
-    card.querySelector('.harvest-btn').onclick = ()=>{ state.currentVesselIndex = idx; openVesselHarvestModal(); };
     card.querySelector('.move-btn').onclick = ()=>{ state.currentVesselIndex = idx; openMoveVesselModal(); };
     card.querySelector('.sell-btn').onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
     card.querySelector('.upgrade-btn').onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
+    card.querySelector('.cancel-btn').onclick = ()=>{ state.currentVesselIndex = idx; cancelVesselHarvest(idx); };
     grid.appendChild(clone);
   });
 }
@@ -251,6 +251,7 @@ function updateVesselCards(){
     card.querySelector('.vessel-progress').style.width = loadPercent + '%';
     card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1);
     card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity;
+    card.querySelector('.cancel-btn').onclick = ()=>{ state.currentVesselIndex = idx; cancelVesselHarvest(idx); };
   });
 }
 
@@ -385,7 +386,7 @@ function openHarvestModal(i){
   const pen  = site.pens[state.currentPenIndex];
   const vessel = state.vessels[state.currentVesselIndex];
   if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
-  if(vessel.currentBiomassLoad>0 && !vessel.cargo[pen.species]){
+  if(vessel.currentBiomassLoad>0 && vessel.cargoSpecies && vessel.cargoSpecies !== pen.species){
     return openModal('Vessel already contains a different species.');
   }
   const remaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
@@ -411,40 +412,6 @@ function confirmHarvest(){
   updateDisplay();
 }
 
-function openVesselHarvestModal(){
-  const site = state.sites[state.currentSiteIndex];
-  const vessel = state.vessels[state.currentVesselIndex];
-  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
-  let species = vessel.currentBiomassLoad>0 ? Object.keys(vessel.cargo)[0] : null;
-  let available = 0;
-  site.pens.forEach(pen=>{
-    if(pen.fishCount===0) return;
-    if(species && pen.species!==species) return;
-    if(!species) species = pen.species;
-    if(pen.species===species) available += pen.fishCount * pen.averageWeight;
-  });
-  const remaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
-  const maxHarvest = Math.min(remaining, available);
-  const rate = getSiteHarvestRate(site);
-  const secs = maxHarvest / rate;
-  if(maxHarvest<=0) return openModal('No biomass available.');
-  document.getElementById('vesselHarvestMax').innerText = maxHarvest.toFixed(2);
-  const input = document.getElementById('vesselHarvestAmount');
-  input.max = maxHarvest;
-  input.value = maxHarvest.toFixed(3);
-  document.getElementById('vesselHarvestModalContent').querySelector('h2').innerText =
-    `Select Biomass to Harvest (~${secs.toFixed(1)}s)`;
-  document.getElementById('vesselHarvestModal').classList.add('visible');
-}
-function closeVesselHarvestModal(){
-  document.getElementById('vesselHarvestModal').classList.remove('visible');
-}
-function confirmVesselHarvest(){
-  const amount = parseFloat(document.getElementById('vesselHarvestAmount').value);
-  harvestWithVessel(state.currentVesselIndex, amount);
-  closeVesselHarvestModal();
-  updateDisplay();
-}
 
 function openSellModal(){
   const optionsDiv = document.getElementById('sellOptions');
@@ -482,6 +449,7 @@ function sellCargo(idx){
     state.cash += total;
     vessel.currentBiomassLoad = 0;
     vessel.cargo = {};
+    vessel.cargoSpecies = null;
     vessel.location = market.name;
     openModal(`Sold cargo for $${total.toFixed(2)} at ${market.name}.`);
     updateDisplay();
@@ -521,9 +489,6 @@ export {
   openHarvestModal,
   closeHarvestModal,
   confirmHarvest,
-  openVesselHarvestModal,
-  closeVesselHarvestModal,
-  confirmVesselHarvest,
   openSellModal,
   closeSellModal,
   sellCargo

@@ -159,10 +159,10 @@
           <div class="stat">Status: <span class="vessel-status"></span></div>
           <div class="progressBar"><div class="progress vessel-progress"></div></div>
           <div class="stat"><span class="vessel-load"></span> / <span class="vessel-capacity"></span> kg</div>
-          <button class="harvest-btn">Harvest</button>
           <button class="move-btn">Move Vessel</button>
           <button class="sell-btn">Sell Cargo</button>
           <button class="upgrade-btn">Vessel Upgrades</button>
+          <button class="cancel-btn">Cancel</button>
         </div>
       </template>
     </div>
@@ -189,15 +189,6 @@
         <input type="number" id="harvestAmount" min="0" step="0.01">
         <button onclick="confirmHarvest()">Harvest</button>
         <button onclick="closeHarvestModal()">Cancel</button>
-      </div>
-    </div>
-    <div id="vesselHarvestModal">
-      <div id="vesselHarvestModalContent">
-        <h2>Select Biomass to Harvest</h2>
-        <div>Max: <span id="vesselHarvestMax">0</span> kg</div>
-        <input type="number" id="vesselHarvestAmount" min="0" step="0.01">
-        <button onclick="confirmVesselHarvest()">Harvest</button>
-        <button onclick="closeVesselHarvestModal()">Cancel</button>
       </div>
     </div>
     <div id="sellModal">
