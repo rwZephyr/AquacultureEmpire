@@ -208,7 +208,8 @@ function renderVesselGrid(){
   state.vessels.forEach((vessel, idx)=>{
     const clone = tmpl.content.cloneNode(true);
     const card = clone.querySelector('.vesselCard');
-    card.querySelector('.vessel-name').textContent = vessel.name;
+    card.querySelector('.vessel-name .name-text').textContent = vessel.name;
+    card.querySelector('.rename-icon').onclick = ()=>{ state.currentVesselIndex = idx; renameVessel(); };
     card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;
     card.querySelector('.vessel-location').textContent = vessel.location;
     const statusEl = card.querySelector('.vessel-status');

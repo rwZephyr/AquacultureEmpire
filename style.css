@@ -205,7 +205,8 @@ button:active {
 #harvestModal,
 #vesselHarvestModal,
 #sellModal,
-#moveModal {
+#moveModal,
+#renameModal {
   position: fixed;
   top: 0;
   left: 0;
@@ -223,7 +224,8 @@ button:active {
 #harvestModal.visible,
 #vesselHarvestModal.visible,
 #sellModal.visible,
-#moveModal.visible {
+#moveModal.visible,
+#renameModal.visible {
   display: flex;
 }
 
@@ -232,7 +234,8 @@ button:active {
 #harvestModalContent,
 #vesselHarvestModalContent,
 #sellModalContent,
-#moveModalContent {
+#moveModalContent,
+#renameModalContent {
   background: var(--modal-bg);
   color: var(--text-light);
   padding: 20px;
@@ -427,6 +430,39 @@ button:active {
   font-size: 18px;
   margin-bottom: 10px;
   color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.rename-icon {
+  cursor: pointer;
+  margin-left: 8px;
+  font-size: 16px;
+  color: var(--icon-muted);
+}
+.rename-icon:hover {
+  color: var(--accent);
+}
+.assign-icon, .unassign-icon {
+  cursor: pointer;
+  margin-left: 6px;
+  font-size: 16px;
+  color: var(--icon-muted);
+}
+.assign-icon:hover, .unassign-icon:hover {
+  color: var(--accent);
+}
+.staff-role {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4px 0;
+}
+.staff-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 6px 0;
 }
 .vesselCard div {
   font-size: 14px;

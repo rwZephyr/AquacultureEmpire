@@ -49,7 +49,6 @@
             <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
             <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
             <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
-            <button onclick="assignStaff('feeder')">Assign Staff</button>
             <button onclick="buyMaxFeed()">Refill Feed</button>
             <button onclick="toggleSection('bargeOptions')">Barge Upgrades</button>
           </div>
@@ -57,10 +56,23 @@
             <h2>Staffing</h2>
             <div>Total: <span id="staffTotal">0</span> / <span id="staffCapacity">0</span></div>
             <div>Unassigned: <span id="staffUnassigned">0</span></div>
-            <div>Feeders: <span id="staffFeeders">0</span></div>
-            <div>Harvesters: <span id="staffHarvesters">0</span></div>
-            <div>Feed Managers: <span id="staffManagers">0</span></div>
-            <div id="staffActionPlaceholder"></div>
+            <div class="staff-buttons">
+              <button onclick="hireStaff()">Hire ($500)</button>
+              <button onclick="fireStaff()">Fire</button>
+              <button onclick="upgradeStaffHousing()">Upgrade Housing</button>
+            </div>
+            <div class="staff-role">Feeders: <span id="staffFeeders">0</span>
+              <span class="assign-icon" title="Assign" onclick="assignStaff('feeder')">&#x2795;</span>
+              <span class="unassign-icon" title="Remove" onclick="unassignStaff('feeder')">&#x2796;</span>
+            </div>
+            <div class="staff-role">Harvesters: <span id="staffHarvesters">0</span>
+              <span class="assign-icon" title="Assign" onclick="assignStaff('harvester')">&#x2795;</span>
+              <span class="unassign-icon" title="Remove" onclick="unassignStaff('harvester')">&#x2796;</span>
+            </div>
+            <div class="staff-role">Feed Managers: <span id="staffManagers">0</span>
+              <span class="assign-icon" title="Assign" onclick="assignStaff('feedManager')">&#x2795;</span>
+              <span class="unassign-icon" title="Remove" onclick="unassignStaff('feedManager')">&#x2796;</span>
+            </div>
           </div>
           <div id="tipsCard" class="tipsCard">
             <h2>Operational Tips</h2>
@@ -84,27 +96,7 @@
         <button onclick="buyNewPen()">+ Pen</button>
       </div>
 
-      <div class="shopSection" onclick="toggleSection('staffOptions')">Staff</div>
-      <div id="staffOptions" class="shopSection-content">
-        <button onclick="hireStaff()">Hire Staff ($500)</button>
-        <button onclick="fireStaff()">Fire Unassigned</button>
-        <button onclick="assignStaff('feeder')">Assign Feeder</button>
-        <button onclick="unassignStaff('feeder')">Remove Feeder</button>
-        <button onclick="assignStaff('harvester')">Assign Harvester</button>
-        <button onclick="unassignStaff('harvester')">Remove Harvester</button>
-        <button onclick="assignStaff('feedManager')">Assign Feed Manager</button>
-        <button onclick="unassignStaff('feedManager')">Remove Feed Manager</button>
-        <button onclick="upgradeStaffHousing()">Upgrade Housing</button>
-      </div>
 
-      <div class="shopSection" onclick="toggleSection('vesselOptions')">Vessels</div>
-      <div id="vesselOptions" class="shopSection-content">
-        <button onclick="renameVessel()">Rename Vessel</button>
-        <button onclick="upgradeVessel()">Upgrade Vessel</button>
-        <button onclick="buyNewVessel()">Buy Vessel</button>
-        <button onclick="openMoveVesselModal()">Move Vessel</button>
-        <button onclick="openSellModal()">Sell Cargo</button>
-      </div>
 
       <div class="shopSection" onclick="toggleSection('devMenu')">Dev Menu</div>
       <div id="devMenu" class="shopSection-content">
@@ -161,7 +153,7 @@
       </div>
       <template id="vesselCardTemplate">
         <div class="vesselCard">
-          <h3 class="vessel-name"></h3>
+          <h3 class="vessel-name"><span class="name-text"></span><span class="rename-icon" title="Rename">&#9998;</span></h3>
           <div class="stat">Tier: <span class="vessel-tier"></span></div>
           <div class="stat">Location: <span class="vessel-location"></span></div>
           <div class="stat">Status: <span class="vessel-status"></span></div>
@@ -220,6 +212,14 @@
         <h2>Select Destination</h2>
         <div id="moveOptions"></div>
         <button onclick="closeMoveModal()">Cancel</button>
+      </div>
+    </div>
+    <div id="renameModal">
+      <div id="renameModalContent">
+        <h2>Rename Vessel</h2>
+        <input type="text" id="renameInput">
+        <button onclick="confirmRename()">Rename</button>
+        <button onclick="closeRenameModal()">Cancel</button>
       </div>
     </div>
   <script type="module" src="script.js"></script>
