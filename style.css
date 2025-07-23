@@ -692,6 +692,7 @@ button:active {
 /* Market report styles */
 .market-section {
   margin-bottom: 20px;
+  overflow-x: auto;
 }
 
 .market-table {
@@ -738,6 +739,28 @@ button:active {
   padding: 6px;
   border-radius: 6px;
   font-size: 12px;
+}
+
+.market-chart {
+  width: 100%;
+  height: 150px;
+  display: block;
+}
+
+.market-legend {
+  font-size: 12px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.legend-item {
+  margin-right: 8px;
+}
+.legend-color {
+  display: inline-block;
+  width: 12px;
+  height: 4px;
+  margin-right: 4px;
+  vertical-align: middle;
 }
 
 /* Responsive layout */

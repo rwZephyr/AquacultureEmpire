@@ -17,6 +17,12 @@ import state, {
   getSiteHarvestRate,
 } from "./gameState.js";
 
+const speciesColors = {
+  shrimp: '#f39c12',
+  salmon: '#e74c3c',
+  tuna: '#3498db'
+};
+
 // Track counts to avoid re-rendering lists every tick
 let lastSiteIndex = -1;
 let lastPenCount = 0;
@@ -132,6 +138,7 @@ function updateDisplay(){
   if(tipsEl) tipsEl.innerText = state.statusMessage || 'All systems nominal.';
   const tsEl = document.querySelector('#marketReportContent .market-timestamp');
   if(tsEl) tsEl.innerText = `Prices last updated: ${state.lastMarketUpdateString}`;
+  updateMarketCharts();
 }
 
 // harvest preview
@@ -636,10 +643,30 @@ function openMarketReport(){
     table.appendChild(tbody);
     section.appendChild(table);
 
-    const placeholder = document.createElement('div');
-    placeholder.classList.add('chart-placeholder');
-    placeholder.innerText = 'Graph coming soon...';
-    section.appendChild(placeholder);
+    const canvas = document.createElement('canvas');
+    canvas.classList.add('market-chart');
+    canvas.width = 300;
+    canvas.height = 150;
+    canvas.dataset.market = m.name;
+    section.appendChild(canvas);
+
+    const legend = document.createElement('div');
+    legend.classList.add('market-legend');
+    for(const sp in m.prices){
+      const item = document.createElement('span');
+      item.classList.add('legend-item');
+      const colorBox = document.createElement('span');
+      colorBox.classList.add('legend-color');
+      colorBox.style.backgroundColor = speciesColors[sp] || '#fff';
+      item.appendChild(colorBox);
+      const lbl = document.createElement('span');
+      lbl.innerText = state.capitalizeFirstLetter(sp);
+      item.appendChild(lbl);
+      legend.appendChild(item);
+    }
+    section.appendChild(legend);
+
+    renderMarketChart(m, canvas);
 
     container.appendChild(section);
   });
@@ -653,6 +680,44 @@ function closeMarketReport(){
   document.getElementById('marketReportPage').classList.remove('visible');
   document.body.style.overflow = '';
   document.documentElement.style.overflow = '';
+}
+
+function updateMarketCharts(){
+  const charts = document.querySelectorAll('.market-chart');
+  charts.forEach(c => {
+    const market = markets.find(m => m.name === c.dataset.market);
+    if(market) renderMarketChart(market, c);
+  });
+}
+
+function renderMarketChart(market, canvas){
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const width = canvas.width;
+  const height = canvas.height;
+  ctx.clearRect(0,0,width,height);
+
+  const species = Object.keys(market.prices);
+  let values = [];
+  species.forEach(sp => { values = values.concat(market.priceHistory[sp]); });
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const padding = 10;
+
+  species.forEach(sp => {
+    const hist = market.priceHistory[sp];
+    const step = (width - padding*2) / (hist.length - 1);
+    ctx.beginPath();
+    ctx.strokeStyle = speciesColors[sp] || '#fff';
+    ctx.lineWidth = 2;
+    hist.forEach((val, idx) => {
+      const x = padding + idx * step;
+      const yRange = max - min || 1;
+      const y = height - padding - ((val - min)/yRange)*(height - padding*2);
+      if(idx===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+  });
 }
 
 // --- PURCHASES & ACTIONS ---
