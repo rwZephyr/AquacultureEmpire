@@ -32,6 +32,17 @@ function updateDisplay(){
   document.getElementById('cashCount').innerText = state.cash.toFixed(2);
   const dateEl = document.getElementById('dateDisplay');
   if(dateEl) dateEl.innerText = getDateString();
+  const playBtn = document.getElementById('playButton');
+  const pauseBtn = document.getElementById('pauseButton');
+  if(playBtn && pauseBtn){
+    if(state.timePaused){
+      playBtn.style.display = 'inline';
+      pauseBtn.style.display = 'none';
+    } else {
+      playBtn.style.display = 'none';
+      pauseBtn.style.display = 'inline';
+    }
+  }
 
   // barge card & feed overview
   const barge = site.barges[state.currentBargeIndex];

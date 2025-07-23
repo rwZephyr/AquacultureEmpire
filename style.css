@@ -607,6 +607,12 @@ button:active {
   cursor: pointer;
 }
 
+.time-btn {
+  cursor: pointer;
+  margin-left: 4px;
+  font-size: 16px;
+}
+
 .top-left button:hover, .top-right button:hover {
   background-color: var(--accent);
   color: var(--bg-darker);
