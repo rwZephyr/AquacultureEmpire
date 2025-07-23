@@ -186,6 +186,7 @@ function upgradeBarge(){
 
 function upgradeVessel(){
   const vessel = state.vessels[state.currentVesselIndex];
+  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
   const currentTier = vessel.tier;
   if(currentTier >= vesselTiers.length - 1)
     return openModal("Vessel already at max tier.");
@@ -244,9 +245,10 @@ function confirmRename(){
 }
 
 function openMoveVesselModal(){
+  const vessel = state.vessels[state.currentVesselIndex];
+  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
   const optionsDiv = document.getElementById('moveOptions');
   optionsDiv.innerHTML = '';
-  const vessel = state.vessels[state.currentVesselIndex];
   state.sites.forEach((s, idx)=>{
     const btn = document.createElement('button');
     const secs = state.estimateTravelTime(vessel.location, s.location, vessel);
@@ -269,6 +271,7 @@ function closeMoveModal(){
 
 function moveVesselTo(type, idx){
   const vessel = state.vessels[state.currentVesselIndex];
+  if(vessel.isHarvesting) { closeMoveModal(); return openModal('Vessel currently harvesting.'); }
   let destName;
   let destLoc;
   if(type==='site'){

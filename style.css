@@ -310,6 +310,12 @@ button:active {
   background-color: #d45c5c;
 }
 
+.penCard button:disabled,
+.vesselCard button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
 .penCard:hover,
 .vesselCard:hover,
 .bargeCard:hover,
