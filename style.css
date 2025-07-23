@@ -414,6 +414,7 @@ button:active {
   background: var(--bg-darker);
   border-radius: 6px;
   height: 12px;
+  line-height: 0;
   margin-bottom: 6px;
   overflow: hidden;
 }
