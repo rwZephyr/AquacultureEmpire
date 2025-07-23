@@ -246,6 +246,13 @@ button:active {
   text-align: center;
   width: 300px;
 }
+
+#bargeUpgradeMessage {
+  margin-bottom: 8px;
+  color: #e74c3c;
+  font-weight: bold;
+  display: none;
+}
 #sidebarContent,
 #sidebar .panel {
   scrollbar-width: none; /* Firefox */
