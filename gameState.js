@@ -142,7 +142,8 @@ state.vessels = [
     currentBiomassLoad: 0,
     speed: vesselTiers[0].speed,
     location: 'Dock',
-    tier: 0
+    tier: 0,
+    actionEndsAt: 0
   })
 ];
 

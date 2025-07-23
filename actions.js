@@ -214,7 +214,8 @@ function buyNewVessel(){
     location: 'Dock',
     tier: 0,
     cargo: {},
-    isHarvesting: false
+    isHarvesting: false,
+    actionEndsAt: 0
   }));
   state.currentVesselIndex = state.vessels.length - 1;
   updateDisplay();
@@ -279,12 +280,15 @@ function moveVesselTo(type, idx){
   const dx = startLoc.x - destLoc.x;
   const dy = startLoc.y - destLoc.y;
   const distance = Math.hypot(dx, dy);
+  const travelTime = distance / vessel.speed * state.TRAVEL_TIME_FACTOR;
   vessel.location = `Traveling to ${destName}`;
+  vessel.actionEndsAt = Date.now() + travelTime;
   closeMoveModal();
   setTimeout(()=>{
     vessel.location = destName;
+    vessel.actionEndsAt = 0;
     updateDisplay();
-  }, distance / vessel.speed * state.TRAVEL_TIME_FACTOR);
+  }, travelTime);
 }
 
 // feed / harvest / restock
@@ -319,6 +323,7 @@ function harvestPen(amount=null){
   const biomass = fishNum * pen.averageWeight;
   const performHarvest = ()=>{
     const harvestTime = biomass / state.getSiteHarvestRate(site) * 1000;
+    vessel.actionEndsAt = Date.now() + harvestTime;
     setTimeout(()=>{
       vessel.currentBiomassLoad += biomass;
       if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
@@ -327,6 +332,7 @@ function harvestPen(amount=null){
       pen.fishCount -= fishNum;
       if(pen.fishCount===0) pen.averageWeight = 0;
       vessel.isHarvesting = false;
+      vessel.actionEndsAt = 0;
       openModal(`Harvested ${biomass.toFixed(2)} kg loaded onto ${vessel.name}.`);
       updateDisplay();
     }, harvestTime);
@@ -336,17 +342,19 @@ function harvestPen(amount=null){
     const dx = startLoc.x - site.location.x;
     const dy = startLoc.y - site.location.y;
     const distance = Math.hypot(dx, dy);
+    const travelTime = distance / vessel.speed * state.TRAVEL_TIME_FACTOR;
     vessel.location = `Traveling to ${site.name}`;
     vessel.isHarvesting = true;
+    vessel.actionEndsAt = Date.now() + travelTime;
     updateDisplay();
     setTimeout(()=>{
       vessel.location = site.name;
       performHarvest();
-    }, distance / vessel.speed * state.TRAVEL_TIME_FACTOR);
+    }, travelTime);
   } else {
     vessel.isHarvesting = true;
-    updateDisplay();
     performHarvest();
+    updateDisplay();
   }
 }
 
@@ -380,6 +388,7 @@ function harvestWithVessel(vIndex, amount){
     }
     if(harvested<=0) { vessel.isHarvesting=false; updateDisplay(); return; }
     const harvestTime = harvested / state.getSiteHarvestRate(site) * 1000;
+    vessel.actionEndsAt = Date.now() + harvestTime;
     setTimeout(()=>{
       plans.forEach(p=>{
         p.pen.fishCount -= p.fishNum;
@@ -390,6 +399,7 @@ function harvestWithVessel(vIndex, amount){
       vessel.currentBiomassLoad += harvested;
       vessel.location = site.name;
       vessel.isHarvesting = false;
+      vessel.actionEndsAt = 0;
       openModal(`Harvested ${harvested.toFixed(2)} kg loaded onto ${vessel.name}.`);
       updateDisplay();
     }, harvestTime);
@@ -399,14 +409,16 @@ function harvestWithVessel(vIndex, amount){
     const dx = startLoc.x - site.location.x;
     const dy = startLoc.y - site.location.y;
     const distance = Math.hypot(dx, dy);
+    const travelTime = distance / vessel.speed * state.TRAVEL_TIME_FACTOR;
     vessel.location = `Traveling to ${site.name}`;
     vessel.isHarvesting = true;
+    vessel.actionEndsAt = Date.now() + travelTime;
     updateDisplay();
-    setTimeout(()=>{ vessel.location = site.name; perform(); }, distance / vessel.speed * state.TRAVEL_TIME_FACTOR);
+    setTimeout(()=>{ vessel.location = site.name; perform(); }, travelTime);
   } else {
     vessel.isHarvesting = true;
-    updateDisplay();
     perform();
+    updateDisplay();
   }
 }
 function restockPen(sp){
@@ -706,6 +718,7 @@ function loadGame() {
       state.vessels.forEach(v => {
         if(!v.cargo) v.cargo = {};
         if(v.isHarvesting === undefined) v.isHarvesting = false;
+        if(v.actionEndsAt === undefined) v.actionEndsAt = 0;
       });
       if(obj.time){
         state.totalDaysElapsed = obj.time.totalDaysElapsed ?? state.totalDaysElapsed;

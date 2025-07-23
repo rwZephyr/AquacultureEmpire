@@ -3,14 +3,14 @@
  Update these values to quickly change the game's look
 --------------------------------------------------*/
 :root {
-  --bg-dark: #1a272e;
-  --bg-darker: #142027;
-  --bg-panel: #1f2d35;
-  --bg-button: #2b3b4a;
-  --btn-main: #65849f;
-  --accent: #4be0ff;
-  --accent-translucent: #4be0ff88;
-  --text-light: #dbe5ed;
+  --bg-dark: #1b1d20;
+  --bg-darker: #14171a;
+  --bg-panel: #22272b;
+  --bg-button: #2e3439;
+  --btn-main: #607c95;
+  --accent: #5fa8d3;
+  --accent-translucent: #5fa8d388;
+  --text-light: #e0e4e9;
   --text-dark: #343b43;
   --text-muted: #8899a6;
   --icon-muted: #4c545b;
@@ -19,15 +19,17 @@
   --shadow-light: #0005;
   --shadow-medium: #0006;
   --black: #000;
+  --font-main: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* Global Styles */
 body {
-  font-family: Arial, sans-serif;
+  font-family: var(--font-main);
   background: var(--bg-dark);
   color: var(--text-light);
   text-align: center;
-  margin-top: 30px;
+  margin: 0;
+  padding-top: 70px;
   overflow-x: hidden; /* prevent horizontal scroll on mobile */
 }
 .container {
@@ -247,7 +249,7 @@ button:active {
   display: none; /* Chrome, Safari */
 }
 
-#penGrid .grid {
+#penGridContainer {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 16px;
@@ -265,6 +267,10 @@ button:active {
   text-align: left;
   color: var(--text-light);
   box-shadow: 0 0 4px var(--shadow-light);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.penCard.placeholder {
+  opacity: 0.6;
 }
 .penCard h3 {
   font-size: 18px;
@@ -292,6 +298,16 @@ button:active {
 .vesselCard button:hover {
   background-color: var(--accent);
   color: var(--bg-darker);
+}
+
+.penCard:hover,
+.vesselCard:hover,
+.bargeCard:hover,
+.staffCard:hover,
+.logisticsCard:hover,
+.tipsCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 8px var(--accent-translucent);
 }
 
 .newPenControls {
@@ -342,16 +358,20 @@ button:active {
   color: var(--text-light);
   box-shadow: 0 0 4px var(--shadow-light);
   max-width: 300px;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 .vesselCard {
   background: var(--bg-panel);
   border-radius: 10px;
   padding: 16px;
-  margin: 16px auto;
+  margin: 0;
   color: var(--text-light);
   box-shadow: 0 0 4px var(--shadow-light);
-  max-width: 300px;
+  max-width: 250px;
+  flex: 0 0 250px;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
+.vesselCard.placeholder { opacity: 0.6; }
 .staffCard {
   background: var(--bg-panel);
   border-radius: 10px;
@@ -360,12 +380,39 @@ button:active {
   color: var(--text-light);
   box-shadow: 0 0 4px var(--shadow-light);
   max-width: 300px;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 .cardContainer {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
   gap: 16px;
+  align-items: stretch;
+}
+
+.logisticsCard, .tipsCard {
+  background: var(--bg-panel);
+  border-radius: 10px;
+  padding: 16px;
+  color: var(--text-light);
+  box-shadow: 0 0 4px var(--shadow-light);
+  max-width: 300px;
+  margin: 0 auto;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.progressBar {
+  background: var(--bg-darker);
+  border-radius: 6px;
+  height: 12px;
+  margin-bottom: 6px;
+  overflow: hidden;
+}
+
+.progress {
+  background: var(--accent);
+  height: 100%;
+  width: 0;
+  transition: width 0.3s;
 }
 .bargeCard h2 {
   font-size: 18px;
@@ -376,7 +423,7 @@ button:active {
   font-size: 14px;
   margin: 6px 0;
 }
-.vesselCard h2 {
+.vesselCard h3 {
   font-size: 18px;
   margin-bottom: 10px;
   color: var(--accent);
@@ -385,17 +432,31 @@ button:active {
   font-size: 14px;
   margin: 6px 0;
 }
+#topHeader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-panel);
+  box-shadow: 0 2px 6px var(--shadow-medium);
+  z-index: 100;
+}
+
 #topBar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--bg-panel);
   padding: 12px 16px;
-  margin: 10px auto 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 6px var(--shadow-medium);
-  color: var(--text-light);
+  margin: 0 auto;
   max-width: 900px;
+  color: var(--text-light);
+}
+
+@media (max-width: 500px) {
+  #topBar {
+    flex-direction: column;
+    gap: 6px;
+  }
 }
 
 .top-left, .top-right {
@@ -437,11 +498,11 @@ button:active {
   justify-content: space-between;
 }
 
-#leftPanel {
+#pensSection {
   flex: 2;
 }
 
-#rightPanel {
+#rightSidebar {
   flex: 1;
   min-width: 260px;
 }
@@ -457,4 +518,46 @@ button:active {
 #shop button {
   width: 100%;
   margin: 4px 0;
+}
+
+/* Footer vessel section */
+#bottomSection {
+  margin-top: 20px;
+}
+
+#bottomSection .vesselCard {
+  margin: 0;
+}
+
+.vesselGrid {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 10px 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.penCard,
+.vesselCard,
+.bargeCard,
+.staffCard,
+.logisticsCard,
+.tipsCard {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Responsive layout */
+@media (max-width: 700px) {
+  #mainLayout {
+    flex-direction: column;
+  }
+  #rightSidebar {
+    min-width: unset;
+    width: 100%;
+  }
 }
