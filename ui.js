@@ -28,7 +28,7 @@ function updateDisplay(){
   const dateEl = document.getElementById('dateDisplay');
   if(dateEl) dateEl.innerText = getDateString();
 
-  // barge card
+  // barge card & feed overview
   const barge = site.barges[state.currentBargeIndex];
   const tierData = bargeTiers[barge.tier];
   document.getElementById('bargeIndex').innerText = state.currentBargeIndex + 1;
@@ -45,26 +45,17 @@ function updateDisplay(){
   document.getElementById('bargeStaffCapacity').innerText = totalCapacity;
   document.getElementById('bargeStaffUnassigned').innerText = site.staff.filter(s=>!s.role).length;
 
-  // vessel card
-  const vessel = state.vessels[state.currentVesselIndex];
-  const vesselTier = vesselTiers[vessel.tier];
-  document.getElementById('vesselIndex').innerText = state.currentVesselIndex + 1;
-  document.getElementById('vesselCount').innerText = state.vessels.length;
-  document.getElementById('vesselName').innerText = vessel.name;
-  document.getElementById('vesselTierName').innerText = vesselTier.name;
-  document.getElementById('vesselLoad').innerText = vessel.currentBiomassLoad.toFixed(1);
-  document.getElementById('vesselCapacity').innerText = vessel.maxBiomassCapacity;
-  document.getElementById('vesselLocation').innerText = vessel.location;
-  const vesselHarvestBtn = document.getElementById('vesselHarvestBtn');
-  if(vesselHarvestBtn) vesselHarvestBtn.disabled = vessel.isHarvesting;
-  if(vessel.tier < vesselTiers.length - 1){
-    const nextVessel = vesselTiers[vessel.tier + 1];
-    document.getElementById('vesselUpgradeInfo').innerText =
-      `Next Vessel Upgrade (${nextVessel.name}): $${nextVessel.cost}`;
-  } else {
-    document.getElementById('vesselUpgradeInfo').innerText = 'Vessel Fully Upgraded';
-  }
-  document.getElementById('vesselPurchaseInfo').innerText = `New Vessel Cost: $${NEW_VESSEL_COST}`;
+  const totalFeed = site.barges.reduce((t,b)=>t+b.feed,0);
+  const totalFeedCap = site.barges.reduce((t,b)=>t+b.feedCapacity,0);
+  const feedPercent = totalFeedCap ? (totalFeed/totalFeedCap)*100 : 0;
+  const prog = document.getElementById('feedProgress');
+  if(prog) prog.style.width = feedPercent + '%';
+  const totalFeedEl = document.getElementById('totalFeed');
+  if(totalFeedEl) totalFeedEl.innerText = totalFeed.toFixed(1);
+  const totalFeedCapEl = document.getElementById('totalFeedCapacity');
+  if(totalFeedCapEl) totalFeedCapEl.innerText = totalFeedCap;
+
+  // vessel grid
 
   // staff card info
   document.getElementById('staffTotal').innerText = site.staff.length;
@@ -100,9 +91,12 @@ function updateDisplay(){
   updateHarvestInfo();
   updateLicenseShop();
   renderPenGrid(site);
+  renderVesselGrid();
   renderMap();
   const statusEl = document.getElementById('statusMessages');
   if(statusEl) statusEl.innerText = state.statusMessage;
+  const tipsEl = document.getElementById('operationalTips');
+  if(tipsEl) tipsEl.innerText = state.statusMessage || 'All systems nominal.';
 }
 
 // harvest preview
@@ -151,30 +145,52 @@ function renderPenGrid(site){
     const disp = document.getElementById('selectedBargeDisplay');
     if(disp) disp.innerText = `Selected: ${Number(select.value)+1}`;
   }
+  const tmpl = document.getElementById('penCardTemplate');
   site.pens.forEach((pen, idx)=>{
-    const bargeOptions = site.barges.map((b,i)=>`<option value="${i}" ${pen.bargeIndex===i?'selected':''}>${i+1}</option>`).join('');
-    const biomass = pen.fishCount * pen.averageWeight;
+    const clone = tmpl.content.cloneNode(true);
+    const card = clone.querySelector('.penCard');
+    card.querySelector('.pen-name').textContent = `Pen ${idx+1}`;
+    card.querySelector('.pen-species').textContent = capitalizeFirstLetter(pen.species);
+    card.querySelector('.pen-fish').textContent = pen.fishCount;
+    card.querySelector('.pen-avg').textContent = pen.averageWeight.toFixed(2);
+    card.querySelector('.pen-biomass').textContent = (pen.fishCount * pen.averageWeight).toFixed(2);
     const feederType = pen.feeder?.type||'None';
     const feederTier = pen.feeder?.tier||0;
-    const nextUpgrade = feederUpgrades[feederTier];
-    const nextCostText = nextUpgrade ? `Upgrade Cost: $${nextUpgrade.cost}` : 'Feeder Maxed';
-    const card = document.createElement('div');
-    card.className = 'penCard';
-    card.innerHTML = `
-      <h3>Pen ${idx+1}</h3>
-      <div class="stat">Species: ${capitalizeFirstLetter(pen.species)}</div>
-      <div class="stat">Fish: ${pen.fishCount}</div>
-      <div class="stat">Avg Weight: ${pen.averageWeight.toFixed(2)} kg</div>
-      <div class="stat">Biomass: ${biomass.toFixed(2)} kg</div>
-      <div class="stat">Feeder: ${capitalizeFirstLetter(feederType)} (Tier ${feederTier})</div>
-      <div class="stat">Barge: <select onchange="assignBarge(${idx}, this.value)">${bargeOptions}</select></div>
-      <div class="stat">${nextCostText}</div>
-      <button onclick="feedFishPen(${idx})">Feed</button>
-      <button onclick="harvestPenIndex(${idx})" ${state.vessels[state.currentVesselIndex].isHarvesting?'disabled':''}>Harvest</button>
-      <button onclick="restockPenUI(${idx})">Restock</button>
-      <button onclick="upgradeFeeder(${idx})">Upgrade Feeder</button>
-    `;
-    grid.appendChild(card);
+    card.querySelector('.pen-feeder').textContent = `${capitalizeFirstLetter(feederType)} (Tier ${feederTier})`;
+    card.querySelector('.feed-btn').onclick = () => feedFishPen(idx);
+    card.querySelector('.restock-btn').onclick = () => restockPenUI(idx);
+    card.querySelector('.upgrade-btn').onclick = () => upgradeFeeder(idx);
+    grid.appendChild(clone);
+  });
+}
+
+function renderVesselGrid(){
+  const grid = document.getElementById('vesselGridContainer');
+  if(!grid) return;
+  grid.innerHTML = '';
+  const tmpl = document.getElementById('vesselCardTemplate');
+  state.vessels.forEach((vessel, idx)=>{
+    const clone = tmpl.content.cloneNode(true);
+    const card = clone.querySelector('.vesselCard');
+    card.querySelector('.vessel-name').textContent = vessel.name;
+    card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;
+    card.querySelector('.vessel-location').textContent = vessel.location;
+    const statusEl = card.querySelector('.vessel-status');
+    let status = vessel.isHarvesting ? 'Harvesting' : (vessel.location.startsWith('Traveling') ? 'Traveling' : 'Idle');
+    if(vessel.actionEndsAt && vessel.actionEndsAt > Date.now()){
+      const eta = Math.max(0, (vessel.actionEndsAt - Date.now())/1000);
+      status += ` (${eta.toFixed(0)}s)`;
+    }
+    statusEl.textContent = status;
+    const loadPercent = vessel.maxBiomassCapacity ? (vessel.currentBiomassLoad / vessel.maxBiomassCapacity)*100 : 0;
+    card.querySelector('.vessel-progress').style.width = loadPercent + '%';
+    card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1);
+    card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity;
+    card.querySelector('.harvest-btn').onclick = ()=>{ state.currentVesselIndex = idx; openVesselHarvestModal(); };
+    card.querySelector('.move-btn').onclick = ()=>{ state.currentVesselIndex = idx; openMoveVesselModal(); };
+    card.querySelector('.sell-btn').onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
+    card.querySelector('.upgrade-btn').onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
+    grid.appendChild(clone);
   });
 }
 
@@ -418,9 +434,14 @@ function sellCargo(idx){
     const dx = startLoc.x - market.location.x;
     const dy = startLoc.y - market.location.y;
     const distance = Math.hypot(dx, dy);
+    const travelTime = distance / vessel.speed * state.TRAVEL_TIME_FACTOR;
     vessel.location = `Traveling to ${market.name}`;
+    vessel.actionEndsAt = Date.now() + travelTime;
     closeSellModal();
-    setTimeout(completeSale, distance / vessel.speed * state.TRAVEL_TIME_FACTOR);
+    setTimeout(()=>{
+      vessel.actionEndsAt = 0;
+      completeSale();
+    }, travelTime);
   }
 }
 
@@ -430,6 +451,7 @@ export {
   updateHarvestInfo,
   updateLicenseShop,
   renderPenGrid,
+  renderVesselGrid,
   renderMap,
   setupMapInteractions,
   openModal,

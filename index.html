@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Aquaculture Empire</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="container">
+  <header id="topHeader">
+    <div class="container">
     <!-- Top bar: site nav on left, cash on right -->
     <div id="topBar">
       <div class="top-left">
@@ -21,55 +23,50 @@
         <div><strong>Cash:</strong> $<span id="cashCount">0</span></div>
         <div><strong>Date:</strong> <span id="dateDisplay">Spring 1, Year 1</span></div>
       </div>
+      </div>
     </div>
+  </header>
 
-    <div id="mainLayout">
-      <div id="rightPanel">
+  <main id="mainLayout">
+      <aside id="rightSidebar">
         <!-- Status cards -->
         <div id="cardContainer" class="cardContainer">
-      <div id="bargeCard" class="bargeCard">
-        <h2>Barge Status</h2>
-        <div>
-          <button onclick="previousBarge()">⟵</button>
-          Barge <span id="bargeIndex">1</span>/<span id="bargeCount">1</span>
-          <button onclick="nextBarge()">⟶</button>
+          <div id="feedOverviewCard" class="logisticsCard">
+            <h2>Feed Storage</h2>
+            <div class="progressBar"><div id="feedProgress" class="progress"></div></div>
+            <div><span id="totalFeed">0</span> / <span id="totalFeedCapacity">0</span> kg</div>
+          </div>
+          <div id="bargeCard" class="bargeCard">
+            <h2>Barge Status</h2>
+            <div>
+              <button onclick="previousBarge()">⟵</button>
+              Barge <span id="bargeIndex">1</span>/<span id="bargeCount">1</span>
+              <button onclick="nextBarge()">⟶</button>
+            </div>
+            <div>Barge Tier: <span id="bargeTierName">Small</span></div>
+            <div>Feeders: <span id="bargeFeedersUsed">0</span>/<span id="bargeFeederLimit">0</span> (Max Tier <span id="bargeMaxFeederTier">0</span>)</div>
+            <div>Feed: <span id="bargeFeed">0</span> / <span id="bargeFeedCapacity">0</span> kg</div>
+            <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
+            <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
+            <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
+            <button onclick="assignStaff('feeder')">Assign Staff</button>
+            <button onclick="buyMaxFeed()">Refill Feed</button>
+            <button onclick="toggleSection('bargeOptions')">Barge Upgrades</button>
+          </div>
+          <div id="staffCard" class="staffCard">
+            <h2>Staffing</h2>
+            <div>Total: <span id="staffTotal">0</span> / <span id="staffCapacity">0</span></div>
+            <div>Unassigned: <span id="staffUnassigned">0</span></div>
+            <div>Feeders: <span id="staffFeeders">0</span></div>
+            <div>Harvesters: <span id="staffHarvesters">0</span></div>
+            <div>Feed Managers: <span id="staffManagers">0</span></div>
+            <div id="staffActionPlaceholder"></div>
+          </div>
+          <div id="tipsCard" class="tipsCard">
+            <h2>Operational Tips</h2>
+            <div id="operationalTips"></div>
+          </div>
         </div>
-        <div>Barge Tier: <span id="bargeTierName">Small</span></div>
-        <div>Feeders: <span id="bargeFeedersUsed">0</span>/<span id="bargeFeederLimit">0</span> (Max Tier <span id="bargeMaxFeederTier">0</span>)</div>
-        <div>Feed: <span id="bargeFeed">0</span> / <span id="bargeFeedCapacity">0</span> kg</div>
-        <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
-        <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
-        <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
-      </div>
-      <div id="vesselCard" class="vesselCard">
-        <h2>Vessel Status</h2>
-        <div>
-          <button onclick="previousVessel()">⟵</button>
-          Vessel <span id="vesselIndex">1</span>/<span id="vesselCount">1</span>
-          <button onclick="nextVessel()">⟶</button>
-        </div>
-        <div>Name: <span id="vesselName">-</span></div>
-        <div>Tier: <span id="vesselTierName">Small</span></div>
-        <div>Load: <span id="vesselLoad">0</span> / <span id="vesselCapacity">0</span> kg</div>
-        <div>Location: <span id="vesselLocation">Dock</span></div>
-        <button id="vesselHarvestBtn" onclick="openVesselHarvestModal()">Harvest</button>
-        <button onclick="renameVessel()">Rename Vessel</button>
-        <button onclick="openMoveVesselModal()">Move Vessel</button>
-        <button onclick="openSellModal()">Sell Cargo</button>
-        <div id="vesselUpgradeInfo"></div>
-        <div id="vesselPurchaseInfo"></div>
-        <div id="vesselActionPlaceholder"></div>
-      </div>
-      <div id="staffCard" class="staffCard">
-        <h2>Staffing</h2>
-        <div>Total: <span id="staffTotal">0</span> / <span id="staffCapacity">0</span></div>
-        <div>Unassigned: <span id="staffUnassigned">0</span></div>
-        <div>Feeders: <span id="staffFeeders">0</span></div>
-        <div>Harvesters: <span id="staffHarvesters">0</span></div>
-        <div>Feed Managers: <span id="staffManagers">0</span></div>
-        <div id="staffActionPlaceholder"></div>
-      </div>
-    </div>
 
     <div id="shop" class="shopPanel">
       <h2>Shop</h2>
@@ -124,9 +121,9 @@
       <div id="penPurchaseInfo"></div>
       <div id="licenseShop"></div>
       <div id="statusMessages"></div>
-    </div>
       </div>
-      <div id="leftPanel">
+    </aside>
+    <section id="pensSection">
         <!-- Harvest info (single-pen harvest preview) -->
         <div id="harvestInfo" class="harvestInfo"></div>
 
@@ -139,12 +136,47 @@
         <button onclick="buyNewPen(document.getElementById('newPenBargeSelect').value)">+ Pen</button>
         <span id="selectedBargeDisplay"></span>
       </div>
-      <div id="penGridContainer" class="grid"></div>
+        <div id="penGridContainer" class="grid">
+        </div>
+      <template id="penCardTemplate">
+        <div class="penCard">
+          <h3 class="pen-name"></h3>
+          <div class="stat">Species: <span class="pen-species"></span></div>
+          <div class="stat">Fish: <span class="pen-fish"></span></div>
+          <div class="stat">Avg Weight: <span class="pen-avg"></span> kg</div>
+          <div class="stat">Biomass: <span class="pen-biomass"></span> kg</div>
+          <div class="stat">Feeder: <span class="pen-feeder"></span></div>
+          <button class="feed-btn">Feed</button>
+          <button class="restock-btn">Restock</button>
+          <button class="upgrade-btn">Upgrade Feeder</button>
+        </div>
+      </template>
     </div>
-      </div>
-    </div>
+    </section>
+  </main>
 
-    <!-- Modals -->
+  <footer id="bottomSection">
+    <div class="container">
+      <div id="vesselGridContainer" class="vesselGrid">
+      </div>
+      <template id="vesselCardTemplate">
+        <div class="vesselCard">
+          <h3 class="vessel-name"></h3>
+          <div class="stat">Tier: <span class="vessel-tier"></span></div>
+          <div class="stat">Location: <span class="vessel-location"></span></div>
+          <div class="stat">Status: <span class="vessel-status"></span></div>
+          <div class="progressBar"><div class="progress vessel-progress"></div></div>
+          <div class="stat"><span class="vessel-load"></span> / <span class="vessel-capacity"></span> kg</div>
+          <button class="harvest-btn">Harvest</button>
+          <button class="move-btn">Move Vessel</button>
+          <button class="sell-btn">Sell Cargo</button>
+          <button class="upgrade-btn">Vessel Upgrades</button>
+        </div>
+      </template>
+    </div>
+  </footer>
+
+  <!-- Modals -->
     <div id="modal">
       <div id="modalContent">
         <p id="modalText"></p>
@@ -190,8 +222,6 @@
         <button onclick="closeMoveModal()">Cancel</button>
       </div>
     </div>
-  </div>
-
   <script type="module" src="script.js"></script>
 </body>
 </html>
