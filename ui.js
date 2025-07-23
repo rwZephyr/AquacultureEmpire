@@ -616,10 +616,14 @@ function openMarketReport(){
   });
 
   document.getElementById('marketReportPage').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
 }
 
 function closeMarketReport(){
   document.getElementById('marketReportPage').classList.remove('visible');
+  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
 }
 
 // --- PURCHASES & ACTIONS ---
