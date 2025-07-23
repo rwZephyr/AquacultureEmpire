@@ -18,6 +18,7 @@ Aquaculture Empire is a small browser-based aquaculture management game written 
 - Interactive map displays sites, markets and vessel locations.
 - Game state is saved in local storage so progress persists across sessions.
 - In-game time tracks days, seasons and years that advance automatically.
+- Each in-game day lasts about 30 seconds by default.
 
 ### Time Data
 Several read-only time values are exposed on the global `window` object:
@@ -29,6 +30,10 @@ Several read-only time values are exposed on the global `window` object:
 
 You can also call `getTimeState()` to retrieve these values as an object for
 use in mods or custom event hooks.
+Call `pauseTime()` to halt all in-game timers and `resumeTime()` to continue.
+While paused, day progression, market prices, vessel travel and other timed
+activities are completely suspended. Resuming simply continues each task from
+the moment it was paused with no time skipped.
 
 ## Getting Started
 No build steps are required. Open `index.html` in any modern web browser to start the game. Everything runs locally in the browser.

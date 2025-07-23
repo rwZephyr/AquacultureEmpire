@@ -35,8 +35,9 @@ const state = {
   // --- Game Time System ---
   SEASONS: ['Spring', 'Summer', 'Fall', 'Winter'],
   DAYS_PER_SEASON: 30,
-  DAY_DURATION_MS: 10000, // 10 seconds per in-game day
+  DAY_DURATION_MS: 30000, // 30 seconds per in-game day
   timePaused: false,
+  pauseStartedAt: 0,
   totalDaysElapsed: 0,
   dayInSeason: 1,
   seasonIndex: 0,
@@ -141,6 +142,25 @@ function addStatusMessage(msg) {
 }
 
 state.addStatusMessage = addStatusMessage;
+
+function pauseTime(){
+  if(state.timePaused) return;
+  state.timePaused = true;
+  state.pauseStartedAt = Date.now();
+}
+
+function resumeTime(){
+  if(!state.timePaused) return;
+  const diff = Date.now() - state.pauseStartedAt;
+  state.timePaused = false;
+  state.pauseStartedAt = 0;
+  state.vessels.forEach(v=>{
+    if(v.actionEndsAt) v.actionEndsAt += diff;
+  });
+}
+
+state.pauseTime = pauseTime;
+state.resumeTime = resumeTime;
 
 // Game Data
 state.sites = [
@@ -254,6 +274,8 @@ export {
   advanceDay,
   advanceDays,
   addStatusMessage,
+  pauseTime,
+  resumeTime,
   getSiteHarvestRate,
 };
 
