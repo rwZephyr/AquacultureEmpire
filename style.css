@@ -240,14 +240,22 @@ button:active {
 #sellModalContent,
 #moveModalContent,
 #renameModalContent,
-#bargeUpgradeModalContent,
-#marketReportContent {
+#bargeUpgradeModalContent {
   background: var(--modal-bg);
   color: var(--text-light);
   padding: 20px;
   border-radius: 10px;
   text-align: center;
   width: 300px;
+}
+
+#marketReportContent {
+  background: var(--modal-bg);
+  color: var(--text-light);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 600px;
 }
 
 #bargeUpgradeMessage {
@@ -640,6 +648,44 @@ button:active {
 .logisticsCard,
 .tipsCard {
   animation: fadeIn 0.3s ease;
+}
+
+/* Market report styles */
+.market-section {
+  margin-bottom: 20px;
+}
+
+.market-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+}
+
+.market-table th,
+.market-table td {
+  border: 1px solid var(--bg-button);
+  padding: 4px 6px;
+  font-size: 14px;
+}
+
+.market-table th {
+  background: var(--bg-button);
+}
+
+.trend-up {
+  color: #2ecc71;
+}
+
+.trend-down {
+  color: #e74c3c;
+}
+
+.chart-placeholder {
+  background: var(--bg-darker);
+  color: var(--text-muted);
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 12px;
 }
 
 /* Responsive layout */

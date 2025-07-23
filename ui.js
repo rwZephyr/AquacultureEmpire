@@ -539,22 +539,70 @@ function sellCargo(idx){
 
 function openMarketReport(){
   const container = document.getElementById('marketReportContent');
-  container.innerHTML = '';
+  container.innerHTML = '<h2>Market Report</h2>';
+
   markets.forEach(m => {
-    const div = document.createElement('div');
+    const section = document.createElement('div');
+    section.classList.add('market-section');
+
     const h = document.createElement('h3');
     h.innerText = m.name;
-    div.appendChild(h);
-    const ul = document.createElement('ul');
+    section.appendChild(h);
+
+    const table = document.createElement('table');
+    table.classList.add('market-table');
+
+    const thead = document.createElement('thead');
+    thead.innerHTML = '<tr><th>Species</th><th>Price</th><th>Change</th><th>Last 5</th></tr>';
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
     for(const sp in m.prices){
-      const li = document.createElement('li');
-      const hist = m.priceHistory[sp].map(p=>p.toFixed(2)).join(' -> ');
-      li.innerText = `${state.capitalizeFirstLetter(sp)}: $${m.prices[sp].toFixed(2)} (${hist})`;
-      ul.appendChild(li);
+      const row = document.createElement('tr');
+
+      const nameCell = document.createElement('td');
+      nameCell.innerText = state.capitalizeFirstLetter(sp);
+
+      const price = m.prices[sp];
+      const history = m.priceHistory[sp];
+      const prevPrice = history[history.length - 2] || price;
+      const delta = price - prevPrice;
+      const recent = history.slice(-5).map(p=>p.toFixed(2)).join(', ');
+      const high = Math.max(...history.slice(-7));
+      const low = Math.min(...history.slice(-7));
+
+      const priceCell = document.createElement('td');
+      priceCell.innerText = `$${price.toFixed(2)}`;
+      if(price === high) priceCell.innerText += ' ▲';
+      if(price === low) priceCell.innerText += ' ▼';
+
+      const changeCell = document.createElement('td');
+      const arrow = delta > 0 ? '↑' : delta < 0 ? '↓' : '→';
+      changeCell.innerText = `${delta >= 0 ? '+' : ''}${delta.toFixed(2)} ${arrow}`;
+      changeCell.className = delta > 0 ? 'trend-up' : delta < 0 ? 'trend-down' : '';
+
+      const histCell = document.createElement('td');
+      histCell.innerText = recent;
+      histCell.classList.add('history-cell');
+
+      row.appendChild(nameCell);
+      row.appendChild(priceCell);
+      row.appendChild(changeCell);
+      row.appendChild(histCell);
+      tbody.appendChild(row);
     }
-    div.appendChild(ul);
-    container.appendChild(div);
+
+    table.appendChild(tbody);
+    section.appendChild(table);
+
+    const placeholder = document.createElement('div');
+    placeholder.classList.add('chart-placeholder');
+    placeholder.innerText = 'Graph coming soon...';
+    section.appendChild(placeholder);
+
+    container.appendChild(section);
   });
+
   document.getElementById('marketReportModal').classList.add('visible');
 }
 
