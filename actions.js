@@ -729,6 +729,7 @@ function saveGame() {
       daysSinceSale: m.daysSinceSale,
       basePrices: m.basePrices
     })),
+    lastMarketUpdate: state.lastMarketUpdateString,
     lastSaved: Date.now(),
     time: {
       totalDaysElapsed: state.totalDaysElapsed,
@@ -778,6 +779,9 @@ function loadGame() {
         state.dayInSeason = obj.time.dayInSeason ?? state.dayInSeason;
         state.seasonIndex = obj.time.seasonIndex ?? state.seasonIndex;
         state.year = obj.time.year ?? state.year;
+      }
+      if(obj.lastMarketUpdate){
+        state.lastMarketUpdateString = obj.lastMarketUpdate;
       }
       if(obj.lastSaved){
         const diff = Date.now() - obj.lastSaved;

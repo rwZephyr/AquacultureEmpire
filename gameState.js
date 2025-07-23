@@ -45,6 +45,7 @@ const state = {
 
   statusMessage: '',
   lastOfflineInfo: null,
+  lastMarketUpdateString: 'Spring 1, Year 1',
 };
 
 // Expose read-only accessors for external logic
@@ -71,6 +72,9 @@ function getDateString() {
 }
 
 state.getDateString = getDateString;
+
+// initialize last market update timestamp
+state.lastMarketUpdateString = getDateString();
 
 // ---- Market Pricing ----
 function setupMarketData(){
@@ -111,6 +115,7 @@ state.setupMarketData = setupMarketData;
 state.updateMarketPrices = updateMarketPrices;
 
 function advanceDay() {
+  state.lastMarketUpdateString = getDateString();
   state.totalDaysElapsed++;
   state.dayInSeason++;
   if (state.dayInSeason > state.DAYS_PER_SEASON) {
