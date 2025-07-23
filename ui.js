@@ -578,7 +578,7 @@ function openMarketReport(){
     table.classList.add('market-table');
 
     const thead = document.createElement('thead');
-    thead.innerHTML = '<tr><th>Species</th><th>Price</th><th>Change</th><th>Last 5</th></tr>';
+    thead.innerHTML = '<tr><th>Species</th><th>Price</th><th>Change</th><th>5-Day Trend</th><th>Last 5</th></tr>';
     table.appendChild(thead);
 
     const tbody = document.createElement('tbody');
@@ -592,7 +592,18 @@ function openMarketReport(){
       const history = m.priceHistory[sp];
       const prevPrice = history[history.length - 2] || price;
       const delta = price - prevPrice;
+
       const recent = history.slice(-5).map(p=>p.toFixed(2)).join(', ');
+      const trendDeltas = [];
+      for(let i=Math.max(history.length-5,1); i<history.length; i++){
+        const diff = history[i] - history[i-1];
+        trendDeltas.push(diff);
+      }
+      const trendHtml = trendDeltas.map(d=>{
+        const arrow = d > 0 ? '↑' : d < 0 ? '↓' : '→';
+        const cls = d > 0 ? 'trend-up' : d < 0 ? 'trend-down' : 'trend-flat';
+        return `<span class="${cls}">${d>=0?'+':''}${d.toFixed(2)}${arrow}</span>`;
+      }).join(', ');
       const high = Math.max(...history.slice(-7));
       const low = Math.min(...history.slice(-7));
 
@@ -606,6 +617,10 @@ function openMarketReport(){
       changeCell.innerText = `${delta >= 0 ? '+' : ''}${delta.toFixed(2)} ${arrow}`;
       changeCell.className = delta > 0 ? 'trend-up' : delta < 0 ? 'trend-down' : '';
 
+      const trendCell = document.createElement('td');
+      trendCell.innerHTML = trendHtml;
+      trendCell.classList.add('trend-history');
+
       const histCell = document.createElement('td');
       histCell.innerText = recent;
       histCell.classList.add('history-cell');
@@ -613,6 +628,7 @@ function openMarketReport(){
       row.appendChild(nameCell);
       row.appendChild(priceCell);
       row.appendChild(changeCell);
+      row.appendChild(trendCell);
       row.appendChild(histCell);
       tbody.appendChild(row);
     }
