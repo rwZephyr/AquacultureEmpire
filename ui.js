@@ -440,7 +440,7 @@ function openHarvestModal(vIdx){
 function closeHarvestModal(){ document.getElementById('harvestModal').classList.remove('visible'); }
 function confirmHarvest(){
   const amount = parseFloat(document.getElementById('harvestAmount').value);
-  harvestPen(amount);
+  window.harvestPen(amount);
   closeHarvestModal();
   updateDisplay();
 }
