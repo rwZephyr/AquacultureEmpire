@@ -530,10 +530,16 @@ function sellCargo(idx){
     vessel.location = `Traveling to ${market.name}`;
     vessel.actionEndsAt = Date.now() + travelTime;
     closeSellModal();
-    setTimeout(()=>{
-      vessel.actionEndsAt = 0;
-      completeSale();
-    }, travelTime);
+    if(vessel.travelInterval){ clearInterval(vessel.travelInterval); }
+    vessel.travelInterval = setInterval(()=>{
+      if(state.timePaused) return;
+      if(Date.now() >= vessel.actionEndsAt){
+        clearInterval(vessel.travelInterval);
+        vessel.travelInterval = null;
+        vessel.actionEndsAt = 0;
+        completeSale();
+      }
+    },250);
   }
 }
 

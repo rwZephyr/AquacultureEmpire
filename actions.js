@@ -308,11 +308,17 @@ function moveVesselTo(type, idx){
   vessel.location = `Traveling to ${destName}`;
   vessel.actionEndsAt = Date.now() + travelTime;
   closeMoveModal();
-  setTimeout(()=>{
-    vessel.location = destName;
-    vessel.actionEndsAt = 0;
-    updateDisplay();
-  }, travelTime);
+  if(vessel.travelInterval){ clearInterval(vessel.travelInterval); }
+  vessel.travelInterval = setInterval(()=>{
+    if(state.timePaused) return;
+    if(Date.now() >= vessel.actionEndsAt){
+      clearInterval(vessel.travelInterval);
+      vessel.travelInterval = null;
+      vessel.location = destName;
+      vessel.actionEndsAt = 0;
+      updateDisplay();
+    }
+  },250);
 }
 
 // feed / harvest / restock
@@ -362,6 +368,7 @@ function harvestPen(amount=null){
     updateEta();
     vessel.harvestInterval = setInterval(()=>{
       const now = Date.now();
+      if(state.timePaused){ last = now; return; }
       const dt = (now - last)/1000;
       last = now;
       const rate = state.getSiteHarvestRate(site);
@@ -406,10 +413,16 @@ function harvestPen(amount=null){
     vessel.isHarvesting = true;
     vessel.actionEndsAt = Date.now() + travelTime;
     updateDisplay();
-    setTimeout(()=>{
-      vessel.location = site.name;
-      performHarvest();
-    }, travelTime);
+    if(vessel.travelInterval){ clearInterval(vessel.travelInterval); }
+    vessel.travelInterval = setInterval(()=>{
+      if(state.timePaused) return;
+      if(Date.now() >= vessel.actionEndsAt){
+        clearInterval(vessel.travelInterval);
+        vessel.travelInterval = null;
+        vessel.location = site.name;
+        performHarvest();
+      }
+    },250);
   } else {
     vessel.isHarvesting = true;
     performHarvest();
@@ -423,6 +436,7 @@ function cancelVesselHarvest(idx){
   if(!vessel.isHarvesting) return;
   if(vessel.harvestTimeout){ clearTimeout(vessel.harvestTimeout); vessel.harvestTimeout = null; }
   if(vessel.harvestInterval){ clearInterval(vessel.harvestInterval); vessel.harvestInterval = null; }
+  if(vessel.travelInterval){ clearInterval(vessel.travelInterval); vessel.travelInterval = null; }
   vessel.harvestProgress = 0;
   vessel.harvestFishBuffer = 0;
   vessel.isHarvesting = false;
@@ -575,6 +589,7 @@ function getStaffFeedRate(site){
 // --- AUTO-FEED ALL SITES & PENS EVERY SECOND ---
 // Locked pens are skipped during auto-feeding
 setInterval(()=>{
+  if(state.timePaused) return;
   state.sites.forEach(site=>{
     const staffRate = getStaffFeedRate(site);
     site.barges.forEach((barge,bIdx)=>{
@@ -602,6 +617,7 @@ setInterval(()=>{
 
 // --- AUTO FEED MANAGER ---
 function checkFeedManagers(){
+  if(state.timePaused) return;
   state.sites.forEach(site=>{
     if(!site.staff.some(s=>s.role==='feedManager')) return;
     site.barges.forEach(barge=>{
@@ -750,6 +766,7 @@ function loadGame() {
         Object.defineProperty(v, 'harvestProgress', { value: 0, writable: true, enumerable: false });
         Object.defineProperty(v, 'harvestFishBuffer', { value: 0, writable: true, enumerable: false });
         Object.defineProperty(v, 'harvestingPenIndex', { value: null, writable: true, enumerable: false });
+        Object.defineProperty(v, 'travelInterval', { value: null, writable: true, enumerable: false });
       });
       state.sites.forEach(site => {
         site.pens.forEach(pen => {
@@ -792,6 +809,14 @@ function resetGame() {
   location.reload();
 }
 
+function pauseTime(){
+  state.pauseTime();
+}
+
+function resumeTime(){
+  state.resumeTime();
+}
+
 // site/pen nav
 function previousSite(){ if(state.currentSiteIndex>0) state.currentSiteIndex--; state.currentPenIndex=0; state.currentBargeIndex=0; updateDisplay(); }
 function nextSite(){ if(state.currentSiteIndex<state.sites.length-1) state.currentSiteIndex++; state.currentPenIndex=0; state.currentBargeIndex=0; updateDisplay(); }
@@ -803,4 +828,4 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openMarketReport, closeMarketReport, getTimeState  };
+export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openMarketReport, closeMarketReport, getTimeState, pauseTime, resumeTime };
