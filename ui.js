@@ -222,14 +222,21 @@ function renderVesselGrid(){
       status += ` (${eta.toFixed(0)}s)`;
     }
     statusEl.textContent = status;
+    const speciesEl = card.querySelector('.harvest-species');
+    speciesEl.textContent = vessel.isHarvesting && vessel.cargoSpecies ? `Harvesting ${capitalizeFirstLetter(vessel.cargoSpecies)}` : '';
     const loadPercent = vessel.maxBiomassCapacity ? (vessel.currentBiomassLoad / vessel.maxBiomassCapacity)*100 : 0;
     card.querySelector('.vessel-progress').style.width = loadPercent + '%';
     card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1);
     card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity;
+    const harvestBtn = card.querySelector('.harvest-btn');
+    harvestBtn.onclick = ()=>{ state.currentVesselIndex = idx; openHarvestModal(idx); };
+    harvestBtn.style.display = vessel.isHarvesting ? 'none' : 'block';
     card.querySelector('.move-btn').onclick = ()=>{ state.currentVesselIndex = idx; openMoveVesselModal(); };
     card.querySelector('.sell-btn').onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
     card.querySelector('.upgrade-btn').onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
-    card.querySelector('.cancel-btn').onclick = ()=>{ state.currentVesselIndex = idx; cancelVesselHarvest(idx); };
+    const cancelBtn = card.querySelector('.cancel-btn');
+    cancelBtn.onclick = ()=>{ state.currentVesselIndex = idx; cancelVesselHarvest(idx); };
+    cancelBtn.style.display = vessel.isHarvesting ? 'block' : 'none';
     grid.appendChild(clone);
   });
 }
@@ -250,11 +257,18 @@ function updateVesselCards(){
       status += ` (${eta.toFixed(0)}s)`;
     }
     statusEl.textContent = status;
+    const speciesEl = card.querySelector('.harvest-species');
+    speciesEl.textContent = vessel.isHarvesting && vessel.cargoSpecies ? `Harvesting ${capitalizeFirstLetter(vessel.cargoSpecies)}` : '';
     const loadPercent = vessel.maxBiomassCapacity ? (vessel.currentBiomassLoad / vessel.maxBiomassCapacity)*100 : 0;
     card.querySelector('.vessel-progress').style.width = loadPercent + '%';
     card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1);
     card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity;
-    card.querySelector('.cancel-btn').onclick = ()=>{ state.currentVesselIndex = idx; cancelVesselHarvest(idx); };
+    const harvestBtn2 = card.querySelector('.harvest-btn');
+    harvestBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openHarvestModal(idx); };
+    harvestBtn2.style.display = vessel.isHarvesting ? 'none' : 'block';
+    const cancelBtn = card.querySelector('.cancel-btn');
+    cancelBtn.onclick = ()=>{ state.currentVesselIndex = idx; cancelVesselHarvest(idx); };
+    cancelBtn.style.display = vessel.isHarvesting ? 'block' : 'none';
   });
 }
 
@@ -370,6 +384,7 @@ function closeModal(){ document.getElementById('modal').classList.remove('visibl
 function openRestockModal(){
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
+  if(pen.locked) return openModal('Pen currently busy.');
   if(pen.fishCount>0){ return openModal("You must harvest the pen before restocking!"); }
   const optionsDiv = document.getElementById('restockOptions');
   optionsDiv.innerHTML = '';
@@ -383,20 +398,14 @@ function openRestockModal(){
 }
 function closeRestockModal(){ document.getElementById('restockModal').classList.remove('visible'); }
 
-function openHarvestModal(i){
-  state.currentPenIndex = i;
+function updateHarvestModal(){
   const site = state.sites[state.currentSiteIndex];
-  const pen  = site.pens[state.currentPenIndex];
   const vessel = state.vessels[state.currentVesselIndex];
-  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
-  if(vessel.currentBiomassLoad>0 && vessel.cargoSpecies && vessel.cargoSpecies !== pen.species){
-    return openModal('Vessel already contains a different species.');
-  }
+  const penIdx = Number(document.getElementById('harvestPenSelect').value);
+  state.currentPenIndex = penIdx;
+  const pen  = site.pens[penIdx];
   const remaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
-  const maxHarvest = Math.min(
-    pen.fishCount * pen.averageWeight,
-    remaining
-  );
+  const maxHarvest = Math.min(pen.fishCount * pen.averageWeight, remaining);
   const rate = getSiteHarvestRate(site);
   const secs = maxHarvest / rate;
   document.getElementById('harvestMax').innerText = maxHarvest.toFixed(2);
@@ -404,7 +413,28 @@ function openHarvestModal(i){
   input.max = maxHarvest;
   input.value = maxHarvest.toFixed(3);
   document.getElementById('harvestModalContent').querySelector('h2').innerText =
-    `Select Biomass to Harvest (~${secs.toFixed(1)}s)`;
+    `Start Harvest (~${secs.toFixed(1)}s)`;
+}
+
+function openHarvestModal(vIdx){
+  state.currentVesselIndex = vIdx;
+  const site = state.sites[state.currentSiteIndex];
+  const vessel = state.vessels[vIdx];
+  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
+  const select = document.getElementById('harvestPenSelect');
+  select.innerHTML = '';
+  site.pens.forEach((pen, idx)=>{
+    const biomass = (pen.fishCount * pen.averageWeight).toFixed(2);
+    const opt = document.createElement('option');
+    opt.value = idx;
+    opt.textContent = `Pen ${idx+1} - ${capitalizeFirstLetter(pen.species)} (${biomass}kg)`;
+    if(pen.locked || pen.fishCount<=0) opt.disabled = true;
+    select.appendChild(opt);
+  });
+  if(select.options.length===0) return openModal('No available pens to harvest.');
+  select.onchange = updateHarvestModal;
+  select.value = select.options[0].value;
+  updateHarvestModal();
   document.getElementById('harvestModal').classList.add('visible');
 }
 function closeHarvestModal(){ document.getElementById('harvestModal').classList.remove('visible'); }

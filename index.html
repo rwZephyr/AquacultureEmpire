@@ -169,8 +169,10 @@
           <div class="stat">Tier: <span class="vessel-tier"></span></div>
           <div class="stat">Location: <span class="vessel-location"></span></div>
           <div class="stat">Status: <span class="vessel-status"></span></div>
+          <div class="stat harvest-species"></div>
           <div class="progressBar"><div class="progress vessel-progress"></div></div>
           <div class="stat"><span class="vessel-load"></span> / <span class="vessel-capacity"></span> kg</div>
+          <button class="harvest-btn">Harvest</button>
           <button class="move-btn">Move Vessel</button>
           <button class="sell-btn">Sell Cargo</button>
           <button class="upgrade-btn">Vessel Upgrades</button>
@@ -196,10 +198,14 @@
     </div>
     <div id="harvestModal">
       <div id="harvestModalContent">
-        <h2>Select Biomass to Harvest</h2>
+        <h2>Start Harvest</h2>
+        <div>
+          <label for="harvestPenSelect">Pen:</label>
+          <select id="harvestPenSelect"></select>
+        </div>
         <div>Max: <span id="harvestMax">0</span> kg</div>
         <input type="number" id="harvestAmount" min="0" step="0.01">
-        <button onclick="confirmHarvest()">Harvest</button>
+        <button onclick="confirmHarvest()">Start Harvest</button>
         <button onclick="closeHarvestModal()">Cancel</button>
       </div>
     </div>
