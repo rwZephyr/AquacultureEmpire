@@ -720,9 +720,14 @@ button:active {
   color: #e74c3c;
 }
 
-.history-cell {
+.trend-flat {
+  color: var(--text-muted);
+}
+
+.trend-history {
   word-break: break-word;
 }
+
 
 .chart-placeholder {
   background: var(--bg-darker);
