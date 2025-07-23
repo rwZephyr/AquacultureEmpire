@@ -130,6 +130,8 @@ function updateDisplay(){
   if(statusEl) statusEl.innerText = state.statusMessage;
   const tipsEl = document.getElementById('operationalTips');
   if(tipsEl) tipsEl.innerText = state.statusMessage || 'All systems nominal.';
+  const tsEl = document.querySelector('#marketReportContent .market-timestamp');
+  if(tsEl) tsEl.innerText = `Prices last updated: ${state.lastMarketUpdateString}`;
 }
 
 // harvest preview
@@ -558,10 +560,10 @@ function openMarketReport(){
   const container = document.getElementById('marketReportContent');
   container.innerHTML = '<h2>Market Report</h2>';
 
-  const ts = state.getTimeState ? state.getTimeState() : { totalDaysElapsed: 0 };
   const timestamp = document.createElement('div');
   timestamp.className = 'market-timestamp';
-  timestamp.innerText = `Prices last updated: Day ${ts.totalDaysElapsed}`;
+  const dateStr = state.lastMarketUpdateString || getDateString();
+  timestamp.innerText = `Prices last updated: ${dateStr}`;
   container.appendChild(timestamp);
 
   markets.forEach(m => {
