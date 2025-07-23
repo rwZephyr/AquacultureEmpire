@@ -394,7 +394,20 @@ function setupMapInteractions(){
 }
 
 // --- MODALS ---
-function openModal(msg){ document.getElementById('modalText').innerText=msg; document.getElementById('modal').classList.add('visible'); }
+function openModal(msg){
+  const bargeModal = document.getElementById('bargeUpgradeModal');
+  if(bargeModal && bargeModal.classList.contains('visible')){
+    const alertEl = document.getElementById('bargeUpgradeMessage');
+    if(alertEl){
+      alertEl.textContent = msg;
+      alertEl.style.display = 'block';
+      setTimeout(()=>{ alertEl.style.display = 'none'; }, 3000);
+    }
+    return;
+  }
+  document.getElementById('modalText').innerText = msg;
+  document.getElementById('modal').classList.add('visible');
+}
 function closeModal(){ document.getElementById('modal').classList.remove('visible'); }
 function openRestockModal(){
   const site = state.sites[state.currentSiteIndex];
