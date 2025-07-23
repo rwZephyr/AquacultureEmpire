@@ -497,6 +497,7 @@ button:active {
   color: white;
   border: none;
   padding: 4px 10px;
+  margin: 6px;
   border-radius: 12px;
   font-weight: bold;
   cursor: pointer;

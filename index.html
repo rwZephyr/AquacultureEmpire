@@ -39,9 +39,9 @@
           <div id="bargeCard" class="bargeCard">
             <h2>Barge Status</h2>
             <div>
-              <button onclick="previousBarge()">⟵</button>
+              <button class="staff-button" onclick="previousBarge()">⟵</button>
               Barge <span id="bargeIndex">1</span>/<span id="bargeCount">1</span>
-              <button onclick="nextBarge()">⟶</button>
+              <button class="staff-button" onclick="nextBarge()">⟶</button>
             </div>
             <div>Barge Tier: <span id="bargeTierName">Small</span></div>
             <div>Feeders: <span id="bargeFeedersUsed">0</span>/<span id="bargeFeederLimit">0</span> (Max Tier <span id="bargeMaxFeederTier">0</span>)</div>
@@ -50,9 +50,8 @@
             <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
             <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
             <div id="bargeHousingInfo"></div>
-            <button class="staff-button" onclick="upgradeStaffHousing()">Upgrade Housing</button>
-            <button onclick="buyMaxFeed()">Refill Feed</button>
-            <button onclick="openBargeUpgradeModal()">Barge Upgrades</button>
+            <button class="staff-button" onclick="buyMaxFeed()">Refill Feed</button>
+            <button class="staff-button" onclick="openBargeUpgradeModal()">Barge Upgrades</button>
           </div>
           <div id="staffCard" class="staffCard">
             <h2>Staffing</h2>
@@ -224,15 +223,16 @@
     <div id="bargeUpgradeModal">
       <div id="bargeUpgradeModalContent">
         <h2>Barge Upgrades</h2>
-        <button onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
-        <button onclick="upgradeBarge()">Upgrade Barge</button>
-        <button onclick="buyNewPen()">+ Pen</button>
-        <button onclick="buyNewBarge()">Buy Barge</button>
+        <button class="staff-button" onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
+        <button class="staff-button" onclick="upgradeBarge()">Upgrade Barge</button>
+        <button class="staff-button" onclick="upgradeStaffHousing()">Upgrade Housing</button>
+        <button class="staff-button" onclick="buyNewPen()">+ Pen</button>
+        <button class="staff-button" onclick="buyNewBarge()">Buy Barge</button>
         <div id="storageUpgradeInfo"></div>
         <div id="bargeUpgradeInfo"></div>
         <div id="bargePurchaseInfo"></div>
         <div id="penPurchaseInfo"></div>
-        <button onclick="closeBargeUpgradeModal()">Close</button>
+        <button class="staff-button" onclick="closeBargeUpgradeModal()">Close</button>
       </div>
     </div>
   <script type="module" src="script.js"></script>
