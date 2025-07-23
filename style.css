@@ -414,9 +414,9 @@ button:active {
   background: var(--bg-darker);
   border-radius: 6px;
   height: 12px;
-  line-height: 0;
   margin-bottom: 6px;
   overflow: hidden;
+  position: relative;
 }
 
 .progress {
@@ -425,8 +425,12 @@ button:active {
   width: 0;
   display: block;
   border-radius: inherit;
-  transition: width 0.3s;
+  transition: width 0.3s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
+
 .bargeCard h2 {
   font-size: 18px;
   margin-bottom: 10px;
