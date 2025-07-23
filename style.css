@@ -206,7 +206,8 @@ button:active {
 #vesselHarvestModal,
 #sellModal,
 #moveModal,
-#renameModal {
+#renameModal,
+#bargeUpgradeModal {
   position: fixed;
   top: 0;
   left: 0;
@@ -225,7 +226,8 @@ button:active {
 #vesselHarvestModal.visible,
 #sellModal.visible,
 #moveModal.visible,
-#renameModal.visible {
+#renameModal.visible,
+#bargeUpgradeModal.visible {
   display: flex;
 }
 
@@ -235,7 +237,8 @@ button:active {
 #vesselHarvestModalContent,
 #sellModalContent,
 #moveModalContent,
-#renameModalContent {
+#renameModalContent,
+#bargeUpgradeModalContent {
   background: var(--modal-bg);
   color: var(--text-light);
   padding: 20px;

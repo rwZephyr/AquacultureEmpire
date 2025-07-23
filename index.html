@@ -52,7 +52,7 @@
             <div id="bargeHousingInfo"></div>
             <button class="staff-button" onclick="upgradeStaffHousing()">Upgrade Housing</button>
             <button onclick="buyMaxFeed()">Refill Feed</button>
-            <button onclick="toggleSection('bargeOptions')">Barge Upgrades</button>
+            <button onclick="openBargeUpgradeModal()">Barge Upgrades</button>
           </div>
           <div id="staffCard" class="staffCard">
             <h2>Staffing</h2>
@@ -101,13 +101,6 @@
         <button onclick="buyMaxFeed()">Buy Max</button>
       </div>
 
-      <div class="shopSection" onclick="toggleSection('bargeOptions')">Barge Upgrades</div>
-      <div id="bargeOptions" class="shopSection-content">
-        <button onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
-        <button onclick="buyNewBarge()">Buy Barge</button>
-        <button onclick="upgradeBarge()">Upgrade Barge</button>
-        <button onclick="buyNewPen()">+ Pen</button>
-      </div>
 
 
 
@@ -119,10 +112,6 @@
         <button onclick="devAddBiomass()">+10kg Biomass (Pen)</button>
       </div>
 
-      <div id="storageUpgradeInfo"></div>
-      <div id="bargeUpgradeInfo"></div>
-      <div id="bargePurchaseInfo"></div>
-      <div id="penPurchaseInfo"></div>
       <div id="licenseShop"></div>
       <div id="statusMessages"></div>
       </div>
@@ -229,6 +218,21 @@
         <input type="text" id="renameInput">
         <button onclick="confirmRename()">Rename</button>
         <button onclick="closeRenameModal()">Cancel</button>
+      </div>
+    </div>
+
+    <div id="bargeUpgradeModal">
+      <div id="bargeUpgradeModalContent">
+        <h2>Barge Upgrades</h2>
+        <button onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
+        <button onclick="upgradeBarge()">Upgrade Barge</button>
+        <button onclick="buyNewPen()">+ Pen</button>
+        <button onclick="buyNewBarge()">Buy Barge</button>
+        <div id="storageUpgradeInfo"></div>
+        <div id="bargeUpgradeInfo"></div>
+        <div id="bargePurchaseInfo"></div>
+        <div id="penPurchaseInfo"></div>
+        <button onclick="closeBargeUpgradeModal()">Close</button>
       </div>
     </div>
   <script type="module" src="script.js"></script>
