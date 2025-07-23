@@ -207,8 +207,7 @@ button:active {
 #sellModal,
 #moveModal,
 #renameModal,
-#bargeUpgradeModal,
-#marketReportModal {
+#bargeUpgradeModal {
   position: fixed;
   top: 0;
   left: 0;
@@ -228,8 +227,7 @@ button:active {
 #sellModal.visible,
 #moveModal.visible,
 #renameModal.visible,
-#bargeUpgradeModal.visible,
-#marketReportModal.visible {
+#bargeUpgradeModal.visible {
   display: flex;
 }
 
@@ -249,13 +247,43 @@ button:active {
   width: 300px;
 }
 
-#marketReportContent {
-  background: var(--modal-bg);
+#marketReportPage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--bg-darker);
   color: var(--text-light);
+  overflow-y: auto;
   padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  width: 600px;
+  display: none;
+  z-index: 900;
+}
+
+#marketReportPage.visible {
+  display: block;
+}
+
+#marketReportContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.market-timestamp {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.close-report-btn {
+  background: var(--btn-main);
+  color: var(--text-dark);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 10px;
 }
 
 #bargeUpgradeMessage {
