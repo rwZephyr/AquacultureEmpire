@@ -22,7 +22,6 @@ import {
   setupMapInteractions,
   openRestockModal,
   closeRestockModal,
-  openHarvestModal,
   closeHarvestModal,
   confirmHarvest,
   openSellModal,
@@ -309,6 +308,7 @@ function feedFish(){
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
   const barge = site.barges[pen.bargeIndex];
+  if(pen.locked) return;
   if(barge.feed<1 || pen.fishCount===0) return;
   barge.feed--;
   const gain = 1 / speciesData[pen.species].fcr;
@@ -329,12 +329,17 @@ function harvestPen(amount=null){
     vessel.maxBiomassCapacity - vessel.currentBiomassLoad
   );
   if(maxHarvest <= 0) return openModal("Vessel capacity full.");
+  if(pen.locked) return openModal('Pen currently busy.');
   let desired = amount === null ? maxHarvest : Math.max(0, Math.min(amount, maxHarvest));
   let fishNum = Math.floor((desired + pen.averageWeight * 0.0001) / pen.averageWeight);
   if(fishNum === 0 && desired > 0) fishNum = 1;
   fishNum = Math.min(fishNum, pen.fishCount);
   const biomass = fishNum * pen.averageWeight;
   const performHarvest = ()=>{
+    pen.locked = true;
+    vessel.harvestingPenIndex = state.currentPenIndex;
+    if(!vessel.cargoSpecies) vessel.cargoSpecies = pen.species;
+    if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
     vessel.harvestProgress = 0;
     vessel.harvestFishBuffer = 0;
     let last = Date.now();
@@ -369,6 +374,8 @@ function harvestPen(amount=null){
         vessel.harvestInterval = null;
         vessel.harvestProgress = 0;
         vessel.harvestFishBuffer = 0;
+        pen.locked = false;
+        vessel.harvestingPenIndex = null;
         vessel.location = site.name;
         vessel.isHarvesting = false;
         vessel.actionEndsAt = 0;
@@ -408,12 +415,19 @@ function cancelVesselHarvest(idx){
   vessel.harvestFishBuffer = 0;
   vessel.isHarvesting = false;
   vessel.actionEndsAt = 0;
+  if(vessel.harvestingPenIndex !== null){
+    const site = state.sites[state.currentSiteIndex];
+    const pen = site.pens[vessel.harvestingPenIndex];
+    if(pen) pen.locked = false;
+    vessel.harvestingPenIndex = null;
+  }
   openModal('Harvest cancelled.');
   updateDisplay();
 }
 function restockPen(sp){
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
+  if(pen.locked) return openModal('Pen currently busy.');
   const data = speciesData[sp];
   if(state.cash < data.restockCost) return openModal("Not enough cash to restock.");
   state.cash -= data.restockCost;
@@ -500,11 +514,11 @@ function showTab(tab){
 
 // pen buttons helper
 function feedFishPen(i){ state.currentPenIndex=i; feedFish(); updateDisplay(); }
-function harvestPenIndex(i){ openHarvestModal(i); }
 function restockPenUI(i){ state.currentPenIndex=i; openRestockModal(); }
 function upgradeFeeder(i){
   const site = state.sites[state.currentSiteIndex];
   const pen = site.pens[i];
+  if(pen.locked) return openModal('Pen currently busy.');
   const currentTier = pen.feeder?.tier || 0;
   if(currentTier >= feederUpgrades.length) return openModal("Feeder already at max tier.");
   const nextTier = currentTier + 1;
@@ -714,6 +728,12 @@ function loadGame() {
         Object.defineProperty(v, 'harvestTimeout', { value: null, writable: true, enumerable: false });
         Object.defineProperty(v, 'harvestProgress', { value: 0, writable: true, enumerable: false });
         Object.defineProperty(v, 'harvestFishBuffer', { value: 0, writable: true, enumerable: false });
+        Object.defineProperty(v, 'harvestingPenIndex', { value: null, writable: true, enumerable: false });
+      });
+      state.sites.forEach(site => {
+        site.pens.forEach(pen => {
+          if(pen.locked === undefined) pen.locked = false;
+        });
       });
       if(obj.time){
         state.totalDaysElapsed = obj.time.totalDaysElapsed ?? state.totalDaysElapsed;
@@ -750,4 +770,4 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, openHarvestModal, closeHarvestModal, confirmHarvest, cancelVesselHarvest, feedFishPen, harvestPenIndex, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, getTimeState  };
+export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, cancelVesselHarvest, feedFishPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, getTimeState  };

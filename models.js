@@ -30,13 +30,15 @@ export class Pen {
     fishCount = 0,
     averageWeight = 0,
     bargeIndex = 0,
-    feeder = null
+    feeder = null,
+    locked = false
   } = {}) {
     this.species = species;
     this.fishCount = fishCount;
     this.averageWeight = averageWeight;
     this.bargeIndex = bargeIndex;
     this.feeder = feeder;
+    this.locked = locked;
   }
 }
 
@@ -87,5 +89,6 @@ export class Vessel {
     Object.defineProperty(this, 'harvestTimeout', { value: null, writable: true, enumerable: false });
     Object.defineProperty(this, 'harvestProgress', { value: 0, writable: true, enumerable: false });
     Object.defineProperty(this, 'harvestFishBuffer', { value: 0, writable: true, enumerable: false });
+    Object.defineProperty(this, 'harvestingPenIndex', { value: null, writable: true, enumerable: false });
   }
 }
