@@ -10,6 +10,10 @@ import {
   feederUpgrades,
   siteNamePrefixes,
   siteNameSuffixes,
+  vesselNamePrefixes,
+  vesselNameSuffixes,
+  vesselClasses,
+  vesselUnlockDays,
   vesselTiers,
   markets,
 } from './data.js';
@@ -202,10 +206,14 @@ state.vessels = [
     cargoSpecies: null,
     speed: vesselTiers[0].speed,
     location: 'Dock',
+    upgradeSlots: vesselClasses.skiff.slots,
+    upgrades: [],
     tier: 0,
     actionEndsAt: 0
   })
 ];
+
+generateShipyardInventory();
 
 // Upgrades & Species constants are imported from data.js
 
@@ -217,9 +225,41 @@ function generateRandomSiteName(){
   return `${p} ${s}`;
 }
 
+function generateRandomVesselName(){
+  const p = vesselNamePrefixes[Math.floor(Math.random()*vesselNamePrefixes.length)];
+  const s = vesselNameSuffixes[Math.floor(Math.random()*vesselNameSuffixes.length)];
+  return `${p} ${s}`;
+}
+
+function isClassUnlocked(cls){
+  if(cls === 'skiff') return true;
+  const req = vesselUnlockDays[cls] || 0;
+  return state.totalDaysElapsed >= req;
+}
+
+function generateShipyardInventory(){
+  state.shipyardInventory = [];
+  for(const cls in vesselClasses){
+    if(!isClassUnlocked(cls)) continue;
+    const base = vesselClasses[cls];
+    const capacity = Math.round(base.baseCapacity * (0.9 + Math.random()*0.2));
+    const speed = +(base.baseSpeed * (0.9 + Math.random()*0.2)).toFixed(1);
+    state.shipyardInventory.push({
+      class: cls,
+      name: generateRandomVesselName(),
+      cargoCapacity: capacity,
+      speed: speed,
+      upgradeSlots: base.slots,
+      cost: base.cost
+    });
+  }
+}
+
 // expose utility functions on the state object for legacy callers
 state.capitalizeFirstLetter = capitalizeFirstLetter;
 state.generateRandomSiteName = generateRandomSiteName;
+state.generateRandomVesselName = generateRandomVesselName;
+state.generateShipyardInventory = generateShipyardInventory;
 state.findSiteByName = findSiteByName;
 state.findMarketByName = findMarketByName;
 state.getLocationByName = getLocationByName;
@@ -267,6 +307,8 @@ export default state;
 export {
   capitalizeFirstLetter,
   generateRandomSiteName,
+  generateRandomVesselName,
+  generateShipyardInventory,
   findSiteByName,
   findMarketByName,
   getLocationByName,

@@ -69,6 +69,8 @@ export class Vessel {
     cargoSpecies = null,
     speed = 10,
     location = '',
+    upgradeSlots = 2,
+    upgrades = [],
     tier = 0,
     isHarvesting = false,
     actionEndsAt = 0
@@ -80,6 +82,8 @@ export class Vessel {
     this.cargoSpecies = cargoSpecies;
     this.speed = speed;
     this.location = location;
+    this.upgradeSlots = upgradeSlots;
+    this.upgrades = upgrades;
     this.tier = tier;
     this.isHarvesting = isHarvesting;
     this.actionEndsAt = actionEndsAt;
