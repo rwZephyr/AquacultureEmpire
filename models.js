@@ -64,6 +64,7 @@ export class Vessel {
     maxBiomassCapacity = 1000,
     currentBiomassLoad = 0,
     cargo = {},
+    cargoSpecies = null,
     speed = 10,
     location = '',
     tier = 0,
@@ -74,10 +75,17 @@ export class Vessel {
     this.maxBiomassCapacity = maxBiomassCapacity;
     this.currentBiomassLoad = currentBiomassLoad;
     this.cargo = cargo;
+    this.cargoSpecies = cargoSpecies;
     this.speed = speed;
     this.location = location;
     this.tier = tier;
     this.isHarvesting = isHarvesting;
     this.actionEndsAt = actionEndsAt;
+
+    // timers and progress (non-enumerable so they aren't saved)
+    Object.defineProperty(this, 'harvestInterval', { value: null, writable: true, enumerable: false });
+    Object.defineProperty(this, 'harvestTimeout', { value: null, writable: true, enumerable: false });
+    Object.defineProperty(this, 'harvestProgress', { value: 0, writable: true, enumerable: false });
+    Object.defineProperty(this, 'harvestFishBuffer', { value: 0, writable: true, enumerable: false });
   }
 }

@@ -303,6 +303,13 @@ button:active {
   color: var(--bg-darker);
 }
 
+.cancel-btn {
+  background-color: #b04444;
+}
+.cancel-btn:hover {
+  background-color: #d45c5c;
+}
+
 .penCard:hover,
 .vesselCard:hover,
 .bargeCard:hover,

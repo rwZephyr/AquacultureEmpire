@@ -140,6 +140,7 @@ state.vessels = [
     name: 'Hauler 1',
     maxBiomassCapacity: vesselTiers[0].maxBiomassCapacity,
     currentBiomassLoad: 0,
+    cargoSpecies: null,
     speed: vesselTiers[0].speed,
     location: 'Dock',
     tier: 0,

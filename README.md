@@ -15,6 +15,8 @@ Aquaculture Empire is a small browser-based aquaculture management game written 
 - Hire and assign staff as feeders, harvesters or feed managers.
 - Upgrade staff housing and barge tiers to unlock more automation.
 - Operate harvest vessels, move them between sites and markets and sell cargo.
+- Harvest progress updates live with staff changes, shows cargo increase in real time and can be cancelled mid-way.
+- Vessels track the species in their hold to prevent mixing different harvests.
 - Interactive map displays sites, markets and vessel locations.
 - Game state is saved in local storage so progress persists across sessions.
 - In-game time tracks days, seasons and years that advance automatically.

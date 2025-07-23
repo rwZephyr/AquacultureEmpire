@@ -163,6 +163,7 @@
           <button class="move-btn">Move Vessel</button>
           <button class="sell-btn">Sell Cargo</button>
           <button class="upgrade-btn">Vessel Upgrades</button>
+          <button class="cancel-btn">Cancel</button>
         </div>
       </template>
     </div>
@@ -193,9 +194,15 @@
     </div>
     <div id="vesselHarvestModal">
       <div id="vesselHarvestModalContent">
-        <h2>Select Biomass to Harvest</h2>
+        <h2>Harvest From Pen</h2>
+        <div>
+          Pen:
+          <select id="vesselHarvestPenSelect"></select>
+        </div>
         <div>Max: <span id="vesselHarvestMax">0</span> kg</div>
         <input type="number" id="vesselHarvestAmount" min="0" step="0.01">
+        <div id="vesselHarvestEta"></div>
+        <div id="vesselHarvestLoad"></div>
         <button onclick="confirmVesselHarvest()">Harvest</button>
         <button onclick="closeVesselHarvestModal()">Cancel</button>
       </div>
