@@ -541,6 +541,12 @@ function openMarketReport(){
   const container = document.getElementById('marketReportContent');
   container.innerHTML = '<h2>Market Report</h2>';
 
+  const ts = state.getTimeState ? state.getTimeState() : { totalDaysElapsed: 0 };
+  const timestamp = document.createElement('div');
+  timestamp.className = 'market-timestamp';
+  timestamp.innerText = `Prices last updated: Day ${ts.totalDaysElapsed}`;
+  container.appendChild(timestamp);
+
   markets.forEach(m => {
     const section = document.createElement('div');
     section.classList.add('market-section');
@@ -603,11 +609,11 @@ function openMarketReport(){
     container.appendChild(section);
   });
 
-  document.getElementById('marketReportModal').classList.add('visible');
+  document.getElementById('marketReportPage').classList.add('visible');
 }
 
 function closeMarketReport(){
-  document.getElementById('marketReportModal').classList.remove('visible');
+  document.getElementById('marketReportPage').classList.remove('visible');
 }
 
 // --- PURCHASES & ACTIONS ---
