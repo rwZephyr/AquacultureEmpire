@@ -183,12 +183,24 @@ function updateLicenseShop(){
   const licenseDiv = document.getElementById('licenseShop');
   const site = state.sites[state.currentSiteIndex];
   licenseDiv.innerHTML = '<h3>Licenses</h3>';
-  for(let sp in speciesData){
-    if(!site.licenses.includes(sp) && speciesData[sp].licenseCost>0){
-      licenseDiv.innerHTML +=
-        `<button onclick="buyLicense('${sp}')">Buy ${capitalizeFirstLetter(sp)} License ($${speciesData[sp].licenseCost})</button><br>`;
+  const sorted = Object.keys(speciesData).sort((a,b)=>a.localeCompare(b));
+  sorted.forEach(sp=>{
+    const data = speciesData[sp];
+    if(!site.licenses.includes(sp) && data.licenseCost>0){
+      const container = document.createElement('div');
+      const btn = document.createElement('button');
+      btn.onclick = () => buyLicense(sp);
+      btn.textContent = `Buy ${capitalizeFirstLetter(sp)} License ($${data.licenseCost})`;
+      container.appendChild(btn);
+      if(data.tags && data.tags.length){
+        const tagEl = document.createElement('div');
+        tagEl.className = 'species-tags';
+        tagEl.textContent = `Tags: ${data.tags.join(', ')}`;
+        container.appendChild(tagEl);
+      }
+      licenseDiv.appendChild(container);
     }
-  }
+  });
 }
 
 // pen grid
@@ -214,6 +226,8 @@ function renderPenGrid(site){
     const feederType = pen.feeder?.type||'None';
     const feederTier = pen.feeder?.tier||0;
     card.querySelector('.pen-feeder').textContent = `${capitalizeFirstLetter(feederType)} (Tier ${feederTier})`;
+    const warnEl = card.querySelector('.pen-warning');
+    updatePenWarning(warnEl, pen);
     card.querySelector('.feed-btn').onclick = () => feedFishPen(idx);
     card.querySelector('.restock-btn').onclick = () => restockPenUI(idx);
     card.querySelector('.upgrade-btn').onclick = () => upgradeFeeder(idx);
@@ -235,7 +249,25 @@ function updatePenCards(site){
     const feederType = pen.feeder?.type||'None';
     const feederTier = pen.feeder?.tier||0;
     card.querySelector('.pen-feeder').textContent = `${capitalizeFirstLetter(feederType)} (Tier ${feederTier})`;
+    const warnEl = card.querySelector('.pen-warning');
+    updatePenWarning(warnEl, pen);
   });
+}
+
+function updatePenWarning(el, pen){
+  if(!el) return;
+  const data = speciesData[pen.species];
+  el.textContent = '';
+  el.className = 'pen-warning';
+  if(!data || !data.maxWeight) return;
+  const max = data.maxWeight;
+  if(pen.averageWeight >= max){
+    el.textContent = '⚠ Exceeds ideal harvest weight — further growth may be inefficient';
+    el.classList.add('critical');
+  } else if(pen.averageWeight >= max*0.8){
+    el.textContent = 'Approaching harvest weight limit';
+    el.classList.add('soft');
+  }
 }
 
 function renderVesselGrid(){
@@ -452,10 +484,19 @@ function openRestockModal(){
   const optionsDiv = document.getElementById('restockOptions');
   optionsDiv.innerHTML = '';
   site.licenses.forEach(sp=>{
+    const data = speciesData[sp];
+    const container = document.createElement('div');
     const btn = document.createElement('button');
-    btn.innerText = `${capitalizeFirstLetter(sp)} ($${speciesData[sp].restockCost})`;
+    btn.innerText = `${capitalizeFirstLetter(sp)} ($${data.restockCost})`;
     btn.onclick = ()=>restockPen(sp);
-    optionsDiv.appendChild(btn);
+    container.appendChild(btn);
+    if(data.tags && data.tags.length){
+      const tagEl = document.createElement('div');
+      tagEl.className = 'species-tags';
+      tagEl.textContent = `Tags: ${data.tags.join(', ')}`;
+      container.appendChild(tagEl);
+    }
+    optionsDiv.appendChild(container);
   });
   document.getElementById('restockModal').classList.add('visible');
 }

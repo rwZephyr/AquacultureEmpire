@@ -467,6 +467,21 @@ button:active {
   font-size: 14px;
   margin: 4px 0;
 }
+.pen-warning {
+  font-size: 13px;
+  margin: 4px 0;
+}
+.pen-warning.soft {
+  color: var(--text-muted);
+}
+.pen-warning.critical {
+  color: #e74c3c;
+}
+.species-tags {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
 .penCard button,
 .vesselCard button {
   display: block;
