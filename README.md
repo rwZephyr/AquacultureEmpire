@@ -1,6 +1,8 @@
 # Aquaculture Empire
 
-Aquaculture Empire is a small browser-based aquaculture management game written in plain HTML, CSS and JavaScript. It lets you run multiple fish farming sites, feed and harvest pens and purchase upgrades without needing any server side components.
+Aquaculture Empire is a lightweight browser-based aquaculture management game. Everything runs locally in your browser using plain HTML, CSS and JavaScript. You can operate multiple farming sites, hire staff, upgrade equipment and grow your business without any server side dependencies.
+
+![Screenshot Placeholder](docs/screenshot.png)
 
 ## Features
 - Manage one or more farming sites. Each site has a barge with feed capacity and a number of pens for raising fish.
@@ -30,14 +32,36 @@ Several read-only time values are exposed on the global `window` object:
 You can also call `getTimeState()` to retrieve these values as an object for
 use in mods or custom event hooks.
 
-## Getting Started
-No build steps are required. Open `index.html` in any modern web browser to start the game. Everything runs locally in the browser.
+## Quickstart
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/AquacultureEmpire.git
+   cd AquacultureEmpire
+   ```
+2. Launch a simple local server:
+   ```bash
+   python3 -m http.server
+   ```
+3. Open your browser at [http://localhost:8000](http://localhost:8000) and start playing.
 
-## File Overview
+## Module Breakdown
 - `index.html` – markup for the sidebar, top bar and modal dialogs.
-- `script.js` – game logic including purchases, feeding, harvesting and UI updates.
-- `data.js` – contains constants for species, upgrades and map locations.
-- `models.js` – simple ES6 classes for Barges, Pens, Sites and Vessels.
 - `style.css` – minimal styling for layout and components.
+- `script.js` – entry point that wires everything together and sets up the auto-save timer.
+- `actions.js` – handles user actions such as buying feed, upgrading equipment, saving and simulating offline progress.
+- `ui.js` – updates DOM elements, renders the map and manages all modal dialogs.
+- `gameState.js` – central state container and time system.
+- `data.js` – constants for species, upgrades, barges, vessels and map locations.
+- `models.js` – simple ES6 classes representing Barges, Pens, Sites and Vessels.
 
-Feel free to modify `script.js` or `data.js` to tweak starting values, species parameters or upgrade costs.
+Feel free to modify `data.js` or the modules above to tweak starting values, species parameters or upgrade costs.
+
+## Auto Save and Offline Progress
+The game automatically saves to your browser's `localStorage` every 30&nbsp;seconds. When you return, `loadGame()` compares the current time with the last save and uses `simulateOfflineProgress()` to advance the simulation in one‑minute steps. A modal dialog shows how many in‑game days passed and how much feed was consumed while you were away.
+
+## Contributing
+Contributions are welcome! Please check the repository's `AGENTS.md` (if present)
+for any project-specific guidelines before submitting a pull request.
+
+## License
+This project is licensed under the [MIT License](LICENSE).
