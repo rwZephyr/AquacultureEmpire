@@ -34,7 +34,9 @@ import {
   closeMarketReport,
   openShipyard as uiOpenShipyard,
   closeShipyard as uiCloseShipyard,
-  backToShipyardList
+  openCustomBuild as uiOpenCustomBuild,
+  backToShipyardList as uiBackToShipyardList,
+  updateCustomBuildStats as uiUpdateCustomBuildStats
 } from "./ui.js";
 
 function buyFeed(amount=20){
@@ -289,6 +291,15 @@ function openShipyard(){
 }
 function closeShipyard(){
   uiCloseShipyard();
+}
+function openCustomBuild(){
+  uiOpenCustomBuild();
+}
+function backToShipyardList(){
+  uiBackToShipyardList();
+}
+function updateCustomBuildStats(){
+  uiUpdateCustomBuildStats();
 }
 function buyShipyardVessel(idx){
   const item = state.shipyardInventory[idx];
@@ -906,4 +917,4 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openShipyard, closeShipyard, buyShipyardVessel, confirmCustomBuild, openMarketReport, closeMarketReport, getTimeState, pauseTime, resumeTime };
+export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openShipyard, closeShipyard, openCustomBuild, backToShipyardList, updateCustomBuildStats, buyShipyardVessel, confirmCustomBuild, openMarketReport, closeMarketReport, getTimeState, pauseTime, resumeTime };
