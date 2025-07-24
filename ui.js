@@ -388,6 +388,11 @@ function closeSellModal(){
   document.getElementById('sellModal').classList.remove('visible');
 }
 
+function openCustomBuild(){
+  // Placeholder for shipyard custom build interface
+  openModal('Custom build feature coming soon!');
+}
+
 function sellCargo(idx){
   const vessel = state.vessels[state.currentVesselIndex];
   if(vessel.currentBiomassLoad<=0) return openModal('No biomass to sell.');
@@ -444,5 +449,6 @@ export {
   confirmVesselHarvest,
   openSellModal,
   closeSellModal,
+  openCustomBuild,
   sellCargo
 };
