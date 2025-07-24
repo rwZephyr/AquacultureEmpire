@@ -248,6 +248,22 @@
         <button class="close-shipyard-btn" onclick="closeShipyard()">Back</button>
         <h2>Shipyard</h2>
         <div id="shipyardList"></div>
+        <button id="openCustomBuildBtn" onclick="openCustomBuild()">Custom Build</button>
+        <div id="customBuildPage" class="custom-build-page" style="display:none">
+          <button class="close-shipyard-btn" onclick="backToShipyardList()">Back</button>
+          <h3>Custom Build</h3>
+          <div>
+            <label for="buildClassSelect">Class:</label>
+            <select id="buildClassSelect" onchange="updateCustomBuildStats()"></select>
+          </div>
+          <div id="buildStats"></div>
+          <div>
+            <label for="buildNameInput">Name:</label>
+            <input type="text" id="buildNameInput">
+          </div>
+          <div>Cost: $<span id="buildCost"></span></div>
+          <button onclick="confirmCustomBuild()">Purchase</button>
+        </div>
       </div>
     </div>
     <div id="marketReportPage" class="market-report-page">

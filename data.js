@@ -91,6 +91,8 @@ export const vesselNameSuffixes = [
 
 export const NEW_VESSEL_COST = 12000;
 
+export const CUSTOM_BUILD_MARKUP = 1.25;
+
 export const siteNamePrefixes = [
   'Driftwood','Stormreach','Gullrock','Cedar','Misty','Haven','Breakwater','Whispering','Duskwater','Salmonstone','SeaLion'
 ];
