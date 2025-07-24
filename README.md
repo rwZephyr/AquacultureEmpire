@@ -26,7 +26,7 @@ Play the latest version [here](https://your-username.github.io/AquacultureEmpire
 Contributions are welcome! Please read [Agents.md](Agents.md) for an overview of the code structure and the major modules. Pull requests should follow the existing style and aim to keep the project dependency free.
 
 ## License
-Code is licensed under the [MIT License](LICENSE). Game art and other assets can be licensed separately (see asset folder for details).
+Code is licensed under the [MIT License](LICENSE). Game art and other assets (including species icons) can be licensed separately (see assets folder for details).
 
 ## Credits
 Created by Evandude and Yamakazi with inspiration from coastal life. Special thanks to open source contributors.
