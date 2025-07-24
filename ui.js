@@ -124,7 +124,6 @@ function updateDisplay(){
   const penPurchaseEl = document.getElementById('penPurchaseInfo');
   if(penPurchaseEl) penPurchaseEl.innerText = `Next Pen Purchase: $${state.penPurchaseCost.toFixed(0)}`;
 
-  updateHarvestInfo();
   updateLicenseShop();
 
   if(lastSiteIndex !== state.currentSiteIndex || site.pens.length !== lastPenCount){
@@ -143,8 +142,6 @@ function updateDisplay(){
   }
 
   renderMap();
-  const statusEl = document.getElementById('statusMessages');
-  if(statusEl) statusEl.innerText = state.statusMessage;
   const tipsEl = document.getElementById('operationalTips');
   if(tipsEl) tipsEl.innerText = state.statusMessage || 'All systems nominal.';
   const tsEl = document.querySelector('#marketReportContent .market-timestamp');
@@ -154,27 +151,6 @@ function updateDisplay(){
 }
 
 // harvest preview
-function updateHarvestInfo(){
-  const site = state.sites[state.currentSiteIndex];
-  const pen  = site.pens[state.currentPenIndex];
-  const infoDiv = document.getElementById('harvestInfo');
-  if(pen.fishCount>0){
-    const vessel = state.vessels[state.currentVesselIndex];
-    if(vessel.currentBiomassLoad>0 && vessel.cargoSpecies && vessel.cargoSpecies !== pen.species){
-      infoDiv.innerText = 'Vessel carrying other species.';
-      return;
-    }
-    const remaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
-    const totalBiomass = pen.fishCount * pen.averageWeight;
-    const harvestableBiomass = Math.min(totalBiomass, remaining);
-    const rate = getSiteHarvestRate(site);
-    const secs  = harvestableBiomass / rate;
-    infoDiv.innerText = `Harvest up to ${harvestableBiomass.toFixed(2)} kg (~${secs.toFixed(1)}s, vessel capacity ${remaining.toFixed(2)} kg)`;
-  } else {
-    infoDiv.innerText = "No fish to harvest.";
-  }
-}
-
 // license shop
 function updateLicenseShop(){
   const licenseDiv = document.getElementById('licenseShop');
@@ -944,7 +920,6 @@ function setFeedPurchaseMax(){
 // --- PURCHASES & ACTIONS ---
 export {
   updateDisplay,
-  updateHarvestInfo,
   updateLicenseShop,
   renderPenGrid,
   renderVesselGrid,
