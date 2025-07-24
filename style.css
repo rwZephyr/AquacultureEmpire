@@ -541,13 +541,44 @@ button:active {
   display: none;
   z-index: 5;
 }
-#feedPurchaseButtons button {
-  display: inline-block;
-}
 #statusMessages {
   margin-top: 10px;
   font-size: 14px;
   color: var(--accent);
+}
+
+/* Feed purchase controls */
+.feed-purchase {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.feed-purchase-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.feed-purchase-row input[type="range"] {
+  flex: 1;
+  min-width: 0;
+}
+.feed-purchase-row input[type="number"] {
+  width: 80px;
+}
+.feed-purchase-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+@media (max-width: 600px) {
+  .feed-purchase-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .feed-purchase-buttons {
+    flex-direction: column;
+  }
 }
 .bargeCard {
   background: var(--bg-panel);

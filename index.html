@@ -39,9 +39,20 @@
         <!-- Status cards -->
         <div id="cardContainer" class="cardContainer">
           <div id="feedOverviewCard" class="logisticsCard">
-            <h2>Feed Storage</h2>
+            <h2>Feed Management</h2>
             <div class="progressBar"><div id="feedProgress" class="progress"></div></div>
             <div><span id="totalFeed">0</span> / <span id="totalFeedCapacity">0</span> kg</div>
+            <div id="feedPurchaseSection" class="feed-purchase">
+              <div class="feed-purchase-row">
+                <input type="range" id="feedPurchaseSlider" min="0" value="0" step="1" oninput="syncFeedPurchase('slider')">
+                <input type="number" id="feedPurchaseInput" min="0" value="0" step="1" oninput="syncFeedPurchase('input')">
+              </div>
+              <div id="feedPurchaseCost">Cost: $0.00</div>
+              <div class="feed-purchase-buttons">
+                <button onclick="confirmBuyFeed()">Buy</button>
+                <button onclick="setFeedPurchaseMax()">Buy Max</button>
+              </div>
+            </div>
           </div>
           <div id="bargeCard" class="bargeCard">
             <h2>Barge Status</h2>
@@ -57,7 +68,6 @@
             <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
             <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
             <div id="bargeHousingInfo"></div>
-            <button class="staff-button" onclick="buyMaxFeed()">Refill Feed</button>
             <button class="staff-button" onclick="openBargeUpgradeModal()">Barge Upgrades</button>
           </div>
           <div id="staffCard" class="staffCard">
@@ -101,11 +111,6 @@
 
     <div id="shop" class="shopPanel">
       <h2>Shop</h2>
-      <div id="feedPurchaseButtons">
-        <button onclick="buyFeed(20)">+20kg Feed</button>
-        <button onclick="buyFeed(100)">+100kg Feed</button>
-        <button onclick="buyMaxFeed()">Buy Max</button>
-      </div>
 
 
 
