@@ -404,7 +404,14 @@ function feedFish(){
   if(pen.locked) return;
   if(barge.feed<1 || pen.fishCount===0) return;
   barge.feed--;
-  const gain = 1 / speciesData[pen.species].fcr;
+  const baseGain = 1 / speciesData[pen.species].fcr;
+  let gain = baseGain;
+  const max = speciesData[pen.species].maxWeight;
+  if(max && pen.averageWeight > max){
+    const excess = pen.averageWeight - max;
+    const scale = Math.max(0.1, 1 - (excess / max));
+    gain *= scale;
+  }
   pen.averageWeight += gain/pen.fishCount;
 }
 function harvestPen(amount=null){
@@ -680,7 +687,14 @@ setInterval(()=>{
         for(let i=0;i<rate;i++){
           if(barge.feed>=1 && pen.fishCount>0){
             barge.feed--;
-            const gain = 1 / speciesData[pen.species].fcr;
+            const baseGain = 1 / speciesData[pen.species].fcr;
+            let gain = baseGain;
+            const max = speciesData[pen.species].maxWeight;
+            if(max && pen.averageWeight > max){
+              const excess = pen.averageWeight - max;
+              const scale = Math.max(0.1, 1 - (excess / max));
+              gain *= scale;
+            }
             pen.averageWeight += gain/pen.fishCount;
           }
         }
@@ -757,8 +771,15 @@ function simulateOfflineProgress(ms){
           barge.feed -= used;
           feedUsed += used;
           if(used > 0 && pen.fishCount > 0){
-            const gain = used / speciesData[pen.species].fcr / pen.fishCount;
-            pen.averageWeight += gain;
+            const baseGain = used / speciesData[pen.species].fcr;
+            let gain = baseGain;
+            const max = speciesData[pen.species].maxWeight;
+            if(max && pen.averageWeight > max){
+              const excess = pen.averageWeight - max;
+              const scale = Math.max(0.1, 1 - (excess / max));
+              gain *= scale;
+            }
+            pen.averageWeight += gain / pen.fishCount;
           }
         });
 

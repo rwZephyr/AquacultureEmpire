@@ -257,17 +257,20 @@ function updatePenCards(site){
 function updatePenWarning(el, pen){
   if(!el) return;
   const data = speciesData[pen.species];
-  el.textContent = '';
+  el.innerHTML = '';
   el.className = 'pen-warning';
   if(!data || !data.maxWeight) return;
   const max = data.maxWeight;
+  const messages = [];
   if(pen.averageWeight >= max){
-    el.textContent = '⚠ Exceeds ideal harvest weight — further growth may be inefficient';
+    messages.push('⚠ Exceeds ideal harvest weight — further growth may be inefficient');
     el.classList.add('critical');
+    messages.push('<span class="diminish-note">⚠ Growth slowed — over optimal weight</span>');
   } else if(pen.averageWeight >= max*0.8){
-    el.textContent = 'Approaching harvest weight limit';
+    messages.push('Approaching harvest weight limit');
     el.classList.add('soft');
   }
+  el.innerHTML = messages.join('<br>');
 }
 
 function renderVesselGrid(){
