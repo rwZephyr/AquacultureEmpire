@@ -1,26 +1,32 @@
+import { siloUpgrades, blowerUpgrades, housingUpgrades, DEFAULT_FEEDER_LIMIT, DEFAULT_MAX_FEEDER_TIER } from './data.js';
+
 export class Barge {
   constructor({
     feed = 100,
-    feedCapacity,
+    feedCapacity = siloUpgrades[0].feedCapacity,
     siloCapacity = 1000,
-    staffCapacity = 2,
-    tier = 0,
-    feederLimit,
-    maxFeederTier,
+    staffCapacity = housingUpgrades[0].staffCapacity,
+    feederLimit = DEFAULT_FEEDER_LIMIT,
+    maxFeederTier = DEFAULT_MAX_FEEDER_TIER,
     upgrades = [],
     storageUpgradeLevel = 0,
-    housingUpgradeLevel = 0
+    housingUpgradeLevel = 0,
+    siloUpgradeLevel = 0,
+    blowerUpgradeLevel = 0,
+    feedRateMultiplier = blowerUpgrades[0].rate
   } = {}) {
     this.feed = feed;
     this.feedCapacity = feedCapacity;
     this.siloCapacity = siloCapacity;
     this.staffCapacity = staffCapacity;
-    this.tier = tier;
     this.feederLimit = feederLimit;
     this.maxFeederTier = maxFeederTier;
     this.upgrades = upgrades;
     this.storageUpgradeLevel = storageUpgradeLevel;
     this.housingUpgradeLevel = housingUpgradeLevel;
+    this.siloUpgradeLevel = siloUpgradeLevel;
+    this.blowerUpgradeLevel = blowerUpgradeLevel;
+    this.feedRateMultiplier = feedRateMultiplier;
   }
 }
 

@@ -4,7 +4,31 @@ export const bargeTiers = [
   { name: 'Large',  feedCapacity: 1000, feederLimit: 8, maxFeederTier: 3, cost: 15000 }
 ];
 
+export const DEFAULT_FEEDER_LIMIT = bargeTiers[0].feederLimit;
+export const DEFAULT_MAX_FEEDER_TIER = bargeTiers[0].maxFeederTier;
+
 export const NEW_BARGE_COST = 8000;
+
+export const siloUpgrades = [
+  { level: 0, feedCapacity: 200,  cost: 0 },
+  { level: 1, feedCapacity: 500,  cost: 2500 },
+  { level: 2, feedCapacity: 1000, cost: 7500 },
+  { level: 3, feedCapacity: 2000, cost: 15000 }
+];
+
+export const blowerUpgrades = [
+  { level: 0, rate: 1, cost: 0 },
+  { level: 1, rate: 2, cost: 3000 },
+  { level: 2, rate: 3, cost: 8000 },
+  { level: 3, rate: 4, cost: 16000 }
+];
+
+export const housingUpgrades = [
+  { level: 0, staffCapacity: 2, cost: 0 },
+  { level: 1, staffCapacity: 4, cost: 4000 },
+  { level: 2, staffCapacity: 6, cost: 9000 },
+  { level: 3, staffCapacity: 8, cost: 18000 }
+];
 
 export const feedStorageUpgrades = [
   { capacity: 250, cost: 100 }, { capacity: 500, cost: 250 },

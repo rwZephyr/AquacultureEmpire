@@ -1,8 +1,12 @@
 import {
-  bargeTiers,
   NEW_BARGE_COST,
   NEW_VESSEL_COST,
   feedStorageUpgrades,
+  siloUpgrades,
+  blowerUpgrades,
+  housingUpgrades,
+  DEFAULT_FEEDER_LIMIT,
+  DEFAULT_MAX_FEEDER_TIER,
   STAFF_HIRE_COST,
   staffRoles,
   staffHousingUpgrades,
@@ -30,6 +34,8 @@ import {
   openSellModal,
   closeSellModal,
   sellCargo,
+  openBargeUpgradeModal as uiOpenBargeUpgradeModal,
+  closeBargeUpgradeModal as uiCloseBargeUpgradeModal,
   openMarketReport,
   closeMarketReport,
   openShipyard as uiOpenShipyard,
@@ -80,15 +86,17 @@ function buyNewSite(){
     location: { x: Math.random()*100, y: Math.random()*60 },
     barges:[new Barge({
       feed:100,
-      feedCapacity: bargeTiers[0].feedCapacity,
+      feedCapacity: siloUpgrades[0].feedCapacity,
       siloCapacity:1000,
-      staffCapacity:2,
-      tier:0,
-      feederLimit: bargeTiers[0].feederLimit,
-      maxFeederTier: bargeTiers[0].maxFeederTier,
+      staffCapacity: housingUpgrades[0].staffCapacity,
+      feederLimit: DEFAULT_FEEDER_LIMIT,
+      maxFeederTier: DEFAULT_MAX_FEEDER_TIER,
       upgrades:[],
       storageUpgradeLevel: 0,
-      housingUpgradeLevel: 0
+      housingUpgradeLevel: 0,
+      siloUpgradeLevel: 0,
+      blowerUpgradeLevel: 0,
+      feedRateMultiplier: blowerUpgrades[0].rate
     })],
     staff: [],
     licenses:['shrimp'],
@@ -113,15 +121,17 @@ function buyNewBarge(){
   state.cash -= NEW_BARGE_COST;
   site.barges.push({
     feed:100,
-    feedCapacity: bargeTiers[0].feedCapacity,
+    feedCapacity: siloUpgrades[0].feedCapacity,
     siloCapacity:1000,
-    staffCapacity:2,
-    tier:0,
-    feederLimit: bargeTiers[0].feederLimit,
-    maxFeederTier: bargeTiers[0].maxFeederTier,
+    staffCapacity: housingUpgrades[0].staffCapacity,
+    feederLimit: DEFAULT_FEEDER_LIMIT,
+    maxFeederTier: DEFAULT_MAX_FEEDER_TIER,
     upgrades:[],
     storageUpgradeLevel:0,
-    housingUpgradeLevel:0
+    housingUpgradeLevel:0,
+    siloUpgradeLevel:0,
+    blowerUpgradeLevel:0,
+    feedRateMultiplier: blowerUpgrades[0].rate
   });
   state.currentBargeIndex = site.barges.length-1;
   updateDisplay();
@@ -159,6 +169,45 @@ function unassignStaff(role){
   member.role = null;
   updateDisplay();
 }
+
+function upgradeSilo(barge = state.sites[state.currentSiteIndex].barges[state.currentBargeIndex]){
+  if(!barge) return;
+  const level = barge.siloUpgradeLevel || 0;
+  if(level >= siloUpgrades.length - 1)
+    return openModal('Silo already at max level.');
+  const next = siloUpgrades[level + 1];
+  if(state.cash < next.cost) return openModal('Not enough cash to upgrade silo.');
+  state.cash -= next.cost;
+  barge.siloUpgradeLevel = level + 1;
+  barge.feedCapacity = next.feedCapacity;
+  updateDisplay();
+}
+
+function upgradeBlower(barge = state.sites[state.currentSiteIndex].barges[state.currentBargeIndex]){
+  if(!barge) return;
+  const level = barge.blowerUpgradeLevel || 0;
+  if(level >= blowerUpgrades.length - 1)
+    return openModal('Blower already at max level.');
+  const next = blowerUpgrades[level + 1];
+  if(state.cash < next.cost) return openModal('Not enough cash to upgrade blower.');
+  state.cash -= next.cost;
+  barge.blowerUpgradeLevel = level + 1;
+  barge.feedRateMultiplier = next.rate;
+  updateDisplay();
+}
+
+function upgradeHousing(barge = state.sites[state.currentSiteIndex].barges[state.currentBargeIndex]){
+  if(!barge) return;
+  const level = barge.housingUpgradeLevel || 0;
+  if(level >= housingUpgrades.length - 1)
+    return openModal('Housing already at max level.');
+  const next = housingUpgrades[level + 1];
+  if(state.cash < next.cost) return openModal('Not enough cash to upgrade housing.');
+  state.cash -= next.cost;
+  barge.housingUpgradeLevel = level + 1;
+  barge.staffCapacity = next.staffCapacity;
+  updateDisplay();
+}
 function upgradeStaffHousing(){
   const site = state.sites[state.currentSiteIndex];
   const barge = site.barges[state.currentBargeIndex];
@@ -172,22 +221,6 @@ function upgradeStaffHousing(){
   updateDisplay();
 }
 
-function upgradeBarge(){
-  const site = state.sites[state.currentSiteIndex];
-  const barge = site.barges[state.currentBargeIndex];
-  const currentTier = barge.tier;
-  if(currentTier >= bargeTiers.length - 1)
-    return openModal("Barge already at max tier.");
-  const next = bargeTiers[currentTier + 1];
-  if(state.cash < next.cost) return openModal("Not enough cash to upgrade barge.");
-  state.cash -= next.cost;
-  barge.tier++;
-  barge.feedCapacity = Math.max(barge.feedCapacity, next.feedCapacity);
-  barge.feederLimit = next.feederLimit;
-  barge.maxFeederTier = next.maxFeederTier;
-  openModal(`Barge upgraded to ${next.name}!`);
-  updateDisplay();
-}
 
 function upgradeVessel(){
   const vessel = state.vessels[state.currentVesselIndex];
@@ -275,10 +308,10 @@ function closeMoveModal(){
 }
 
 function openBargeUpgradeModal(){
-  document.getElementById('bargeUpgradeModal').classList.add('visible');
+  uiOpenBargeUpgradeModal();
 }
 function closeBargeUpgradeModal(){
-  document.getElementById('bargeUpgradeModal').classList.remove('visible');
+  uiCloseBargeUpgradeModal();
 }
 
 function openShipyard(){
@@ -688,6 +721,8 @@ setInterval(()=>{
           rate += feederRate;
           activeFeeders++;
         }
+        const blowerRate = barge.feedRateMultiplier || 1;
+        rate *= blowerRate;
         for(let i=0;i<rate;i++){
           if(barge.feed>=1 && pen.fishCount>0){
             barge.feed--;
@@ -770,6 +805,8 @@ function simulateOfflineProgress(ms){
             rate += fr;
             activeFeeders++;
           }
+          const blowerRate = barge.feedRateMultiplier || 1;
+          rate *= blowerRate;
           const need = rate * dt;
           const used = Math.min(need, barge.feed);
           barge.feed -= used;
@@ -875,6 +912,19 @@ function loadGame() {
         site.pens.forEach(pen => {
           if(pen.locked === undefined) pen.locked = false;
         });
+        site.barges.forEach(barge => {
+          if(barge.siloUpgradeLevel === undefined) barge.siloUpgradeLevel = 0;
+          if(barge.blowerUpgradeLevel === undefined) barge.blowerUpgradeLevel = 0;
+          if(barge.feedRateMultiplier === undefined) {
+            const lvl = barge.blowerUpgradeLevel ?? 0;
+            barge.feedRateMultiplier = blowerUpgrades[lvl]?.rate || 1;
+          }
+          if(barge.feedCapacity === undefined) barge.feedCapacity = siloUpgrades[0].feedCapacity;
+          if(barge.housingUpgradeLevel === undefined) barge.housingUpgradeLevel = 0;
+          if(barge.staffCapacity === undefined) barge.staffCapacity = housingUpgrades[0].staffCapacity;
+          if(barge.feederLimit === undefined) barge.feederLimit = DEFAULT_FEEDER_LIMIT;
+          if(barge.maxFeederTier === undefined) barge.maxFeederTier = DEFAULT_MAX_FEEDER_TIER;
+        });
       });
       if(obj.time){
         state.totalDaysElapsed = obj.time.totalDaysElapsed ?? state.totalDaysElapsed;
@@ -937,4 +987,4 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export { buyFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openShipyard, closeShipyard, openCustomBuild, backToShipyardList, updateCustomBuildStats, buyShipyardVessel, confirmCustomBuild, openMarketReport, closeMarketReport, getTimeState, pauseTime, resumeTime, updateFeedPurchaseUI, syncFeedPurchase, confirmBuyFeed, setFeedPurchaseMax };
+export { buyFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeSilo, upgradeBlower, upgradeHousing, upgradeStaffHousing, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openShipyard, closeShipyard, openCustomBuild, backToShipyardList, updateCustomBuildStats, buyShipyardVessel, confirmCustomBuild, openMarketReport, closeMarketReport, getTimeState, pauseTime, resumeTime, updateFeedPurchaseUI, syncFeedPurchase, confirmBuyFeed, setFeedPurchaseMax };

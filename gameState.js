@@ -1,5 +1,9 @@
 import {
-  bargeTiers,
+  siloUpgrades,
+  blowerUpgrades,
+  housingUpgrades,
+  DEFAULT_FEEDER_LIMIT,
+  DEFAULT_MAX_FEEDER_TIER,
   NEW_BARGE_COST,
   NEW_VESSEL_COST,
   feedStorageUpgrades,
@@ -179,15 +183,17 @@ state.sites = [
     barges: [
       new Barge({
         feed: 100,
-        feedCapacity: bargeTiers[0].feedCapacity,
+        feedCapacity: siloUpgrades[0].feedCapacity,
         siloCapacity: 1000,
-        staffCapacity: 2,
-        tier: 0,
-        feederLimit: bargeTiers[0].feederLimit,
-        maxFeederTier: bargeTiers[0].maxFeederTier,
+        staffCapacity: housingUpgrades[0].staffCapacity,
+        feederLimit: DEFAULT_FEEDER_LIMIT,
+        maxFeederTier: DEFAULT_MAX_FEEDER_TIER,
         upgrades: [],
         storageUpgradeLevel: 0,
-        housingUpgradeLevel: 0
+        housingUpgradeLevel: 0,
+        siloUpgradeLevel: 0,
+        blowerUpgradeLevel: 0,
+        feedRateMultiplier: blowerUpgrades[0].rate
       })
     ],
     staff: [],

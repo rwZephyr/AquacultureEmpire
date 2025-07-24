@@ -61,7 +61,6 @@
               Barge <span id="bargeIndex">1</span>/<span id="bargeCount">1</span>
               <button class="staff-button" onclick="nextBarge()">⟶</button>
             </div>
-            <div>Barge Tier: <span id="bargeTierName">Small</span></div>
             <div>Feeders: <span id="bargeFeedersUsed">0</span>/<span id="bargeFeederLimit">0</span> (Max Tier <span id="bargeMaxFeederTier">0</span>)</div>
             <div>Feed: <span id="bargeFeed">0</span> / <span id="bargeFeedCapacity">0</span> kg</div>
             <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
@@ -237,15 +236,9 @@
       <div id="bargeUpgradeModalContent">
         <h2>Barge Upgrades</h2>
         <div id="bargeUpgradeMessage" class="barge-alert" style="display:none"></div>
-        <button class="staff-button" onclick="buyFeedStorageUpgrade()">Upgrade Storage</button>
-        <button class="staff-button" onclick="upgradeBarge()">Upgrade Barge</button>
-        <button class="staff-button" onclick="upgradeStaffHousing()">Upgrade Housing</button>
-        <button class="staff-button" onclick="buyNewPen()">+ Pen</button>
-        <button class="staff-button" onclick="buyNewBarge()">Buy Barge</button>
-        <div id="storageUpgradeInfo"></div>
-        <div id="bargeUpgradeInfo"></div>
-        <div id="bargePurchaseInfo"></div>
-        <div id="penPurchaseInfo"></div>
+        <div id="upgradeSiloRow" class="upgrade-row"></div>
+        <div id="upgradeBlowerRow" class="upgrade-row"></div>
+        <div id="upgradeHousingRow" class="upgrade-row"></div>
         <button class="staff-button" onclick="closeBargeUpgradeModal()">Close</button>
       </div>
     </div>
