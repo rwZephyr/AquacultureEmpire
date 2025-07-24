@@ -39,6 +39,7 @@ const state = {
   AUTO_SAVE_INTERVAL_MS: 30000, // 30 seconds
   SAVE_KEY: 'aquacultureEmpireSave',
   TRAVEL_TIME_FACTOR: 1000, // ms per distance unit
+  OFFLOAD_RATE: 10, // kg per second
 
   // --- Game Time System ---
   SEASONS: ['Spring', 'Summer', 'Fall', 'Winter'],

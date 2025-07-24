@@ -94,6 +94,9 @@ export class Vessel {
     this.isHarvesting = isHarvesting;
     this.actionEndsAt = actionEndsAt;
 
+    this.unloading = false;
+    this.offloadRevenue = 0;
+
     // timers and progress (non-enumerable so they aren't saved)
     Object.defineProperty(this, 'harvestInterval', { value: null, writable: true, enumerable: false });
     Object.defineProperty(this, 'harvestTimeout', { value: null, writable: true, enumerable: false });
@@ -101,5 +104,8 @@ export class Vessel {
     Object.defineProperty(this, 'harvestFishBuffer', { value: 0, writable: true, enumerable: false });
     Object.defineProperty(this, 'harvestingPenIndex', { value: null, writable: true, enumerable: false });
     Object.defineProperty(this, 'travelInterval', { value: null, writable: true, enumerable: false });
+    Object.defineProperty(this, 'offloadInterval', { value: null, writable: true, enumerable: false });
+    Object.defineProperty(this, 'offloadPrices', { value: null, writable: true, enumerable: false });
+    Object.defineProperty(this, 'offloadMarket', { value: null, writable: true, enumerable: false });
   }
 }
