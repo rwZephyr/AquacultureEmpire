@@ -91,12 +91,14 @@ function setupMarketData(){
     if(!m.prices) m.prices = {};
     if(!m.priceHistory) m.priceHistory = {};
     if(!m.daysSinceSale) m.daysSinceSale = {};
+    if(!m.volatility) m.volatility = {};
     for(const sp in speciesData){
       const base = speciesData[sp].marketPrice * (m.modifiers[sp]||1);
       if(m.basePrices[sp] === undefined) m.basePrices[sp] = base;
       if(m.prices[sp] === undefined) m.prices[sp] = base;
       if(!Array.isArray(m.priceHistory[sp])) m.priceHistory[sp] = [m.prices[sp]];
       if(m.daysSinceSale[sp] === undefined) m.daysSinceSale[sp] = 0;
+      if(m.volatility[sp] === undefined) m.volatility[sp] = 0;
     }
   });
 }
@@ -106,7 +108,16 @@ function updateMarketPrices(){
     for(const sp in m.prices){
       const base = m.basePrices[sp];
       let price = m.prices[sp];
-      const change = (Math.random()*0.1 - 0.05); // +/-5%
+      if(!m.volatility[sp]) m.volatility[sp] = 0;
+      let momentum = m.volatility[sp] * 0.5;
+      let randomComponent = (Math.random()*0.1 - 0.05);
+      let change = momentum + randomComponent;
+      if(Math.random() < 0.05){
+        change += (Math.random()*0.2 - 0.1);
+      }
+      const volatilityFactor = speciesData[sp].volatility || 1;
+      change *= volatilityFactor;
+      m.volatility[sp] = change;
       price *= (1 + change);
       const min = base * 0.5;
       const max = base * 1.5;
