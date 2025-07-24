@@ -54,7 +54,10 @@ function updateDisplay(){
   document.getElementById('vesselTierName').innerText = vesselTier.name;
   document.getElementById('vesselLoad').innerText = vessel.currentBiomassLoad.toFixed(1);
   document.getElementById('vesselCapacity').innerText = vessel.maxBiomassCapacity;
+  document.getElementById('vesselSpeed').innerText = vessel.speed;
   document.getElementById('vesselLocation').innerText = vessel.location;
+  const priceEl = document.getElementById('vesselPrice');
+  if(priceEl) priceEl.innerText = `$${NEW_VESSEL_COST}`;
   const vesselHarvestBtn = document.getElementById('vesselHarvestBtn');
   if(vesselHarvestBtn) vesselHarvestBtn.disabled = vessel.isHarvesting;
   if(vessel.tier < vesselTiers.length - 1){
@@ -64,7 +67,6 @@ function updateDisplay(){
   } else {
     document.getElementById('vesselUpgradeInfo').innerText = 'Vessel Fully Upgraded';
   }
-  document.getElementById('vesselPurchaseInfo').innerText = `New Vessel Cost: $${NEW_VESSEL_COST}`;
 
   // staff card info
   document.getElementById('staffTotal').innerText = site.staff.length;
