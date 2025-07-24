@@ -259,33 +259,46 @@ function renderVesselGrid(){
     card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;
     card.querySelector('.vessel-location').textContent = vessel.location;
     const statusEl = card.querySelector('.vessel-status');
-    let status = vessel.isHarvesting ? 'Harvesting' : (vessel.location.startsWith('Traveling') ? 'Traveling' : 'Idle');
+    let status = vessel.isHarvesting ? 'Harvesting' : vessel.unloading ? 'Unloading' : (vessel.location.startsWith('Traveling') ? 'Traveling' : 'Idle');
     if(vessel.actionEndsAt && vessel.actionEndsAt > Date.now()){
       const eta = Math.max(0, (vessel.actionEndsAt - Date.now())/1000);
       status += ` (${eta.toFixed(0)}s)`;
     }
     statusEl.textContent = status;
     const speciesEl = card.querySelector('.harvest-species');
-    speciesEl.textContent = vessel.isHarvesting && vessel.cargoSpecies ? `Harvesting ${capitalizeFirstLetter(vessel.cargoSpecies)}` : '';
+    if(vessel.unloading){
+      speciesEl.textContent = `Revenue $${vessel.offloadRevenue.toFixed(2)}`;
+    } else {
+      speciesEl.textContent = vessel.isHarvesting && vessel.cargoSpecies ? `Harvesting ${capitalizeFirstLetter(vessel.cargoSpecies)}` : '';
+    }
     const loadPercent = vessel.maxBiomassCapacity ? (vessel.currentBiomassLoad / vessel.maxBiomassCapacity)*100 : 0;
     card.querySelector('.vessel-progress').style.width = loadPercent + '%';
     card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1);
     card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity;
     const harvestBtn = card.querySelector('.harvest-btn');
     harvestBtn.onclick = ()=>{ state.currentVesselIndex = idx; openHarvestModal(idx); };
-    harvestBtn.style.display = vessel.isHarvesting ? 'none' : 'block';
+    harvestBtn.style.display = (vessel.isHarvesting || vessel.unloading) ? 'none' : 'block';
     const moveBtn = card.querySelector('.move-btn');
     moveBtn.onclick = ()=>{ state.currentVesselIndex = idx; openMoveVesselModal(); };
-    moveBtn.disabled = vessel.isHarvesting;
+    moveBtn.disabled = vessel.isHarvesting || vessel.unloading;
     const sellBtn = card.querySelector('.sell-btn');
     sellBtn.onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
-    sellBtn.disabled = vessel.isHarvesting;
+    sellBtn.disabled = vessel.isHarvesting || vessel.unloading;
     const upBtn = card.querySelector('.upgrade-btn');
     upBtn.onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
-    upBtn.disabled = vessel.isHarvesting;
+    upBtn.disabled = vessel.isHarvesting || vessel.unloading;
     const cancelBtn = card.querySelector('.cancel-btn');
-    cancelBtn.onclick = ()=>{ state.currentVesselIndex = idx; cancelVesselHarvest(idx); };
-    cancelBtn.style.display = vessel.isHarvesting ? 'block' : 'none';
+    cancelBtn.onclick = ()=>{
+      state.currentVesselIndex = idx;
+      if(vessel.unloading){
+        const market = markets.find(m=>m.name===vessel.offloadMarket);
+        finishOffloading(vessel, market, true);
+      } else {
+        cancelVesselHarvest(idx);
+      }
+    };
+    cancelBtn.textContent = vessel.unloading ? 'Cancel Offloading' : 'Cancel';
+    cancelBtn.style.display = (vessel.isHarvesting || vessel.unloading) ? 'block' : 'none';
     grid.appendChild(clone);
   });
 }
@@ -300,33 +313,46 @@ function updateVesselCards(){
     card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;
     card.querySelector('.vessel-location').textContent = vessel.location;
     const statusEl = card.querySelector('.vessel-status');
-    let status = vessel.isHarvesting ? 'Harvesting' : (vessel.location.startsWith('Traveling') ? 'Traveling' : 'Idle');
+    let status = vessel.isHarvesting ? 'Harvesting' : vessel.unloading ? 'Unloading' : (vessel.location.startsWith('Traveling') ? 'Traveling' : 'Idle');
     if(vessel.actionEndsAt && vessel.actionEndsAt > Date.now()){
       const eta = Math.max(0, (vessel.actionEndsAt - Date.now())/1000);
       status += ` (${eta.toFixed(0)}s)`;
     }
     statusEl.textContent = status;
     const speciesEl = card.querySelector('.harvest-species');
-    speciesEl.textContent = vessel.isHarvesting && vessel.cargoSpecies ? `Harvesting ${capitalizeFirstLetter(vessel.cargoSpecies)}` : '';
+    if(vessel.unloading){
+      speciesEl.textContent = `Revenue $${vessel.offloadRevenue.toFixed(2)}`;
+    } else {
+      speciesEl.textContent = vessel.isHarvesting && vessel.cargoSpecies ? `Harvesting ${capitalizeFirstLetter(vessel.cargoSpecies)}` : '';
+    }
     const loadPercent = vessel.maxBiomassCapacity ? (vessel.currentBiomassLoad / vessel.maxBiomassCapacity)*100 : 0;
     card.querySelector('.vessel-progress').style.width = loadPercent + '%';
     card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1);
     card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity;
     const harvestBtn2 = card.querySelector('.harvest-btn');
     harvestBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openHarvestModal(idx); };
-    harvestBtn2.style.display = vessel.isHarvesting ? 'none' : 'block';
+    harvestBtn2.style.display = (vessel.isHarvesting || vessel.unloading) ? 'none' : 'block';
     const moveBtn2 = card.querySelector('.move-btn');
-    moveBtn2.disabled = vessel.isHarvesting;
+    moveBtn2.disabled = vessel.isHarvesting || vessel.unloading;
     moveBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openMoveVesselModal(); };
     const sellBtn2 = card.querySelector('.sell-btn');
-    sellBtn2.disabled = vessel.isHarvesting;
+    sellBtn2.disabled = vessel.isHarvesting || vessel.unloading;
     sellBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
     const upBtn2 = card.querySelector('.upgrade-btn');
-    upBtn2.disabled = vessel.isHarvesting;
+    upBtn2.disabled = vessel.isHarvesting || vessel.unloading;
     upBtn2.onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
     const cancelBtn = card.querySelector('.cancel-btn');
-    cancelBtn.onclick = ()=>{ state.currentVesselIndex = idx; cancelVesselHarvest(idx); };
-    cancelBtn.style.display = vessel.isHarvesting ? 'block' : 'none';
+    cancelBtn.onclick = ()=>{
+      state.currentVesselIndex = idx;
+      if(vessel.unloading){
+        const market = markets.find(m=>m.name===vessel.offloadMarket);
+        finishOffloading(vessel, market, true);
+      } else {
+        cancelVesselHarvest(idx);
+      }
+    };
+    cancelBtn.textContent = vessel.unloading ? 'Cancel Offloading' : 'Cancel';
+    cancelBtn.style.display = (vessel.isHarvesting || vessel.unloading) ? 'block' : 'none';
   });
 }
 
@@ -650,34 +676,95 @@ function updateCustomBuildStats(){
   }
 }
 
+function startOffloading(vessel, market){
+  vessel.unloading = true;
+  vessel.offloadRevenue = 0;
+  vessel.offloadMarket = market.name;
+  // offloadPrices may be pre-set when the market was chosen. If not, lock prices now.
+  if(!vessel.offloadPrices){
+    vessel.offloadPrices = {};
+    for(const sp in vessel.cargo){
+      const price = market.prices?.[sp] ?? (speciesData[sp].marketPrice * (market.modifiers[sp]||1));
+      vessel.offloadPrices[sp] = price;
+    }
+  }
+  const rate = state.OFFLOAD_RATE;
+  const updateEta = ()=>{ vessel.actionEndsAt = Date.now() + (vessel.currentBiomassLoad / rate) * 1000; };
+  updateEta();
+  let last = Date.now();
+  vessel.offloadInterval = setInterval(()=>{
+    const now = Date.now();
+    if(state.timePaused){ last = now; return; }
+    let dt = (now - last)/1000;
+    last = now;
+    let remaining = rate * dt;
+    while(remaining > 0 && vessel.currentBiomassLoad > 0){
+      const sp = Object.keys(vessel.cargo).find(s=>vessel.cargo[s]>0);
+      if(!sp) break;
+      const amt = Math.min(remaining, vessel.cargo[sp]);
+      vessel.cargo[sp] -= amt;
+      vessel.currentBiomassLoad -= amt;
+      vessel.offloadRevenue += amt * vessel.offloadPrices[sp];
+      if(market.daysSinceSale) market.daysSinceSale[sp] = 0;
+      if(vessel.cargo[sp] <= 0){
+        delete vessel.cargo[sp];
+        if(Object.keys(vessel.cargo).length===0) vessel.cargoSpecies = null;
+      }
+      remaining -= amt;
+    }
+    updateEta();
+    updateDisplay();
+    if(vessel.currentBiomassLoad <= 0){
+      finishOffloading(vessel, market);
+    }
+  },250);
+}
+
+function finishOffloading(vessel, market, canceled=false){
+  if(vessel.offloadInterval){ clearInterval(vessel.offloadInterval); vessel.offloadInterval = null; }
+  vessel.unloading = false;
+  vessel.actionEndsAt = 0;
+  const earned = vessel.offloadRevenue || 0;
+  const prices = vessel.offloadPrices || {};
+  state.cash += earned;
+  vessel.offloadRevenue = 0;
+  vessel.offloadPrices = null;
+  vessel.offloadMarket = null;
+  if(!canceled){
+    vessel.cargo = {};
+    vessel.cargoSpecies = null;
+    vessel.currentBiomassLoad = 0;
+    if(market && market.daysSinceSale){
+      for(const sp in prices){ market.daysSinceSale[sp] = 0; }
+    }
+  }
+  const msg = canceled ? `Offloading canceled. Earned $${earned.toFixed(2)} so far.` :
+                         `Sold cargo for $${earned.toFixed(2)} at ${market.name}.`;
+  openModal(msg);
+  updateDisplay();
+}
+
 function sellCargo(idx){
   const vessel = state.vessels[state.currentVesselIndex];
-  if(vessel.isHarvesting) { closeSellModal(); return openModal('Vessel currently harvesting.'); }
+  if(vessel.isHarvesting || vessel.unloading){ closeSellModal(); return openModal('Vessel currently busy.'); }
   if(vessel.currentBiomassLoad<=0) return openModal('No biomass to sell.');
   const market = markets[idx];
   if(vessel.location === `Traveling to ${market.name}`){
     closeSellModal();
     return openModal('Vessel already en route to this market.');
   }
-  const completeSale = ()=>{
-    let total = 0;
-    for(const sp in vessel.cargo){
-      const weight = vessel.cargo[sp];
-      const price = market.prices?.[sp] ?? (speciesData[sp].marketPrice * (market.modifiers[sp]||1));
-      total += weight * price;
-      if(market.daysSinceSale) market.daysSinceSale[sp] = 0;
-    }
-    state.cash += total;
-    vessel.currentBiomassLoad = 0;
-    vessel.cargo = {};
-    vessel.cargoSpecies = null;
-    vessel.location = market.name;
-    openModal(`Sold cargo for $${total.toFixed(2)} at ${market.name}.`);
-    updateDisplay();
-  };
+  // lock in prices when the market is chosen
+  vessel.offloadPrices = {};
+  vessel.offloadMarket = market.name;
+  for(const sp in vessel.cargo){
+    const price = market.prices?.[sp] ?? (speciesData[sp].marketPrice * (market.modifiers[sp]||1));
+    vessel.offloadPrices[sp] = price;
+  }
+  vessel.offloadRevenue = 0;
+  const begin = ()=>{ startOffloading(vessel, market); updateDisplay(); };
   if(vessel.location === market.name){
     closeSellModal();
-    completeSale();
+    begin();
   } else {
     const startLoc = state.getLocationByName(vessel.location) || market.location;
     const dx = startLoc.x - market.location.x;
@@ -694,7 +781,8 @@ function sellCargo(idx){
         clearInterval(vessel.travelInterval);
         vessel.travelInterval = null;
         vessel.actionEndsAt = 0;
-        completeSale();
+        vessel.location = market.name;
+        begin();
       }
     },250);
   }
@@ -935,6 +1023,8 @@ export {
   openSellModal,
   closeSellModal,
   sellCargo,
+  startOffloading,
+  finishOffloading,
   openBargeUpgradeModal,
   closeBargeUpgradeModal,
   openShipyard,
