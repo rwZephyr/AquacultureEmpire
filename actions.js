@@ -442,6 +442,7 @@ function harvestPen(amount=null){
     if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
     vessel.harvestProgress = 0;
     vessel.harvestFishBuffer = 0;
+    const startFishCount = pen.fishCount;
     let last = Date.now();
     const updateEta = () => {
       const rate = state.getSiteHarvestRate(site);
@@ -474,6 +475,9 @@ function harvestPen(amount=null){
         clearInterval(vessel.harvestInterval);
         vessel.harvestInterval = null;
         vessel.harvestProgress = 0;
+        // ensure final fish count accounts for rounding
+        pen.fishCount = Math.max(0, startFishCount - fishNum);
+        if(pen.fishCount === 0) pen.averageWeight = 0;
         vessel.harvestFishBuffer = 0;
         pen.locked = false;
         vessel.harvestingPenIndex = null;
