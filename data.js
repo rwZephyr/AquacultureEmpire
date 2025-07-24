@@ -30,7 +30,11 @@ export const staffHousingUpgrades = [
 export const speciesData = {
   shrimp: { marketPrice:8, fcr:1.25, startingWeight:0.01, restockCount:500, restockCost:200, licenseCost:0 },
   salmon: { marketPrice:5, fcr:1.5, startingWeight:0.05, restockCount:250, restockCost:400, licenseCost:500 },
-  tuna:   { marketPrice:10,fcr:2.0, startingWeight:0.2,  restockCount:100, restockCost:800, licenseCost:1500 }
+  tuna:   { marketPrice:10,fcr:2.0, startingWeight:0.2,  restockCount:100, restockCost:800, licenseCost:1500 },
+  tilapia:    { marketPrice:3.5, fcr:1.2, startingWeight:0.03, restockCount:400, restockCost:150,  licenseCost:250 },
+  barramundi: { marketPrice:6,   fcr:1.3, startingWeight:0.04, restockCount:300, restockCost:350,  licenseCost:750 },
+  cod:        { marketPrice:7.5, fcr:1.6, startingWeight:0.07, restockCount:200, restockCost:500,  licenseCost:1000 },
+  grouper:    { marketPrice:12,  fcr:2.5, startingWeight:0.25,restockCount:80,  restockCost:1000, licenseCost:2000 }
 };
 
 export const feederUpgrades = [
