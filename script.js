@@ -4,7 +4,18 @@ import * as actions from './actions.js';
 
 Object.assign(window, actions);
 
+function adjustHeaderPadding(){
+  const header = document.getElementById('topHeader');
+  if(header){
+    const height = header.offsetHeight;
+    document.documentElement.style.setProperty('--header-height', height + 'px');
+  }
+}
+
+window.addEventListener('resize', adjustHeaderPadding);
+
 document.addEventListener('DOMContentLoaded', () => {
+  adjustHeaderPadding();
   actions.loadGame();
   ui.updateDisplay();
   ui.setupMapInteractions();
