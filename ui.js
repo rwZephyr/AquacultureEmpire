@@ -203,6 +203,7 @@ function renderPenGrid(site){
     updatePenWarning(warnEl, pen);
 
     const hasFish = pen.species && pen.fishCount > 0;
+    // single badge overlay in the top-right corner
     const badge = document.createElement('div');
     badge.classList.add('species-badge');
     badge.style.backgroundColor = hasFish ? (speciesColors[pen.species] || '#666') : '#666';
@@ -210,8 +211,6 @@ function renderPenGrid(site){
       const icon = document.createElement('img');
       icon.src = 'assets/species-icons/' + pen.species + '.png';
       icon.alt = pen.species;
-      icon.width = 40;
-      icon.height = 40;
       badge.appendChild(icon);
     }
     card.appendChild(badge);
@@ -241,6 +240,7 @@ function updatePenCards(site){
 
     let badge = card.querySelector('.species-badge');
     if(!badge){
+      // create badge once per card
       badge = document.createElement('div');
       badge.classList.add('species-badge');
       card.appendChild(badge);
@@ -252,8 +252,6 @@ function updatePenCards(site){
       const icon = document.createElement('img');
       icon.src = 'assets/species-icons/' + pen.species + '.png';
       icon.alt = pen.species;
-      icon.width = 40;
-      icon.height = 40;
       badge.appendChild(icon);
     }
   });
