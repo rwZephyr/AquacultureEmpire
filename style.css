@@ -573,11 +573,6 @@ button:active {
   display: none;
   z-index: 5;
 }
-#statusMessages {
-  margin-top: 10px;
-  font-size: 14px;
-  color: var(--accent);
-}
 
 /* Feed purchase controls */
 .feed-purchase {

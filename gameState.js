@@ -150,7 +150,7 @@ state.advanceDays = advanceDays;
 
 function addStatusMessage(msg) {
   state.statusMessage = msg;
-  const el = document.getElementById('statusMessages');
+  const el = document.getElementById('operationalTips');
   if(el) el.innerText = msg;
 }
 
