@@ -8,7 +8,8 @@ import {
   feederUpgrades,
   vesselTiers,
   markets,
-  vesselClasses
+  vesselClasses,
+  CUSTOM_BUILD_MARKUP
 } from "./data.js";
 import state, {
   capitalizeFirstLetter,
