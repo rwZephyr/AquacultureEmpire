@@ -272,19 +272,69 @@ button:active {
   margin: 0 auto;
 }
 
-.shipyard-row {
-  margin-bottom: 8px;
+#shipyardList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
 }
-.shipyard-row button {
-  margin-left: 10px;
+
+.shipyard-card {
+  background: var(--bg-panel);
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 0 4px var(--shadow-light);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+}
+
+.shipyard-card h4 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  color: var(--accent);
+}
+
+.shipyard-attr,
+.shipyard-price {
+  font-size: 14px;
+  margin: 2px 0;
+}
+
+.shipyard-card button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px 8px;
+  font-size: 13px;
+  background-color: var(--bg-button);
+  color: var(--text-light);
+  border-radius: 6px;
+  border: none;
+}
+
+.shipyard-card button:hover {
+  background-color: var(--accent);
+  color: var(--bg-darker);
+}
+
+.shipyard-main-btn {
+  margin-top: 12px;
+}
+
+.lock-message {
+  color: #e74c3c;
+  font-size: 14px;
+  margin-top: 6px;
 }
 
 .custom-build-page {
-  margin-top: 10px;
-  padding: 10px;
+  margin-top: 20px;
+  padding: 12px;
   background: var(--bg-panel);
-  border-radius: 8px;
+  border-radius: 10px;
+  box-shadow: 0 0 4px var(--shadow-light);
   display: none;
+  border-top: 1px solid var(--bg-button);
 }
 
 #marketReportPage {
