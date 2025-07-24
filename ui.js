@@ -23,7 +23,11 @@ import state, {
 const speciesColors = {
   shrimp: '#f39c12',
   salmon: '#e74c3c',
-  tuna: '#3498db'
+  tuna: '#3498db',
+  tilapia: '#74c476',
+  barramundi: '#9b59b6',
+  cod: '#95a5a6',
+  grouper: '#d35400'
 };
 
 const vesselIcons = {

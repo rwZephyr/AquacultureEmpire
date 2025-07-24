@@ -8,6 +8,7 @@ Aquaculture Empire lets you manage multiple marine sites, harvest fresh stock an
 - Manage floating barges and fish pens across several remote sites
 - Hire staff to automate feeding and harvesting
 - Dynamic markets with daily price changes and historical charts
+- Harvest and trade multiple species including shrimp, salmon, tuna and more
 - Construct vessels or custom build your own to move product
 - Site-based travel system with real-time sailing
 - Fully offline – progress is saved in local storage and simulated when you’re away

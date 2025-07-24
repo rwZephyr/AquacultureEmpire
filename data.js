@@ -106,11 +106,27 @@ export const markets = [
   {
     name: 'Capital Wharf',
     location: { x: 10, y: 80 },
-    modifiers: { shrimp: 1.0, salmon: 1.1, tuna: 0.9 }
+    modifiers: {
+      shrimp: 1.0,
+      salmon: 1.1,
+      tuna: 0.9,
+      tilapia: 1.0,
+      barramundi: 1.0,
+      cod: 1.0,
+      grouper: 1.0
+    }
   },
   {
     name: 'East Bay Processing',
     location: { x: 80, y: 85 },
-    modifiers: { shrimp: 1.2, salmon: 0.9, tuna: 1.1 }
+    modifiers: {
+      shrimp: 1.2,
+      salmon: 0.9,
+      tuna: 1.1,
+      tilapia: 1.0,
+      barramundi: 1.0,
+      cod: 1.0,
+      grouper: 1.0
+    }
   }
 ];
