@@ -148,6 +148,7 @@ function updateDisplay(){
   if(tipsEl) tipsEl.innerText = state.statusMessage || 'All systems nominal.';
   const tsEl = document.querySelector('#marketReportContent .market-timestamp');
   if(tsEl) tsEl.innerText = `Prices last updated: ${state.lastMarketUpdateString}`;
+  updateFeedPurchaseUI();
   updateMarketCharts();
 }
 
@@ -800,6 +801,66 @@ function renderMarketChart(market, canvas){
   });
 }
 
+// --- Feed Purchase UI ---
+function updateFeedPurchaseCost(){
+  const slider = document.getElementById('feedPurchaseSlider');
+  if(!slider) return;
+  const costEl = document.getElementById('feedPurchaseCost');
+  const val = Number(slider.value) || 0;
+  if(costEl) costEl.innerText = `Cost: $${(val * state.FEED_COST_PER_KG).toFixed(2)}`;
+}
+
+function syncFeedPurchase(source){
+  const slider = document.getElementById('feedPurchaseSlider');
+  const input = document.getElementById('feedPurchaseInput');
+  if(!slider || !input) return;
+  let val = source === 'slider' ? Number(slider.value) : Number(input.value);
+  if(isNaN(val)) val = 0;
+  if(val < 0) val = 0;
+  const max = Number(slider.max || 0);
+  if(val > max) val = max;
+  slider.value = val;
+  input.value = val;
+  updateFeedPurchaseCost();
+}
+
+function updateFeedPurchaseUI(){
+  const slider = document.getElementById('feedPurchaseSlider');
+  const input = document.getElementById('feedPurchaseInput');
+  if(!slider || !input) return;
+  const site = state.sites[state.currentSiteIndex];
+  const barge = site.barges[state.currentBargeIndex];
+  const maxAffordable = Math.floor(state.cash / state.FEED_COST_PER_KG);
+  const available = barge.feedCapacity - barge.feed;
+  const max = Math.max(0, Math.min(maxAffordable, available));
+  slider.max = max;
+  input.max = max;
+  if(Number(slider.value) > max) slider.value = max;
+  if(Number(input.value) > max) input.value = max;
+  updateFeedPurchaseCost();
+}
+
+function confirmBuyFeed(){
+  const slider = document.getElementById('feedPurchaseSlider');
+  if(!slider) return;
+  const amount = Number(slider.value) || 0;
+  window.buyFeed(amount);
+  slider.value = 0;
+  const input = document.getElementById('feedPurchaseInput');
+  if(input) input.value = 0;
+  updateFeedPurchaseUI();
+}
+
+function setFeedPurchaseMax(){
+  const slider = document.getElementById('feedPurchaseSlider');
+  const input = document.getElementById('feedPurchaseInput');
+  if(!slider || !input) return;
+  updateFeedPurchaseUI();
+  slider.value = slider.max;
+  input.value = slider.max;
+  updateFeedPurchaseCost();
+}
+
 // --- PURCHASES & ACTIONS ---
 export {
   updateDisplay,
@@ -825,5 +886,9 @@ export {
   backToShipyardList,
   updateCustomBuildStats,
   openMarketReport,
-  closeMarketReport
+  closeMarketReport,
+  updateFeedPurchaseUI,
+  syncFeedPurchase,
+  confirmBuyFeed,
+  setFeedPurchaseMax
 };
