@@ -48,16 +48,18 @@
           Vessel <span id="vesselIndex">1</span>/<span id="vesselCount">1</span>
           <button onclick="nextVessel()">⟶</button>
         </div>
-        <div>Name: <span id="vesselName">-</span></div>
-        <div>Tier: <span id="vesselTierName">Small</span></div>
-        <div>Load: <span id="vesselLoad">0</span> / <span id="vesselCapacity">0</span> kg</div>
-        <div>Location: <span id="vesselLocation">Dock</span></div>
-        <button id="vesselHarvestBtn" onclick="openVesselHarvestModal()">Harvest</button>
-        <button onclick="renameVessel()">Rename Vessel</button>
-        <button onclick="openMoveVesselModal()">Move Vessel</button>
-        <button onclick="openSellModal()">Sell Cargo</button>
+        <div class="vessel-name" id="vesselName">-</div>
+        <div class="vessel-class" id="vesselTierName">Small</div>
+        <div class="stat-row"><span class="label">Capacity</span> <span class="value"><span id="vesselCapacity">0</span> kg</span></div>
+        <div class="stat-row"><span class="label">Speed</span> <span class="value" id="vesselSpeed">0</span></div>
+        <div class="stat-row"><span class="label">Load</span> <span class="value" id="vesselLoad">0</span> kg</div>
+        <div class="stat-row"><span class="label">Location</span> <span class="value" id="vesselLocation">Dock</span></div>
+        <button id="vesselHarvestBtn" class="buy-button" onclick="openVesselHarvestModal()">Harvest</button>
+        <button class="buy-button" onclick="renameVessel()">Rename Vessel</button>
+        <button class="buy-button" onclick="openMoveVesselModal()">Move Vessel</button>
+        <button class="buy-button" onclick="openSellModal()">Sell Cargo</button>
         <div id="vesselUpgradeInfo"></div>
-        <div id="vesselPurchaseInfo"></div>
+        <div class="stat-row"><span class="label">Price</span> <span class="value" id="vesselPrice"></span></div>
         <div id="vesselActionPlaceholder"></div>
       </div>
       <div id="staffCard" class="staffCard">
