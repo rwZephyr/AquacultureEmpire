@@ -1,5 +1,4 @@
 import {
-  bargeTiers,
   NEW_BARGE_COST,
   NEW_VESSEL_COST,
   feedStorageUpgrades,
@@ -10,7 +9,10 @@ import {
   markets,
   vesselClasses,
   vesselUnlockDays,
-  CUSTOM_BUILD_MARKUP
+  CUSTOM_BUILD_MARKUP,
+  siloUpgrades,
+  blowerUpgrades,
+  housingUpgrades
 } from "./data.js";
 import state, {
   capitalizeFirstLetter,
@@ -66,13 +68,11 @@ function updateDisplay(){
 
   // barge card & feed overview
   const barge = site.barges[state.currentBargeIndex];
-  const tierData = bargeTiers[barge.tier];
   document.getElementById('bargeIndex').innerText = state.currentBargeIndex + 1;
   document.getElementById('bargeCount').innerText = site.barges.length;
-  document.getElementById('bargeTierName').innerText   = tierData.name;
   document.getElementById('bargeFeedersUsed').innerText = site.pens.filter(p=>p.feeder && p.bargeIndex===state.currentBargeIndex).length;
-  document.getElementById('bargeFeederLimit').innerText = tierData.feederLimit;
-  document.getElementById('bargeMaxFeederTier').innerText = tierData.maxFeederTier;
+  document.getElementById('bargeFeederLimit').innerText = barge.feederLimit;
+  document.getElementById('bargeMaxFeederTier').innerText = barge.maxFeederTier;
   document.getElementById('bargeFeed').innerText         = barge.feed.toFixed(1);
   document.getElementById('bargeFeedCapacity').innerText = barge.feedCapacity;
   document.getElementById('bargeSiloCapacity').innerText = barge.siloCapacity;
@@ -102,11 +102,13 @@ function updateDisplay(){
   document.getElementById('staffManagers').innerText = site.staff.filter(s=>s.role==='feedManager').length;
 
   // shop panel info
-  if(barge.storageUpgradeLevel < feedStorageUpgrades.length){
-    document.getElementById('storageUpgradeInfo').innerText =
-      `Next Feed Storage Upgrade: $${feedStorageUpgrades[barge.storageUpgradeLevel].cost}`;
-  } else {
-    document.getElementById('storageUpgradeInfo').innerText = 'Feed Storage Fully Upgraded';
+  const storageInfoEl = document.getElementById('storageUpgradeInfo');
+  if(storageInfoEl){
+    if(barge.storageUpgradeLevel < feedStorageUpgrades.length){
+      storageInfoEl.innerText = `Next Feed Storage Upgrade: $${feedStorageUpgrades[barge.storageUpgradeLevel].cost}`;
+    } else {
+      storageInfoEl.innerText = 'Feed Storage Fully Upgraded';
+    }
   }
   const housingInfoEl = document.getElementById('bargeHousingInfo');
   if(housingInfoEl){
@@ -117,15 +119,10 @@ function updateDisplay(){
       housingInfoEl.innerText = 'Housing Fully Upgraded';
     }
   }
-  if(barge.tier < bargeTiers.length - 1){
-    const next = bargeTiers[barge.tier + 1];
-    document.getElementById('bargeUpgradeInfo').innerText =
-      `Next Barge Upgrade (${next.name}): $${next.cost}`;
-  } else {
-    document.getElementById('bargeUpgradeInfo').innerText = 'Barge Fully Upgraded';
-  }
-  document.getElementById('bargePurchaseInfo').innerText = `New Barge Cost: $${NEW_BARGE_COST}`;
-  document.getElementById('penPurchaseInfo').innerText = `Next Pen Purchase: $${state.penPurchaseCost.toFixed(0)}`;
+  const bargePurchaseEl = document.getElementById('bargePurchaseInfo');
+  if(bargePurchaseEl) bargePurchaseEl.innerText = `New Barge Cost: $${NEW_BARGE_COST}`;
+  const penPurchaseEl = document.getElementById('penPurchaseInfo');
+  if(penPurchaseEl) penPurchaseEl.innerText = `Next Pen Purchase: $${state.penPurchaseCost.toFixed(0)}`;
 
   updateHarvestInfo();
   updateLicenseShop();
@@ -572,6 +569,40 @@ function closeSellModal(){
   document.getElementById('sellModal').classList.remove('visible');
 }
 
+function openBargeUpgradeModal(){
+  const site = state.sites[state.currentSiteIndex];
+  const barge = site.barges[state.currentBargeIndex];
+
+  const setRow = (id, label, lvl, table, key, fnName) => {
+    const row = document.getElementById(id);
+    if(!row) return;
+    row.innerHTML = '';
+    const span = document.createElement('span');
+    const curr = table[lvl];
+    const next = table[lvl + 1];
+    if(next){
+      span.textContent = `${label}: ${curr[key]}${key==='rate'?'x':'kg'} → ${next[key]}${key==='rate'?'x':'kg'}`;
+      const btn = document.createElement('button');
+      btn.textContent = `Upgrade ($${next.cost})`;
+      btn.onclick = () => window[fnName]();
+      row.appendChild(span);
+      row.appendChild(btn);
+    } else {
+      span.textContent = `${label}: ${curr[key]}${key==='rate'?'x':'kg'} (Max)`;
+      row.appendChild(span);
+    }
+  };
+
+  setRow('upgradeSiloRow','Silo Capacity',barge.siloUpgradeLevel,siloUpgrades,'feedCapacity','upgradeSilo');
+  setRow('upgradeBlowerRow','Blower Rate',barge.blowerUpgradeLevel,blowerUpgrades,'rate','upgradeBlower');
+  setRow('upgradeHousingRow','Staff Capacity',barge.housingUpgradeLevel,housingUpgrades,'staffCapacity','upgradeHousing');
+
+  document.getElementById('bargeUpgradeModal').classList.add('visible');
+}
+function closeBargeUpgradeModal(){
+  document.getElementById('bargeUpgradeModal').classList.remove('visible');
+}
+
 function openShipyard(){
   const list = document.getElementById('shipyardList');
   list.innerHTML = '';
@@ -928,6 +959,8 @@ export {
   openSellModal,
   closeSellModal,
   sellCargo,
+  openBargeUpgradeModal,
+  closeBargeUpgradeModal,
   openShipyard,
   closeShipyard,
   openCustomBuild,

@@ -272,7 +272,20 @@ button:active {
   padding: 20px;
   border-radius: 10px;
   text-align: center;
-  width: 300px;
+  width: 340px;
+}
+
+.upgrade-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid var(--bg-button);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.upgrade-row button {
+  margin-left: 8px;
 }
 
 #shipyardModalContent {
