@@ -26,6 +26,13 @@ const speciesColors = {
   tuna: '#3498db'
 };
 
+const vesselIcons = {
+  skiff: '🛶',
+  lobsterBoat: '⚓',
+  retiredTrawler: '🚢',
+  wellboat: '🚤'
+};
+
 // Track counts to avoid re-rendering lists every tick
 let lastSiteIndex = -1;
 let lastPenCount = 0;
@@ -522,13 +529,14 @@ function openShipyard(){
   state.shipyardInventory.forEach((v, idx)=>{
     const row = document.createElement('div');
     row.className = 'shipyard-row shipyard-card';
+    const icon = vesselIcons[v.class] || '🛥️';
     row.innerHTML = `
-      <h4 class="vessel-name">${v.name}</h4>
-      <div class="shipyard-attr">Class: ${vesselClasses[v.class].name}</div>
-      <div class="shipyard-attr">Cap ${v.cargoCapacity}kg</div>
-      <div class="shipyard-attr">Speed ${v.speed}</div>
-      <div class="shipyard-attr">Slots ${v.upgradeSlots}</div>
-      <div class="shipyard-price">$${v.cost}</div>`;
+      <div class="vessel-name">${v.name}</div>
+      <div class="vessel-class">${icon} ${vesselClasses[v.class].name}</div>
+      <div class="shipyard-stat"><span>Capacity</span><span>${v.cargoCapacity} kg</span></div>
+      <div class="shipyard-stat"><span>Speed</span><span>${v.speed}</span></div>
+      <div class="shipyard-stat"><span>Slots</span><span>${v.upgradeSlots}</span></div>
+      <div class="shipyard-stat price"><span>Price</span><span>$${v.cost}</span></div>`;
     const btn = document.createElement('button');
     btn.innerText = 'Buy';
     btn.onclick = ()=>buyShipyardVessel(idx);
