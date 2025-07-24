@@ -83,10 +83,10 @@ export const vesselUnlockDays = {
 };
 
 export const vesselNamePrefixes = [
-  'Sea', 'Wave', 'Storm', 'Lucky', 'Salty', 'Swift', 'Coral', 'Northern'
+  'Sea', 'Wave', 'Storm', 'Lucky', 'Salty', 'Swift', 'Coral', 'Northern', 'Coastal', 'Rapid', 'Brazen', 'Lady', 'Sir' 
 ];
 export const vesselNameSuffixes = [
-  'Runner', 'Queen', 'Voyager', 'Dream', 'Star', 'Dawn', 'Breeze', 'Spirit'
+  'Runner', 'Queen', 'Voyager', 'Dream', 'Star', 'Dawn', 'Breeze', 'Spirit', 'Nightmare', 'Squall', 'Cloud', 'Tidus','Flotsam'
 ];
 
 export const NEW_VESSEL_COST = 12000;
