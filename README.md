@@ -29,3 +29,6 @@ Code is licensed under the [MIT License](LICENSE). Game art and other assets can
 
 ## Credits
 Created by Evandude and Yamakazi with inspiration from coastal life. Special thanks to open source contributors.
+
+## Analytics
+This project uses the privacy-friendly [GoatCounter](https://www.goatcounter.com/) script for basic page view statistics. The tracker is included in `index.html` and points to `https://rwzephyr.goatcounter.com/count`.
