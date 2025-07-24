@@ -9,6 +9,7 @@ import {
   vesselTiers,
   markets,
   vesselClasses,
+  vesselUnlockDays,
   CUSTOM_BUILD_MARKUP
 } from "./data.js";
 import state, {
@@ -520,10 +521,14 @@ function openShipyard(){
   list.innerHTML = '';
   state.shipyardInventory.forEach((v, idx)=>{
     const row = document.createElement('div');
-    row.className = 'shipyard-row';
-    row.innerHTML = `<strong>${v.name}</strong> - ${vesselClasses[v.class].name} `+
-      `| Cap ${v.cargoCapacity}kg | Speed ${v.speed} | Slots ${v.upgradeSlots} `+
-      `| $${v.cost}`;
+    row.className = 'shipyard-row shipyard-card';
+    row.innerHTML = `
+      <h4 class="vessel-name">${v.name}</h4>
+      <div class="shipyard-attr">Class: ${vesselClasses[v.class].name}</div>
+      <div class="shipyard-attr">Cap ${v.cargoCapacity}kg</div>
+      <div class="shipyard-attr">Speed ${v.speed}</div>
+      <div class="shipyard-attr">Slots ${v.upgradeSlots}</div>
+      <div class="shipyard-price">$${v.cost}</div>`;
     const btn = document.createElement('button');
     btn.innerText = 'Buy';
     btn.onclick = ()=>buyShipyardVessel(idx);
@@ -569,6 +574,15 @@ function updateCustomBuildStats(){
   document.getElementById('buildCost').innerText = cost;
   document.getElementById('buildStats').innerText =
     `Cap ${data.baseCapacity}kg | Speed ${data.baseSpeed} | Slots ${data.slots}`;
+  const msgEl = document.getElementById('buildLockMessage');
+  const req = vesselUnlockDays[cls] || 0;
+  if(state.totalDaysElapsed < req && cls !== 'skiff'){
+    msgEl.style.display = 'block';
+    msgEl.innerText = `Locked until Day ${req}`;
+  } else {
+    msgEl.style.display = 'none';
+    msgEl.innerText = '';
+  }
 }
 
 function sellCargo(idx){
