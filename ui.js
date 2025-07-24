@@ -530,6 +530,9 @@ function openShipyard(){
     row.appendChild(btn);
     list.appendChild(row);
   });
+  document.getElementById('customBuildPage').style.display = 'none';
+  document.getElementById('shipyardList').style.display = 'block';
+  document.getElementById('openCustomBuildBtn').style.display = 'block';
   document.getElementById('shipyardModal').classList.add('visible');
   document.body.style.overflow = 'hidden';
   document.documentElement.style.overflow = 'hidden';
@@ -538,6 +541,33 @@ function closeShipyard(){
   document.getElementById('shipyardModal').classList.remove('visible');
   document.body.style.overflow = '';
   document.documentElement.style.overflow = '';
+}
+
+function openCustomBuild(){
+  const select = document.getElementById('buildClassSelect');
+  select.innerHTML = Object.entries(vesselClasses)
+    .map(([cls,data])=>`<option value="${cls}">${data.name}</option>`).join('');
+  select.value = Object.keys(vesselClasses)[0];
+  document.getElementById('buildNameInput').value = '';
+  updateCustomBuildStats();
+  document.getElementById('shipyardList').style.display = 'none';
+  document.getElementById('openCustomBuildBtn').style.display = 'none';
+  document.getElementById('customBuildPage').style.display = 'block';
+}
+
+function backToShipyardList(){
+  document.getElementById('customBuildPage').style.display = 'none';
+  document.getElementById('shipyardList').style.display = 'block';
+  document.getElementById('openCustomBuildBtn').style.display = 'block';
+}
+
+function updateCustomBuildStats(){
+  const cls = document.getElementById('buildClassSelect').value;
+  const data = vesselClasses[cls];
+  const cost = Math.round(data.cost * CUSTOM_BUILD_MARKUP);
+  document.getElementById('buildCost').innerText = cost;
+  document.getElementById('buildStats').innerText =
+    `Cap ${data.baseCapacity}kg | Speed ${data.baseSpeed} | Slots ${data.slots}`;
 }
 
 function sellCargo(idx){
@@ -768,6 +798,9 @@ export {
   sellCargo,
   openShipyard,
   closeShipyard,
+  openCustomBuild,
+  backToShipyardList,
+  updateCustomBuildStats,
   openMarketReport,
   closeMarketReport
 };

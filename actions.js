@@ -10,7 +10,9 @@ import {
   feederUpgrades,
   vesselTiers,
   markets,
-  vesselClasses
+  vesselClasses,
+  vesselUnlockDays,
+  CUSTOM_BUILD_MARKUP
 } from "./data.js";
 import { Site, Barge, Pen, Vessel } from "./models.js";
 import state, { getTimeState, addStatusMessage, advanceDays, setupMarketData } from "./gameState.js";
@@ -31,7 +33,8 @@ import {
   openMarketReport,
   closeMarketReport,
   openShipyard as uiOpenShipyard,
-  closeShipyard as uiCloseShipyard
+  closeShipyard as uiCloseShipyard,
+  backToShipyardList
 } from "./ui.js";
 
 function buyFeed(amount=20){
@@ -309,6 +312,39 @@ function buyShipyardVessel(idx){
   closeShipyard();
   updateDisplay();
   openModal(`Purchased ${item.name}!`);
+}
+
+function confirmCustomBuild(){
+  const cls = document.getElementById('buildClassSelect').value;
+  const name = document.getElementById('buildNameInput').value.trim();
+  if(!name) return openModal('Enter a vessel name.');
+  if(state.vessels.some(v=>v.name.toLowerCase()===name.toLowerCase())){
+    return openModal('A vessel with that name already exists.');
+  }
+  const req = vesselUnlockDays[cls] || 0;
+  if(state.totalDaysElapsed < req && cls !== 'skiff'){
+    return openModal('This vessel class is not unlocked yet.');
+  }
+  const base = vesselClasses[cls];
+  const cost = Math.round(base.cost * CUSTOM_BUILD_MARKUP);
+  if(state.cash < cost) return openModal('Not enough cash to build this vessel.');
+  state.cash -= cost;
+  const vessel = new Vessel({
+    name: name,
+    maxBiomassCapacity: base.baseCapacity,
+    currentBiomassLoad: 0,
+    cargoSpecies: null,
+    speed: base.baseSpeed,
+    location: 'Dock',
+    tier: 0,
+    upgradeSlots: base.slots,
+    upgrades: []
+  });
+  state.vessels.push(vessel);
+  state.currentVesselIndex = state.vessels.length - 1;
+  updateDisplay();
+  backToShipyardList();
+  openModal('Custom vessel constructed!');
 }
 
 function moveVesselTo(type, idx){
@@ -870,4 +906,4 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openShipyard, closeShipyard, buyShipyardVessel, openMarketReport, closeMarketReport, getTimeState, pauseTime, resumeTime };
+export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openShipyard, closeShipyard, buyShipyardVessel, confirmCustomBuild, openMarketReport, closeMarketReport, getTimeState, pauseTime, resumeTime };
