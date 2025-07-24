@@ -580,15 +580,16 @@ function openBargeUpgradeModal(){
     const span = document.createElement('span');
     const curr = table[lvl];
     const next = table[lvl + 1];
+    const unit = key==='rate' ? 'x' : (key==='staffCapacity' ? '' : 'kg');
     if(next){
-      span.textContent = `${label}: ${curr[key]}${key==='rate'?'x':'kg'} → ${next[key]}${key==='rate'?'x':'kg'}`;
+      span.textContent = `${label}: ${curr[key]}${unit} → ${next[key]}${unit}`;
       const btn = document.createElement('button');
       btn.textContent = `Upgrade ($${next.cost})`;
       btn.onclick = () => window[fnName]();
       row.appendChild(span);
       row.appendChild(btn);
     } else {
-      span.textContent = `${label}: ${curr[key]}${key==='rate'?'x':'kg'} (Max)`;
+      span.textContent = `${label}: ${curr[key]}${unit} (Max)`;
       row.appendChild(span);
     }
   };
