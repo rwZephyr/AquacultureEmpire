@@ -201,6 +201,20 @@ function renderPenGrid(site){
     card.querySelector('.pen-feeder').textContent = `${capitalizeFirstLetter(feederType)} (Tier ${feederTier})`;
     const warnEl = card.querySelector('.pen-warning');
     updatePenWarning(warnEl, pen);
+
+    const hasFish = pen.species && pen.fishCount > 0;
+    const badge = document.createElement('div');
+    badge.classList.add('species-badge');
+    badge.style.backgroundColor = hasFish ? (speciesColors[pen.species] || '#666') : '#666';
+    if(hasFish){
+      const icon = document.createElement('img');
+      icon.src = 'assets/species-icons/' + pen.species + '.png';
+      icon.alt = pen.species;
+      icon.width = 40;
+      icon.height = 40;
+      badge.appendChild(icon);
+    }
+    card.appendChild(badge);
     card.querySelector('.feed-btn').onclick = () => feedFishPen(idx);
     card.querySelector('.restock-btn').onclick = () => restockPenUI(idx);
     card.querySelector('.upgrade-btn').onclick = () => upgradeFeeder(idx);
@@ -224,6 +238,24 @@ function updatePenCards(site){
     card.querySelector('.pen-feeder').textContent = `${capitalizeFirstLetter(feederType)} (Tier ${feederTier})`;
     const warnEl = card.querySelector('.pen-warning');
     updatePenWarning(warnEl, pen);
+
+    let badge = card.querySelector('.species-badge');
+    if(!badge){
+      badge = document.createElement('div');
+      badge.classList.add('species-badge');
+      card.appendChild(badge);
+    }
+    const hasFish = pen.species && pen.fishCount > 0;
+    badge.style.backgroundColor = hasFish ? (speciesColors[pen.species] || '#666') : '#666';
+    badge.innerHTML = '';
+    if(hasFish){
+      const icon = document.createElement('img');
+      icon.src = 'assets/species-icons/' + pen.species + '.png';
+      icon.alt = pen.species;
+      icon.width = 40;
+      icon.height = 40;
+      badge.appendChild(icon);
+    }
   });
 }
 

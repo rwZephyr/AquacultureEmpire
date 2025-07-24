@@ -467,6 +467,7 @@ button:active {
   color: var(--text-light);
   box-shadow: 0 0 4px var(--shadow-light);
   transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
 }
 .penCard.placeholder {
   opacity: 0.6;
@@ -529,6 +530,26 @@ button:active {
 .vesselCard button:disabled {
   background-color: #555;
   cursor: not-allowed;
+}
+
+.species-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  position: absolute;
+  top: -24px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: grey;
+  overflow: hidden;
+}
+
+.species-badge img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
 }
 
 .penCard:hover,
