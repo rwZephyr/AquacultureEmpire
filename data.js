@@ -60,7 +60,8 @@ export const speciesData = {
     restockCost: 200,
     licenseCost: 0,
     maxWeight: 0.05,
-    tags: ["starter", "fast-grow", "low-margin"]
+    tags: ["starter", "fast-grow", "low-margin"],
+    volatility: 1.2
   },
   salmon: {
     marketPrice: 5,
@@ -70,7 +71,8 @@ export const speciesData = {
     restockCost: 400,
     licenseCost: 500,
     maxWeight: 6,
-    tags: ["standard", "coldwater"]
+    tags: ["standard", "coldwater"],
+    volatility: 1
   },
   tuna: {
     marketPrice: 10,
@@ -80,7 +82,8 @@ export const speciesData = {
     restockCost: 800,
     licenseCost: 1500,
     maxWeight: 20,
-    tags: ["premium", "late-game", "offshore"]
+    tags: ["premium", "late-game", "offshore"],
+    volatility: 1.5
   },
   tilapia: {
     marketPrice: 3.5,
@@ -90,7 +93,8 @@ export const speciesData = {
     restockCost: 150,
     licenseCost: 250,
     maxWeight: 2,
-    tags: ["cheap", "fast-grow", "warmwater"]
+    tags: ["cheap", "fast-grow", "warmwater"],
+    volatility: 0.8
   },
   barramundi: {
     marketPrice: 6,
@@ -100,7 +104,8 @@ export const speciesData = {
     restockCost: 350,
     licenseCost: 750,
     maxWeight: 4,
-    tags: ["balanced", "warmwater"]
+    tags: ["balanced", "warmwater"],
+    volatility: 1
   },
   cod: {
     marketPrice: 7.5,
@@ -110,7 +115,8 @@ export const speciesData = {
     restockCost: 500,
     licenseCost: 1000,
     maxWeight: 7,
-    tags: ["stable", "coldwater", "mid-tier"]
+    tags: ["stable", "coldwater", "mid-tier"],
+    volatility: 0.9
   },
   grouper: {
     marketPrice: 12,
@@ -120,7 +126,8 @@ export const speciesData = {
     restockCost: 1000,
     licenseCost: 2000,
     maxWeight: 12,
-    tags: ["premium", "deepwater", "slow-grow"]
+    tags: ["premium", "deepwater", "slow-grow"],
+    volatility: 1.4
   }
 };
 
