@@ -533,22 +533,22 @@ button:active {
 }
 
 .species-badge {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+  /* small notification-style overlay */
+  width: 32px;
+  height: 32px;
   position: absolute;
-  top: -24px;
-  left: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: grey;
+  top: -8px;
+  right: -8px;
+  z-index: 10;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 2px solid white;
   overflow: hidden;
 }
 
 .species-badge img {
-  width: 40px;
-  height: 40px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
