@@ -494,6 +494,11 @@ button:active {
   width: 100%;
 }
 
+.site-upgrade-card button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
 #bargeUpgradeMessage {
   margin-bottom: 8px;
   color: #e74c3c;
