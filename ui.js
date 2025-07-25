@@ -23,8 +23,8 @@ import state, {
 } from "./gameState.js";
 
 const speciesColors = {
-  shrimp: '#f39c12',
-  salmon: '#e74c3c',
+  shrimp: '#e74c3c',
+  salmon: '#f39c12',
   tuna: '#3498db',
   tilapia: '#74c476',
   barramundi: '#9b59b6',
