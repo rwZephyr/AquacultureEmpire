@@ -899,7 +899,9 @@ function startOffloading(vessel, market){
     }
     updateEta();
     updateDisplay();
-    if(vessel.currentBiomassLoad <= 0){
+    const epsilon = 0.0001;
+    if(vessel.currentBiomassLoad <= epsilon || vessel.fishBuffer.length === 0){
+      vessel.currentBiomassLoad = 0;
       finishOffloading(vessel, market);
     }
   },250);
