@@ -519,20 +519,43 @@ function openRestockModal(){
   if(pen.fishCount>0){ return openModal("You must harvest the pen before restocking!"); }
   const optionsDiv = document.getElementById('restockOptions');
   optionsDiv.innerHTML = '';
-  site.licenses.forEach(sp=>{
+  site.licenses.forEach(sp => {
     const data = speciesData[sp];
-    const container = document.createElement('div');
-    const btn = document.createElement('button');
-    btn.innerText = `${capitalizeFirstLetter(sp)} ($${data.restockCost})`;
-    btn.onclick = ()=>restockPen(sp);
-    container.appendChild(btn);
-    if(data.tags && data.tags.length){
-      const tagEl = document.createElement('div');
-      tagEl.className = 'species-tags';
-      tagEl.textContent = `Tags: ${data.tags.join(', ')}`;
-      container.appendChild(tagEl);
+    const card = document.createElement('div');
+    card.className = 'species-card';
+    card.onclick = () => {
+      optionsDiv.querySelectorAll('.species-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      restockPen(sp);
+    };
+
+    const img = document.createElement('img');
+    img.src = `assets/species-icons/${sp}.png`;
+    img.className = 'species-icon';
+
+    const info = document.createElement('div');
+    info.className = 'species-info';
+
+    const name = document.createElement('div');
+    name.className = 'species-name';
+    name.textContent = `${capitalizeFirstLetter(sp)} ($${data.restockCost})`;
+
+    const tagRow = document.createElement('div');
+    tagRow.className = 'species-tags';
+    if (data.tags && data.tags.length) {
+      data.tags.forEach(t => {
+        const span = document.createElement('span');
+        span.className = 'tag';
+        span.textContent = t;
+        tagRow.appendChild(span);
+      });
     }
-    optionsDiv.appendChild(container);
+
+    info.appendChild(name);
+    info.appendChild(tagRow);
+    card.appendChild(img);
+    card.appendChild(info);
+    optionsDiv.appendChild(card);
   });
   document.getElementById('restockModal').classList.add('visible');
 }

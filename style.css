@@ -986,6 +986,55 @@ button:active {
   vertical-align: middle;
 }
 
+.species-card {
+  display: flex;
+  gap: 10px;
+  background: rgba(255,255,255,0.05);
+  padding: 10px;
+  border-radius: 6px;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.species-card.selected {
+  background: rgba(255,255,255,0.15);
+}
+
+.species-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.species-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.species-name {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.species-tags .tag {
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-right: 4px;
+  font-size: 0.75rem;
+  display: inline-block;
+}
+
+.secondary-btn {
+  background: var(--bg-button);
+  color: var(--text-light);
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 10px;
+}
+
 /* Responsive layout */
 @media (max-width: 700px) {
   #mainLayout {
