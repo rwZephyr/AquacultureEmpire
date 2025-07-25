@@ -1088,6 +1088,27 @@ function closeDevModal(){
   document.getElementById('devModal').classList.remove('visible');
 }
 
+function openSpeciesData() {
+  const modal = document.getElementById('speciesDataModal');
+  const tbody = modal.querySelector('tbody');
+  tbody.innerHTML = '';
+  Object.entries(speciesData).forEach(([name, s]) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${name}</td>
+      <td>${s.fcr ?? '-'}</td>
+      <td>${s.restockCount ?? '-'}</td>
+      <td>${s.growthRate ?? '-'}</td>
+    `;
+    tbody.appendChild(row);
+  });
+  modal.classList.add('visible');
+}
+
+function closeSpeciesData() {
+  document.getElementById('speciesDataModal').classList.remove('visible');
+}
+
 function updateMarketCharts(){
   const charts = document.querySelectorAll('.market-chart');
   charts.forEach(c => {
@@ -1259,6 +1280,8 @@ export {
   updateSiteUpgrades,
   openDevModal,
   closeDevModal,
+  openSpeciesData,
+  closeSpeciesData,
   updateFeedPurchaseUI,
   syncFeedPurchase,
   confirmBuyFeed,
