@@ -21,9 +21,7 @@
           <div id="siteDropdownList" class="site-list hidden"></div>
         </div>
         <div class="mobile-action-wrapper" id="siteActionGroup">
-          <button id="siteActionToggle" onclick="toggleSiteActions()">
-            <img src="assets/general-icons/siteactions.png" alt="Site Actions" class="icon-img" />
-          </button>
+          <img id="siteActionToggle" src="assets/general-icons/siteactions.png" alt="Site Actions" class="icon-button" onclick="toggleSiteActions()" />
           <div id="siteActionMenu" class="hidden">
             <button onclick="buyNewSite()">+ New Site</button>
             <button onclick="openSiteManagement()">Manage Site</button>
@@ -41,9 +39,7 @@
       </div>
       <div class="top-bar-group" id="toolsGroup">
         <div class="mobile-action-wrapper">
-          <button id="mobileActionToggle" onclick="toggleMobileActions()">
-            <img src="assets/general-icons/browser.png" alt="Tools" class="icon-img" />
-          </button>
+          <img id="mobileActionToggle" src="assets/general-icons/browser.png" alt="Tools" class="icon-button" onclick="toggleMobileActions()" />
           <div id="mobileActionGroup" class="hidden">
             <button onclick="openMarketReport()">Market</button>
             <button onclick="openShipyard()">Shipyard</button>

@@ -975,18 +975,12 @@ button:active {
   position: relative;
 }
 
-#mobileActionToggle {
-  background-color: var(--bg-button);
-  border: none;
-  border-radius: 6px;
-  padding: 6px;
-}
-
+#mobileActionToggle,
 #siteActionToggle {
-  background-color: var(--bg-button);
+  /* Images act as buttons, no extra styling */
+  padding: 0;
+  background: none;
   border: none;
-  border-radius: 6px;
-  padding: 6px;
 }
 
 .icon-img {
@@ -1051,8 +1045,9 @@ button:active {
 }
 
 .icon-button {
-  width: 36px;
-  height: 36px;
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
   cursor: pointer;
   filter: brightness(0) invert(1);
   transition: filter 0.2s ease, transform 0.2s ease;
@@ -1060,8 +1055,8 @@ button:active {
 
 .icon-button:hover,
 .icon-button:active {
-  filter: drop-shadow(0 0 4px var(--accent)) brightness(1.3) invert(0.9);
-  transform: scale(1.1);
+  filter: drop-shadow(0 0 6px var(--accent)) brightness(1.3) invert(0.9);
+  transform: scale(1.05);
 }
 
 .icon-menu {
