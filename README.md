@@ -20,6 +20,7 @@ The most up-to-date build is available on **GitHub Pages**, so you can play onli
 - Upgrade staff housing and barge tiers to unlock more automation.
 - Operate harvest vessels, move them between sites and markets and sell cargo.
 - Interactive map displays sites, markets and vessel locations.
+- Mobile-friendly top bar collapses into a vertical layout on small screens.
 - Game state is saved in local storage so progress persists across sessions.
 - In-game time tracks days, seasons and years that advance automatically.
 
