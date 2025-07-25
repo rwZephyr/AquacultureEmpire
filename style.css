@@ -789,9 +789,14 @@ button:active {
   margin: 6px 0;
 }
 .staff-icon {
-  width: 24px;
-  height: 24px;
+  flex: 0 0 60%;
+  width: 60%;
+  height: auto;
   margin-right: 8px;
+  object-fit: contain;
+}
+.staff-info {
+  flex: 1;
 }
 .vesselCard div {
   font-size: 14px;
