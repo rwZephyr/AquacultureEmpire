@@ -449,10 +449,11 @@ button:active {
 }
 
 #penGridContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   margin-top: 10px;
+  margin-bottom: 20px;
 }
 
 #penGrid {
@@ -462,6 +463,8 @@ button:active {
 .penCard {
   background: var(--bg-panel);
   border-radius: 10px;
+  width: 180px;
+  flex: 0 0 auto;
   padding: 12px;
   text-align: left;
   color: var(--text-light);
