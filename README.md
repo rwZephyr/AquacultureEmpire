@@ -23,6 +23,7 @@ The most up-to-date build is available on **GitHub Pages**, so you can play onli
 - Mobile-friendly top bar collapses into a vertical layout on small screens.
 - Game state is saved in local storage so progress persists across sessions.
 - In-game time tracks days, seasons and years that advance automatically.
+- Pause or resume time with the play/pause button in the top bar.
 
 ### Time Data
 Several read-only time values are exposed on the global `window` object:

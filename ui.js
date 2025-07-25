@@ -17,6 +17,9 @@ import state, {
   getSiteHarvestRate,
 } from "./gameState.js";
 
+const PLAY_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBvbHlnb24gcG9pbnRzPSI4LDUgMTksMTIgOCwxOSIvPjwvc3ZnPg==';
+const PAUSE_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHJlY3QgeD0iNiIgeT0iNSIgd2lkdGg9IjQiIGhlaWdodD0iMTQiLz48cmVjdCB4PSIxNCIgeT0iNSIgd2lkdGg9IjQiIGhlaWdodD0iMTQiLz48L3N2Zz4=';
+
 // --- UPDATE UI ---
 function updateDisplay(){
   const site = state.sites[state.currentSiteIndex];
@@ -105,6 +108,17 @@ function updateDisplay(){
   renderMap();
   const statusEl = document.getElementById('statusMessages');
   if(statusEl) statusEl.innerText = state.statusMessage;
+  const timeToggle = document.getElementById('timeToggle');
+  const icon = document.getElementById('timeToggleIcon');
+  if(timeToggle && icon){
+    if(state.timePaused){
+      timeToggle.classList.add('paused');
+      icon.src = PLAY_ICON;
+    } else {
+      timeToggle.classList.remove('paused');
+      icon.src = PAUSE_ICON;
+    }
+  }
 }
 
 // harvest preview
