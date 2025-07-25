@@ -97,6 +97,7 @@ export class Vessel {
 
     this.unloading = false;
     this.offloadRevenue = 0;
+    this.deliveringContractId = null;
 
     // timers and progress (non-enumerable so they aren't saved)
     Object.defineProperty(this, 'harvestInterval', { value: null, writable: true, enumerable: false });
@@ -109,5 +110,6 @@ export class Vessel {
     Object.defineProperty(this, 'offloadInterval', { value: null, writable: true, enumerable: false });
     Object.defineProperty(this, 'offloadPrices', { value: null, writable: true, enumerable: false });
     Object.defineProperty(this, 'offloadMarket', { value: null, writable: true, enumerable: false });
+    Object.defineProperty(this, 'contractInterval', { value: null, writable: true, enumerable: false });
   }
 }

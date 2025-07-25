@@ -1,4 +1,5 @@
 // Local state reference initialized via initContracts to avoid circular imports
+import { updateDisplay } from './ui.js';
 let state;
 let contracts = [];
 
@@ -23,8 +24,10 @@ export function initContracts(gameState){
       startDay: state.totalDaysElapsed,
       durationDays: 10,
       rewardCash: 500,
+      priceMultiplier: 1.15,
       flavorKey: 'basicDelivery',
       status: 'active',
+      reminders: {}
     });
   }
 }
@@ -45,8 +48,121 @@ export function checkContractExpirations(){
   contracts.forEach(c => {
     if(c.status === 'active' && state.totalDaysElapsed > c.startDay + c.durationDays){
       c.status = 'expired';
+      if(c.reminders) c.reminders = {};
     }
   });
+}
+
+function getEligibleVessels(contract){
+  return state.vessels.filter(v =>
+    !v.isHarvesting && !v.unloading && !v.deliveringContractId &&
+    v.cargoSpecies === contract.species &&
+    v.currentBiomassLoad >= contract.biomassGoalKg
+  );
+}
+
+export function checkVesselContractEligibility(vessel){
+  contracts.forEach(c => {
+    if(c.status !== 'active') return;
+    if(!c.reminders) c.reminders = {};
+    if(c.reminders[vessel.name]) return;
+    if(vessel.cargoSpecies === c.species && vessel.currentBiomassLoad >= c.biomassGoalKg){
+      state.addStatusMessage(`✅ ${vessel.name} can now fulfill a contract for ${capitalizeFirstLetter(c.species)}! Check the Contracts screen.`);
+      c.reminders[vessel.name] = true;
+    }
+  });
+}
+
+export function openContractDeliveryModal(id){
+  const contract = contracts.find(c=>c.id===id);
+  if(!contract) return;
+  const optionsDiv = document.getElementById('contractDeliveryOptions');
+  if(!optionsDiv) return;
+  optionsDiv.innerHTML = '';
+  const vessels = getEligibleVessels(contract);
+  if(vessels.length === 0) return state.addStatusMessage('No eligible vessels.');
+  if(vessels.length === 1){
+    deliverContract(id, state.vessels.indexOf(vessels[0]));
+    return;
+  }
+  vessels.forEach(v => {
+    const btn = document.createElement('button');
+    btn.textContent = v.name;
+    btn.onclick = ()=>{ deliverContract(id, state.vessels.indexOf(v)); closeContractDeliveryModal(); };
+    optionsDiv.appendChild(btn);
+  });
+  document.getElementById('contractDeliveryModal').classList.add('visible');
+}
+
+export function closeContractDeliveryModal(){
+  const modal = document.getElementById('contractDeliveryModal');
+  if(modal) modal.classList.remove('visible');
+}
+
+function finishContractDelivery(vessel, contract){
+  vessel.location = contract.destination;
+  vessel.deliveringContractId = null;
+  let remaining = contract.biomassGoalKg;
+  for(let i=0;i<vessel.fishBuffer.length && remaining>0;){
+    const fish = vessel.fishBuffer[i];
+    if(fish.weight <= remaining){
+      remaining -= fish.weight;
+      vessel.currentBiomassLoad -= fish.weight;
+      vessel.fishBuffer.splice(i,1);
+    } else {
+      fish.weight -= remaining;
+      vessel.currentBiomassLoad -= remaining;
+      remaining = 0;
+    }
+  }
+  if(vessel.currentBiomassLoad <= 0.001){
+    vessel.currentBiomassLoad = 0;
+    vessel.cargoSpecies = null;
+  }
+  const base = state.speciesData[contract.species]?.marketPrice || 0;
+  const market = state.findMarketByName(contract.destination);
+  let payout = contract.biomassGoalKg * base;
+  if(market) payout *= (market.modifiers[contract.species] || 1);
+  payout *= (contract.priceMultiplier || 1.1);
+  state.cash += payout;
+  contract.status = 'fulfilled';
+  if(contract.reminders) contract.reminders = {};
+  state.addStatusMessage(`Contract fulfilled for $${payout.toFixed(2)}.`);
+  closeContractDeliveryModal();
+  if(typeof updateDisplay === 'function') updateDisplay();
+}
+
+export function deliverContract(id, vIdx){
+  const contract = contracts.find(c=>c.id===id);
+  if(!contract || contract.status !== 'active') return state.addStatusMessage('Contract unavailable.');
+  const vessel = state.vessels[vIdx];
+  if(!vessel || vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+    return state.addStatusMessage('Vessel currently busy.');
+  if(vessel.cargoSpecies !== contract.species || vessel.currentBiomassLoad < contract.biomassGoalKg)
+    return state.addStatusMessage('Vessel lacks required cargo.');
+  const market = state.findMarketByName(contract.destination);
+  const destLoc = market ? market.location : null;
+  const startLoc = state.getLocationByName(vessel.location) || (market ? market.location : {x:0,y:0});
+  let travelTime = 10000;
+  if(destLoc){
+    const dx = startLoc.x - destLoc.x;
+    const dy = startLoc.y - destLoc.y;
+    const dist = Math.hypot(dx, dy);
+    travelTime = dist / vessel.speed * state.TRAVEL_TIME_FACTOR;
+  }
+  vessel.location = `Traveling to ${contract.destination}`;
+  vessel.actionEndsAt = Date.now() + travelTime;
+  vessel.deliveringContractId = contract.id;
+  if(vessel.travelInterval){ clearInterval(vessel.travelInterval); }
+  vessel.travelInterval = setInterval(()=>{
+    if(state.timePaused) return;
+    if(Date.now() >= vessel.actionEndsAt){
+      clearInterval(vessel.travelInterval);
+      vessel.travelInterval = null;
+      vessel.actionEndsAt = 0;
+      finishContractDelivery(vessel, contract);
+    }
+  },250);
 }
 
 export function renderContracts(){
@@ -88,11 +204,21 @@ export function renderContracts(){
     flavor.className = 'contract-flavor';
     flavor.textContent = getContractFlavor(c);
 
+    const btn = document.createElement('button');
+    btn.textContent = 'Deliver to Contract';
+    const eligible = getEligibleVessels(c);
+    if(eligible.length > 0){
+      btn.onclick = ()=>openContractDeliveryModal(c.id);
+    } else {
+      btn.disabled = true;
+    }
+
     info.appendChild(title);
     info.appendChild(dest);
     info.appendChild(time);
     info.appendChild(reward);
     info.appendChild(flavor);
+    info.appendChild(btn);
 
     row.appendChild(img);
     row.appendChild(info);

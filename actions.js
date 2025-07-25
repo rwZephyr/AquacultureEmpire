@@ -21,6 +21,7 @@ import {
 import { Site, Barge, Pen, Vessel } from "./models.js";
 import state, { getTimeState, addStatusMessage, advanceDays, setupMarketData, updateMarketPrices } from "./gameState.js";
 import { initMilestones } from './milestones.js';
+import { openContractDeliveryModal, closeContractDeliveryModal, deliverContract, checkVesselContractEligibility } from './contracts.js';
 
 const OFFLINE_STEP_SECONDS = 60; // simulation granularity for offline progress
 import {
@@ -257,7 +258,8 @@ function upgradeStaffHousing(){
 
 function upgradeVessel(){
   const vessel = state.vessels[state.currentVesselIndex];
-  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
+  if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+    return openModal('Vessel currently busy.');
   const currentTier = vessel.tier;
   if(currentTier >= vesselTiers.length - 1)
     return openModal("Vessel already at max tier.");
@@ -317,7 +319,8 @@ function confirmRename(){
 
 function openMoveVesselModal(){
   const vessel = state.vessels[state.currentVesselIndex];
-  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
+  if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+    return openModal('Vessel currently busy.');
   const optionsDiv = document.getElementById('moveOptions');
   optionsDiv.innerHTML = '';
   state.sites.forEach((s, idx)=>{
@@ -497,7 +500,8 @@ function harvestPen(amount=null){
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
   const vessel = state.vessels[state.currentVesselIndex];
-  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
+  if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+    return openModal('Vessel currently busy.');
   if(pen.fishCount===0) return;
   if(vessel.currentBiomassLoad>0 && vessel.cargoSpecies && vessel.cargoSpecies !== pen.species){
     return openModal('Vessel already contains a different species.');
@@ -575,6 +579,7 @@ function harvestPen(amount=null){
         vessel.actionEndsAt = 0;
         state.harvestsCompleted++;
         openModal(`Harvested ${biomass.toFixed(2)} kg loaded onto ${vessel.name}.`);
+        checkVesselContractEligibility(vessel);
       }
       updateDisplay();
     }, 250);
@@ -1042,8 +1047,10 @@ function loadGame() {
         Object.defineProperty(v, 'offloadInterval', { value: null, writable: true, enumerable: false });
         Object.defineProperty(v, 'offloadPrices', { value: null, writable: true, enumerable: false });
         Object.defineProperty(v, 'offloadMarket', { value: null, writable: true, enumerable: false });
+        Object.defineProperty(v, 'contractInterval', { value: null, writable: true, enumerable: false });
         if(v.unloading === undefined) v.unloading = false;
         if(v.offloadRevenue === undefined) v.offloadRevenue = 0;
+        if(v.deliveringContractId === undefined) v.deliveringContractId = null;
       });
       state.sites.forEach(site => {
         site.pens.forEach(pen => {
@@ -1221,5 +1228,8 @@ export {
   toggleMobileActions,
   toggleSiteActions,
   selectSite,
-  populateSiteList
+  populateSiteList,
+  openContractDeliveryModal,
+  closeContractDeliveryModal,
+  deliverContract
 };
