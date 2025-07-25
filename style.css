@@ -936,13 +936,19 @@ button:active {
 }
 
 @media (max-width: 500px) {
+  :root {
+    --header-height: 60px;
+  }
   #topBar {
     flex-direction: column;
-    gap: 6px;
-    padding: 8px 12px;
+    gap: 4px;
+    padding: 4px 8px;
   }
   .top-bar-group {
-    gap: 6px;
+    gap: 4px;
+  }
+  #statusGroup div {
+    margin: 0;
   }
 }
 
@@ -1101,8 +1107,8 @@ button:active {
     gap: 8px;
   }
   .icon-button {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
   }
 }
 
