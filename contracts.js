@@ -1,5 +1,6 @@
 // Local state reference initialized via initContracts to avoid circular imports
 import { updateDisplay } from './ui.js';
+import { speciesData } from './data.js';
 let state;
 let contracts = [];
 
@@ -119,7 +120,7 @@ function finishContractDelivery(vessel, contract){
     vessel.currentBiomassLoad = 0;
     vessel.cargoSpecies = null;
   }
-  const base = state.speciesData[contract.species]?.marketPrice || 0;
+  const base = speciesData[contract.species]?.marketPrice || 0;
   const market = state.findMarketByName(contract.destination);
   let payout = contract.biomassGoalKg * base;
   if(market) payout *= (market.modifiers[contract.species] || 1);
