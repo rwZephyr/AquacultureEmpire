@@ -45,6 +45,7 @@
           <div id="mobileActionGroup" class="hidden">
             <button onclick="openMarketReport()">Market</button>
             <button onclick="openShipyard()">Shipyard</button>
+            <button onclick="openLogbook()" title="Open Logbook">Logbook</button>
             <button onclick="toggleDevTools()">⚙️</button>
           </div>
         </div>
@@ -332,6 +333,20 @@
           <div id="buildLockMessage" class="lock-message" style="display:none"></div>
           <button onclick="confirmCustomBuild()">Purchase</button>
         </div>
+      </div>
+    </div>
+    <div id="logbookModal" class="logbook-modal">
+      <button class="close-report-btn" onclick="closeLogbook()">Back</button>
+      <div id="logbookContent" class="logbook-content">
+        <h2>Logbook</h2>
+        <h3>Milestones</h3>
+        <div id="milestoneList"></div>
+        <h3>Species Info</h3>
+        <div id="speciesInfoPlaceholder"></div>
+        <h3>Contracts</h3>
+        <div id="contractsPlaceholder"></div>
+        <h3>Upgrades</h3>
+        <div id="upgradesPlaceholder"></div>
       </div>
     </div>
     <div id="marketReportPage" class="market-report-page">

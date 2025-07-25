@@ -279,6 +279,40 @@ button:active {
   margin: 0 auto;
 }
 
+#logbookModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background: var(--bg-darker);
+  color: var(--text-light);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+  display: none;
+  z-index: 900;
+}
+
+#logbookModal.visible {
+  display: block;
+}
+
+#logbookContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.milestone-entry {
+  display: flex;
+  justify-content: space-between;
+  background: var(--bg-panel);
+  padding: 6px 8px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+
 #shipyardList {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
