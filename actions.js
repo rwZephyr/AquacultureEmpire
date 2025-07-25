@@ -561,6 +561,12 @@ function harvestPen(amount=null){
         // ensure final fish count accounts for rounding
         pen.fishCount = Math.max(0, startFishCount - fishNum);
         if(pen.fishCount === 0) pen.averageWeight = 0;
+        const leftover = Math.round(vessel.harvestFishBuffer);
+        if(leftover > 0){
+          for(let i=0; i<leftover; i++){
+            vessel.fishBuffer.push({ species: pen.species, weight: lockedWeight });
+          }
+        }
         vessel.harvestFishBuffer = 0;
         pen.locked = false;
         vessel.harvestingPenIndex = null;
