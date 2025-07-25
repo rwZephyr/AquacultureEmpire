@@ -891,6 +891,7 @@ function finishOffloading(vessel, market, canceled=false){
     vessel.cargo = {};
     vessel.cargoSpecies = null;
     vessel.currentBiomassLoad = 0;
+    vessel.fishBuffer = [];
     if(market && market.daysSinceSale){
       for(const sp in prices){ market.daysSinceSale[sp] = 0; }
     }
