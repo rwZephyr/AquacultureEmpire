@@ -71,8 +71,13 @@
           </div>
           <div id="staffCard" class="staffCard">
             <h2>Staffing</h2>
-            <div>Total: <span id="staffTotal">0</span> / <span id="staffCapacity">0</span></div>
-            <div>Unassigned: <span id="staffUnassigned">0</span></div>
+            <div class="staff-stats">
+              <img src="assets/general-icons/farmer.png" alt="Staff icon" class="staff-icon">
+              <div>
+                <div>Total: <span id="staffTotal">0</span> / <span id="staffCapacity">0</span></div>
+                <div>Unassigned: <span id="staffUnassigned">0</span></div>
+              </div>
+            </div>
             <div class="staff-buttons">
               <button class="staff-button" onclick="hireStaff()">&#x2795; Hire ($500)</button>
               <button class="staff-button" onclick="fireStaff()">&#x1f5d1; Fire</button>

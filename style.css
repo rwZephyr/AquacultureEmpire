@@ -780,6 +780,16 @@ button:active {
   background-color: #555;
   cursor: not-allowed;
 }
+.staff-stats {
+  display: flex;
+  align-items: center;
+  margin: 6px 0;
+}
+.staff-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
 .vesselCard div {
   font-size: 14px;
   margin: 6px 0;
