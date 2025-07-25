@@ -51,6 +51,31 @@ document.addEventListener('click', evt => {
   }
 });
 
+function toggleMobileActions(){
+  const group = document.getElementById('mobileActionGroup');
+  if(!group) return;
+  if(group.classList.contains('visible')){
+    group.classList.remove('visible');
+    group.classList.add('hidden');
+  } else {
+    group.classList.remove('hidden');
+    group.classList.add('visible');
+  }
+}
+
+function outsideMobileActionHandler(evt){
+  const group = document.getElementById('mobileActionGroup');
+  const toggle = document.getElementById('mobileActionToggle');
+  if(!group || !toggle) return;
+  if(group.classList.contains('visible') &&
+     !group.contains(evt.target) && !toggle.contains(evt.target)){
+    group.classList.remove('visible');
+    group.classList.add('hidden');
+  }
+}
+
+document.addEventListener('click', outsideMobileActionHandler);
+
 // Track counts to avoid re-rendering lists every tick
 let lastSiteIndex = -1;
 let lastPenCount = 0;
@@ -1215,6 +1240,8 @@ export {
   confirmBuyFeed,
   setFeedPurchaseMax,
   toggleSiteList,
+  toggleMobileActions,
+  outsideMobileActionHandler,
   selectSite,
   populateSiteList
 };
