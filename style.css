@@ -970,6 +970,64 @@ button:active {
   font-weight: bold;
 }
 
+.mobile-action-wrapper {
+  position: relative;
+}
+
+#mobileActionToggle {
+  background-color: var(--bg-button);
+  border: none;
+  border-radius: 6px;
+  padding: 6px;
+}
+
+.icon-img {
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+#mobileActionGroup {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: var(--bg-panel);
+  box-shadow: 0 2px 6px var(--shadow-light);
+  border-radius: 6px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 200;
+}
+
+#mobileActionGroup.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+@media (min-width: 601px) {
+  #mobileActionToggle {
+    display: none;
+  }
+  #mobileActionGroup {
+    position: static;
+    flex-direction: row;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    display: flex;
+  }
+  #mobileActionGroup.hidden {
+    display: flex !important;
+  }
+}
+
 /* Mobile sidebar behavior */
 @media (max-width: 700px) {
   #sidebar {

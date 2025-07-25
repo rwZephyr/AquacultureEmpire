@@ -19,14 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
   actions.loadGame();
   ui.updateDisplay();
   ui.setupMapInteractions();
-  const cog = document.getElementById('devCog');
-  if(cog){
-    cog.addEventListener('click', () => {
-      const modal = document.getElementById('devModal');
-      if(modal.classList.contains('visible')) ui.closeDevModal();
-      else ui.openDevModal();
-    });
-  }
   if(state.lastOfflineInfo){
     const days = state.lastOfflineInfo.daysPassed;
     const feed = state.lastOfflineInfo.feedUsed.toFixed(0);

@@ -33,9 +33,16 @@
         </div>
       </div>
       <div class="top-bar-group" id="toolsGroup">
-        <button onclick="openMarketReport()">Market Report</button>
-        <button onclick="openShipyard()">Shipyard</button>
-        <button id="devCog" title="Developer Tools">⚙️</button>
+        <div class="mobile-action-wrapper">
+          <button id="mobileActionToggle" onclick="toggleMobileActions()">
+            <img src="assets/general-icons/browser.png" alt="Tools" class="icon-img" />
+          </button>
+          <div id="mobileActionGroup" class="hidden">
+            <button onclick="openMarketReport()">Market</button>
+            <button onclick="openShipyard()">Shipyard</button>
+            <button onclick="toggleDevTools()">⚙️</button>
+          </div>
+        </div>
       </div>
     </div>
     </div>
