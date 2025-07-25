@@ -1126,6 +1126,57 @@ function renderLogbook(){
   });
 }
 
+function renderSpeciesInfo(){
+  const container = document.getElementById('speciesInfoList');
+  if(!container) return;
+  container.innerHTML = '';
+  const sorted = Object.keys(speciesData).sort((a,b)=>a.localeCompare(b));
+  sorted.forEach(key => {
+    const data = speciesData[key];
+    const row = document.createElement('div');
+    row.className = 'logbook-species-entry';
+
+    const img = document.createElement('img');
+    img.src = `assets/species-icons/${key}.png`;
+    img.alt = key;
+    img.className = 'logbook-species-icon';
+
+    const info = document.createElement('div');
+    info.className = 'species-info';
+
+    const name = document.createElement('div');
+    name.className = 'species-name';
+    name.textContent = data.displayName || capitalizeFirstLetter(key);
+
+    const stats = document.createElement('div');
+    stats.className = 'species-stats';
+    stats.innerHTML =
+      `<span>Max ${data.maxWeight}kg</span>`+
+      ` <span>$${data.marketPrice}/kg</span>`+
+      ` <span>FCR ${data.fcr}</span>`+
+      ` <span>Restock ${data.restockCount}</span>`;
+
+    const tagsRow = document.createElement('div');
+    tagsRow.className = 'species-tags';
+    if(data.tags && data.tags.length){
+      data.tags.forEach(t => {
+        const span = document.createElement('span');
+        span.className = 'tag';
+        span.textContent = t;
+        tagsRow.appendChild(span);
+      });
+    }
+
+    info.appendChild(name);
+    info.appendChild(stats);
+    info.appendChild(tagsRow);
+
+    row.appendChild(img);
+    row.appendChild(info);
+    container.appendChild(row);
+  });
+}
+
 function switchLogbookSection(section){
   logbookSection = section;
   const sections = ['milestones','species','contracts','upgrades'];
@@ -1136,6 +1187,7 @@ function switchLogbookSection(section){
     if(tab) tab.classList.toggle('active', s === section);
   });
   if(section === 'milestones') renderLogbook();
+  if(section === 'species') renderSpeciesInfo();
 }
 
 function openLogbook(){
