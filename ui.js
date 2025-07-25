@@ -210,6 +210,7 @@ function renderPenGrid(site){
       const icon = document.createElement('img');
       icon.src = 'assets/species-icons/' + pen.species + '.png';
       icon.alt = pen.species;
+      icon.className = 'species-icon';
       badge.appendChild(icon);
       badge.style.backgroundColor = speciesColors[pen.species] || 'rgba(0,0,0,0.2)';
     } else {
@@ -253,6 +254,7 @@ function updatePenCards(site){
       const icon = document.createElement('img');
       icon.src = 'assets/species-icons/' + pen.species + '.png';
       icon.alt = pen.species;
+      icon.className = 'species-icon';
       badge.appendChild(icon);
       badge.style.backgroundColor = speciesColors[pen.species] || 'rgba(0,0,0,0.2)';
     } else {
