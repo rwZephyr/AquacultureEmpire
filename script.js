@@ -14,8 +14,28 @@ function adjustHeaderPadding(){
 
 window.addEventListener('resize', adjustHeaderPadding);
 
+function reflowTopBar(){
+  const mobileBreak = 500;
+  const siteGroup = document.getElementById('siteGroup');
+  const siteActions = document.getElementById('siteActionGroup');
+  const toolsGroup = document.getElementById('toolsGroup');
+  const toolsActions = document.getElementById('toolsActionGroup');
+  const mobileBar = document.getElementById('mobileIconBar');
+  if(!siteGroup || !siteActions || !toolsGroup || !toolsActions || !mobileBar) return;
+  if(window.innerWidth <= mobileBreak){
+    if(!mobileBar.contains(siteActions)) mobileBar.appendChild(siteActions);
+    if(!mobileBar.contains(toolsActions)) mobileBar.appendChild(toolsActions);
+  } else {
+    if(!siteGroup.contains(siteActions)) siteGroup.appendChild(siteActions);
+    if(!toolsGroup.contains(toolsActions)) toolsGroup.appendChild(toolsActions);
+  }
+}
+
+window.addEventListener('resize', reflowTopBar);
+
 document.addEventListener('DOMContentLoaded', () => {
   adjustHeaderPadding();
+  reflowTopBar();
   actions.loadGame();
   ui.updateDisplay();
   ui.setupMapInteractions();
