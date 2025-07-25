@@ -937,15 +937,19 @@ button:active {
 
 @media (max-width: 500px) {
   :root {
-    --header-height: 60px;
+    --header-height: 48px;
   }
   #topBar {
     flex-direction: column;
-    gap: 4px;
-    padding: 4px 8px;
+    gap: 2px;
+    padding: 2px 4px;
   }
   .top-bar-group {
-    gap: 4px;
+    gap: 2px;
+  }
+  .top-bar-group button {
+    margin: 0;
+    padding: 4px 6px;
   }
   #statusGroup div {
     margin: 0;
@@ -961,6 +965,7 @@ button:active {
 .top-bar-group button {
   font-size: 14px;
   padding: 6px 12px;
+  margin: 0;
   background-color: var(--bg-button);
   color: var(--text-light);
   border: none;
