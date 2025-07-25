@@ -20,15 +20,14 @@
           </button>
           <div id="siteDropdownList" class="site-list hidden"></div>
         </div>
-        <div class="icon-action-bar">
-          <img src="assets/general-icons/cagesystem.png"
-               alt="Site Actions"
-               class="icon-button"
-               onclick="toggleSiteActions()" />
-        </div>
-        <div id="siteActionMenu" class="icon-menu hidden">
-          <div onclick="buyNewSite()">+ New Site</div>
-          <div onclick="openSiteManagement()">Manage Site</div>
+        <div class="mobile-action-wrapper" id="siteActionGroup">
+          <button id="siteActionToggle" onclick="toggleSiteActions()">
+            <img src="assets/general-icons/cagesystem.png" alt="Site Actions" class="icon-img" />
+          </button>
+          <div id="siteActionMenu" class="hidden">
+            <button onclick="buyNewSite()">+ New Site</button>
+            <button onclick="openSiteManagement()">Manage Site</button>
+          </div>
         </div>
       </div>
       <div class="top-bar-group" id="statusGroup">
