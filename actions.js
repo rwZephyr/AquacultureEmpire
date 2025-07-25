@@ -19,7 +19,7 @@ import {
   CUSTOM_BUILD_MARKUP
 } from "./data.js";
 import { Site, Barge, Pen, Vessel } from "./models.js";
-import state, { getTimeState, addStatusMessage, advanceDays, setupMarketData } from "./gameState.js";
+import state, { getTimeState, addStatusMessage, advanceDays, setupMarketData, updateMarketPrices } from "./gameState.js";
 import { initMilestones } from './milestones.js';
 
 const OFFLINE_STEP_SECONDS = 60; // simulation granularity for offline progress
@@ -692,7 +692,7 @@ function devSetTimeScalePrompt() {
 }
 
 function devResetMarketPrices() {
-  state.markets.forEach(market => {
+  markets.forEach(market => {
     Object.keys(market.basePrices).forEach(species => {
       market.prices[species] = market.basePrices[species];
     });
@@ -708,7 +708,7 @@ function devSetMarketModifierPrompt() {
   const market = prompt("Market name:");
   const species = prompt("Species name:");
   const modifier = parseFloat(prompt("Modifier (e.g. 1.2):"));
-  const target = state.markets.find(m => m.name === market);
+  const target = markets.find(m => m.name === market);
   if (target && !isNaN(modifier)) {
     target.priceModifiers[species] = modifier;
   }
@@ -718,7 +718,7 @@ function devSetMarketModifierPrompt() {
 function calculateHarvestIncome(pen) {
   const species = pen.species;
   const biomass = pen.fishCount * pen.averageWeight;
-  const price = state.markets[0].prices?.[species] ?? speciesData[species].marketPrice;
+  const price = markets[0].prices?.[species] ?? speciesData[species].marketPrice;
   return biomass * price;
 }
 
