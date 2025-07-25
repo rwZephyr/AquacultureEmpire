@@ -55,6 +55,8 @@ const state = {
   statusMessage: '',
   lastOfflineInfo: null,
   lastMarketUpdateString: 'Spring 1, Year 1',
+  harvestsCompleted: 0,
+  milestones: {},
 };
 
 // Expose read-only accessors for external logic

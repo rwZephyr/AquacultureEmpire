@@ -20,6 +20,7 @@ import {
 } from "./data.js";
 import { Site, Barge, Pen, Vessel } from "./models.js";
 import state, { getTimeState, addStatusMessage, advanceDays, setupMarketData } from "./gameState.js";
+import { initMilestones } from './milestones.js';
 
 const OFFLINE_STEP_SECONDS = 60; // simulation granularity for offline progress
 import {
@@ -559,6 +560,7 @@ function harvestPen(amount=null){
         vessel.location = site.name;
         vessel.isHarvesting = false;
         vessel.actionEndsAt = 0;
+        state.harvestsCompleted++;
         openModal(`Harvested ${biomass.toFixed(2)} kg loaded onto ${vessel.name}.`);
       }
       updateDisplay();
@@ -966,6 +968,8 @@ function saveGame() {
     penPurchaseCost: state.penPurchaseCost,
     sites: state.sites,
     vessels: state.vessels,
+    harvestsCompleted: state.harvestsCompleted,
+    milestones: state.milestones,
     marketStates: markets.map(m => ({
       name: m.name,
       prices: m.prices,
@@ -992,12 +996,19 @@ function saveGame() {
 
 function loadGame() {
   const raw = localStorage.getItem(state.SAVE_KEY);
-  if (!raw) { setupMarketData(); state.generateShipyardInventory(); return; }
+  if (!raw) {
+    setupMarketData();
+    state.generateShipyardInventory();
+    initMilestones();
+    return;
+  }
   try {
     const obj = JSON.parse(raw);
     if (obj && obj.sites) {
       state.cash = obj.cash ?? state.cash;
       state.penPurchaseCost = obj.penPurchaseCost ?? state.penPurchaseCost;
+      state.harvestsCompleted = obj.harvestsCompleted ?? 0;
+      state.milestones = obj.milestones ?? {};
       state.sites = obj.sites;
       state.sites.forEach(s => { if(!s.location) s.location = { x: Math.random()*100, y: Math.random()*100 }; });
       state.vessels = obj.vessels ?? state.vessels;
@@ -1071,6 +1082,7 @@ function loadGame() {
   }
   setupMarketData();
   state.generateShipyardInventory();
+  initMilestones();
 }
 
 function resetGame() {
