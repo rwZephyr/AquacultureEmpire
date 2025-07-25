@@ -14,9 +14,12 @@
     <div id="topBar">
       <div class="top-bar-group" id="siteGroup">
         <strong>Site:</strong>
-        <span id="siteName">-</span>
-        <button onclick="previousSite()">⟵</button>
-        <button onclick="nextSite()">⟶</button>
+        <div class="site-switcher">
+          <button id="siteNameBtn" onclick="toggleSiteList()">
+            <span id="siteName">-</span> ⌄
+          </button>
+          <div id="siteDropdownList" class="site-list hidden"></div>
+        </div>
         <button onclick="buyNewSite()">+ New Site</button>
         <button id="manageSiteBtn" onclick="openSiteManagement()">Manage Site</button>
       </div>
