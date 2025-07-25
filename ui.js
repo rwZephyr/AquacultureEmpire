@@ -204,8 +204,6 @@ function updateDisplay(){
   }
 
   renderMap();
-  const tipsEl = document.getElementById('operationalTips');
-  if(tipsEl) tipsEl.innerText = state.statusMessage || 'All systems nominal.';
   const tsEl = document.querySelector('#marketReportContent .market-timestamp');
   if(tsEl) tsEl.innerText = `Prices last updated: ${state.lastMarketUpdateString}`;
   updateFeedPurchaseUI();

@@ -1383,6 +1383,39 @@ button:active {
   margin-top: 10px;
 }
 
+#toastContainer {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.toast-tip {
+  background: var(--bg-panel);
+  color: var(--text-light);
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: auto;
+  max-width: 90vw;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.toast-tip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* Responsive layout */
 @media (max-width: 700px) {
   #mainLayout {
