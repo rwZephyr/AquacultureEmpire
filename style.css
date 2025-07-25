@@ -90,6 +90,22 @@ button:active {
   color: var(--text-dark);
 }
 
+@media (max-width: 500px) {
+  #tabBar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  #tabBar button {
+    flex: 1 1 45%;
+    margin: 2px;
+    padding: 4px 6px;
+    font-size: 14px;
+  }
+}
+
 /* Sidebar Layout */
 #sidebar {
   position: fixed;
