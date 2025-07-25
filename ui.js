@@ -91,7 +91,7 @@ function toggleSiteActions(){
 
 function outsideSiteActionHandler(e){
   const menu = document.getElementById('siteActionMenu');
-  const toggle = document.querySelector('img[onclick="toggleSiteActions()"]');
+  const toggle = document.getElementById('siteActionToggle');
   if(!menu || !toggle) return;
   if(!menu.contains(e.target) && !toggle.contains(e.target)){
     menu.classList.remove('visible');
