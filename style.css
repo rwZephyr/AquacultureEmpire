@@ -408,13 +408,13 @@ button:active {
   max-width: 900px;
 }
 
-.top-left, .top-right {
+.top-bar-group {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.top-left button, .top-right button {
+.top-bar-group button {
   font-size: 14px;
   padding: 6px 12px;
   background-color: #2b3b4a;
@@ -424,7 +424,7 @@ button:active {
   cursor: pointer;
 }
 
-.top-left button:hover, .top-right button:hover {
+.top-bar-group button:hover {
   background-color: #4be0ff;
   color: #142027;
 }
@@ -467,4 +467,26 @@ button:active {
 #shop button {
   width: 100%;
   margin: 4px 0;
+}
+
+@media (max-width: 600px) {
+  #topBar {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .top-bar-group {
+    width: 100%;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .top-bar-group button {
+    flex: 1 1 48%;
+  }
+
+  .site-switcher {
+    width: 100%;
+  }
 }
