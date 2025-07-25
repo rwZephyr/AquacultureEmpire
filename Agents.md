@@ -32,6 +32,16 @@ Aquaculture Empire is organized into several functional modules. Each plays a ro
 - **Key Functions:** `saveGame`, `loadGame`, and `simulateOfflineProgress` in `actions.js`.
 - **Interactions:** Triggered on page load and every 30 seconds. When returning after a break, it advances time and feeds fish as if the game kept running.
 
+## Milestone Tracker
+- **Purpose:** Rewards players for reaching gameplay achievements.
+- **Key Files/Functions:** `milestones.js` defines milestone data and exposes `checkMilestones`.
+- **Interactions:** Called whenever major actions occur, granting rewards and updating the logbook.
+
+## Logbook & Notifications
+- **Purpose:** Shows milestone progress, species details and contract info while also providing toast tips.
+- **Key Functions:** `renderLogbook`, `switchLogbookSection` in `ui.js` and `showToast` in `gameState.js`.
+- **Interactions:** Accessed from the top bar; other systems trigger toasts for status updates.
+
 ## UI Renderer
 - **Purpose:** Updates on-screen stats, handles modals, and renders the map and market reports.
 - **Key Files/Functions:** The majority of `ui.js`, particularly `updateDisplay`, `renderMap`, and `openMarketReport`.
