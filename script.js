@@ -2,7 +2,7 @@ import state from './gameState.js';
 import * as ui from './ui.js';
 import * as actions from './actions.js';
 
-Object.assign(window, actions);
+Object.assign(window, actions, ui);
 
 document.addEventListener('DOMContentLoaded', () => {
   actions.loadGame();

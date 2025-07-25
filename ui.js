@@ -395,6 +395,56 @@ function openCustomBuild(){
   openModal('Custom build feature coming soon!');
 }
 
+function updateSiteManagementModal(){
+  const site = state.sites[state.currentSiteIndex];
+  document.getElementById('siteManagementTitle').innerText = `Site Management – ${site.name}`;
+  const licenseDiv = document.getElementById('siteLicenses');
+  licenseDiv.innerHTML = '<h3>Licenses</h3>';
+  site.licenses.forEach(sp=>{
+    licenseDiv.innerHTML += `<div class="license-entry">Species: ${capitalizeFirstLetter(sp)} – ✅</div>`;
+  });
+  const notLicensed = Object.keys(speciesData).filter(sp=>!site.licenses.includes(sp));
+  if(notLicensed.length){
+    const options = notLicensed.map(sp=>`<option value="${sp}">${capitalizeFirstLetter(sp)} - $${speciesData[sp].licenseCost}</option>`).join('');
+    licenseDiv.innerHTML += `<div><select id="licenseBuySelect">${options}</select> <button onclick="buySelectedLicense()">Buy License</button></div>`;
+  } else {
+    licenseDiv.innerHTML += '<div>All licenses acquired</div>';
+  }
+
+  const upDiv = document.getElementById('siteUpgrades');
+  upDiv.innerHTML = '<h3>Site Upgrades</h3>';
+  const upgrades = [
+    {key:'dockUpgrade',name:'Dock Upgrade',desc:'Improves vessel turnaround speed.'},
+    {key:'warehouseExpansion',name:'Warehouse Expansion',desc:'Increases passive storage or barge feed storage.'},
+    {key:'environmentalSensors',name:'Environmental Sensors',desc:'Unlocks weather or seasonal UI in future.'}
+  ];
+  upgrades.forEach(u=>{
+    const owned = site.upgrades && site.upgrades.includes(u.key);
+    const disabled = owned ? 'disabled' : '';
+    const text = owned ? 'Purchased' : 'Upgrade ($25000)';
+    upDiv.innerHTML += `
+      <div class="site-upgrade-card">
+        <h4>${u.name}</h4>
+        <p>${u.desc}</p>
+        <button ${disabled} onclick="purchaseSiteUpgrade('${u.key}')">${text}</button>
+      </div>`;
+  });
+}
+
+function openSiteManagementModal(){
+  updateSiteManagementModal();
+  document.getElementById('siteManagementModal').classList.add('visible');
+}
+
+function closeSiteManagementModal(){
+  document.getElementById('siteManagementModal').classList.remove('visible');
+}
+
+function buySelectedLicense(){
+  const select = document.getElementById('licenseBuySelect');
+  if(select) purchaseLicense(null, select.value);
+}
+
 function sellCargo(idx){
   const vessel = state.vessels[state.currentVesselIndex];
   if(vessel.currentBiomassLoad<=0) return openModal('No biomass to sell.');
@@ -452,5 +502,9 @@ export {
   openSellModal,
   closeSellModal,
   openCustomBuild,
-  sellCargo
+  sellCargo,
+  updateSiteManagementModal,
+  openSiteManagementModal,
+  closeSiteManagementModal,
+  buySelectedLicense
 };

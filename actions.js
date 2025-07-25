@@ -71,6 +71,38 @@ function buyLicense(sp){
   if(state.cash<cost) return openModal("Not enough cash to buy license.");
   state.cash-=cost; site.licenses.push(sp); updateDisplay();
 }
+
+function purchaseLicense(site, speciesKey){
+  if(!site) site = state.sites[state.currentSiteIndex];
+  const cost = speciesData[speciesKey].licenseCost || 0;
+  if(site.licenses.includes(speciesKey)){
+    return openModal('Already licensed');
+  }
+  if(state.cash < cost){
+    return openModal('Insufficient funds');
+  }
+  state.cash -= cost;
+  site.licenses.push(speciesKey);
+  updateDisplay();
+  if(typeof updateSiteManagementModal === 'function') updateSiteManagementModal();
+  openModal('License purchased successfully');
+}
+
+function purchaseSiteUpgrade(upgradeKey){
+  const site = state.sites[state.currentSiteIndex];
+  const UPGRADE_COST = 25000;
+  if(site.upgrades.includes(upgradeKey)){
+    return openModal('Upgrade already purchased');
+  }
+  if(state.cash < UPGRADE_COST){
+    return openModal('Insufficient funds');
+  }
+  state.cash -= UPGRADE_COST;
+  site.upgrades.push(upgradeKey);
+  updateDisplay();
+  if(typeof updateSiteManagementModal === 'function') updateSiteManagementModal();
+  openModal('Upgrade purchased successfully');
+}
 function buyNewSite(){
   if(state.cash<20000) return openModal("Not enough cash to buy a new site!");
   state.cash-=20000;
@@ -92,7 +124,8 @@ function buyNewSite(){
     })],
     staff: [],
     licenses:['shrimp'],
-    pens:[new Pen({ species:"shrimp", fishCount:500, averageWeight:0.01, bargeIndex:0 })]
+    pens:[new Pen({ species:"shrimp", fishCount:500, averageWeight:0.01, bargeIndex:0 })],
+    upgrades:[]
   }));
   updateDisplay();
   openModal("New site purchased!");
@@ -743,4 +776,4 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, openHarvestModal, closeHarvestModal, confirmHarvest, openVesselHarvestModal, closeVesselHarvestModal, confirmVesselHarvest, feedFishPen, harvestPenIndex, harvestWithVessel, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, getTimeState, openCustomBuild };
+export { buyFeed, buyMaxFeed, buyFeedStorageUpgrade, buyLicense, purchaseLicense, purchaseSiteUpgrade, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeStaffHousing, upgradeBarge, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, openHarvestModal, closeHarvestModal, confirmHarvest, openVesselHarvestModal, closeVesselHarvestModal, confirmVesselHarvest, feedFishPen, harvestPenIndex, harvestWithVessel, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, getTimeState, openCustomBuild };

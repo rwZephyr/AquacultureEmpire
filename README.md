@@ -14,6 +14,7 @@ The most up-to-date build is available on **GitHub Pages**, so you can play onli
 - Each pen has a tiered auto-feeder path from floating rafts to
   underwater systems with individual upgrade costs.
 - Expand your business by buying entirely new sites.
+- Use the **Manage Site** panel to view licenses and purchase site upgrades.
 - Development menu with helper buttons to add cash, harvest all pens and restock them for free.
 - Progress is automatically saved every 30 seconds.
 - Hire and assign staff as feeders, harvesters or feed managers.
