@@ -18,6 +18,7 @@
         <button onclick="previousSite()">⟵</button>
         <button onclick="nextSite()">⟶</button>
         <button onclick="buyNewSite()">+ New Site</button>
+        <button id="manageSiteBtn" onclick="openSiteManagement()">Manage Site</button>
       </div>
       <div class="top-right">
         <div><strong>Cash:</strong> $<span id="cashCount">0</span></div>
@@ -29,7 +30,6 @@
         </div>
         <button onclick="openMarketReport()">Market Report</button>
         <button onclick="openShipyard()">Shipyard</button>
-        <button onclick="openSiteManagement()">Manage Site</button>
         <button id="devCog" title="Developer Tools">⚙️</button>
       </div>
       </div>
@@ -235,23 +235,24 @@
       <div id="siteManagementContent">
         <button class="close-report-btn" onclick="closeSiteManagement()">Back</button>
         <h2>Site Management – <span id="siteManagementSiteName"></span></h2>
+        <div id="siteLicenses"></div>
         <section id="licenseShop"></section>
-        <h3>Site Infrastructure Upgrades</h3>
-        <div id="upgradeGrid" class="site-upgrade-grid">
-          <div class="upgrade-card">
+        <h3>Site Upgrades</h3>
+        <div id="siteUpgrades" class="site-upgrade-grid">
+          <div class="site-upgrade-card">
             <h4>Dock Upgrade</h4>
-            <p>Increase docking capacity.</p>
-            <button>Upgrade ($X)</button>
+            <p>Improves vessel turnaround speed.</p>
+            <button data-upgrade="dockUpgrade" onclick="purchaseSiteUpgrade('dockUpgrade')">Upgrade ($25000)</button>
           </div>
-          <div class="upgrade-card">
+          <div class="site-upgrade-card">
             <h4>Warehouse Expansion</h4>
-            <p>Expand storage space.</p>
-            <button>Upgrade ($X)</button>
+            <p>Increases passive storage or barge feed storage.</p>
+            <button data-upgrade="warehouseExpansion" onclick="purchaseSiteUpgrade('warehouseExpansion')">Upgrade ($25000)</button>
           </div>
-          <div class="upgrade-card">
+          <div class="site-upgrade-card">
             <h4>Environmental Sensors</h4>
-            <p>Monitor water quality in real time.</p>
-            <button>Upgrade ($X)</button>
+            <p>Unlocks weather or seasonal UI in future.</p>
+            <button data-upgrade="envSensors" onclick="purchaseSiteUpgrade('envSensors')">Upgrade ($25000)</button>
           </div>
         </div>
       </div>

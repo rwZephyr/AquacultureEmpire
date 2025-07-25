@@ -151,28 +151,61 @@ function updateDisplay(){
 }
 
 // harvest preview
-// license shop
+// license management
+function updateSiteLicenses(){
+  const listDiv = document.getElementById('siteLicenses');
+  if(!listDiv) return;
+  const site = state.sites[state.currentSiteIndex];
+  listDiv.innerHTML = '<h3>Licensed Species</h3>';
+  site.licenses.forEach(sp=>{
+    const entry = document.createElement('div');
+    entry.className = 'license-entry';
+    entry.textContent = `Species: ${capitalizeFirstLetter(sp)} \u2013 \u2705`;
+    listDiv.appendChild(entry);
+  });
+}
+
 function updateLicenseShop(){
   const licenseDiv = document.getElementById('licenseShop');
   if(!licenseDiv) return;
+  updateSiteLicenses();
   const site = state.sites[state.currentSiteIndex];
-  licenseDiv.innerHTML = '<h3>Licenses</h3>';
+  licenseDiv.innerHTML = '';
+  const select = document.createElement('select');
+  select.id = 'licenseSelect';
   const sorted = Object.keys(speciesData).sort((a,b)=>a.localeCompare(b));
   sorted.forEach(sp=>{
     const data = speciesData[sp];
     if(!site.licenses.includes(sp) && data.licenseCost>0){
-      const container = document.createElement('div');
-      const btn = document.createElement('button');
-      btn.onclick = () => buyLicense(sp);
-      btn.textContent = `Buy ${capitalizeFirstLetter(sp)} License ($${data.licenseCost})`;
-      container.appendChild(btn);
-      if(data.tags && data.tags.length){
-        const tagEl = document.createElement('div');
-        tagEl.className = 'species-tags';
-        tagEl.textContent = `Tags: ${data.tags.join(', ')}`;
-        container.appendChild(tagEl);
-      }
-      licenseDiv.appendChild(container);
+      const option = document.createElement('option');
+      option.value = sp;
+      option.textContent = `${capitalizeFirstLetter(sp)} - $${data.licenseCost}`;
+      select.appendChild(option);
+    }
+  });
+  if(select.options.length===0){
+    licenseDiv.innerText = 'All licenses purchased.';
+    return;
+  }
+  const btn = document.createElement('button');
+  btn.id = 'buyLicenseBtn';
+  btn.textContent = 'Buy License';
+  btn.onclick = () => purchaseLicense(select.value);
+  licenseDiv.appendChild(select);
+  licenseDiv.appendChild(btn);
+}
+
+function updateSiteUpgrades(){
+  const site = state.sites[state.currentSiteIndex];
+  if(!site.upgrades) site.upgrades = [];
+  const cards = document.querySelectorAll('#siteUpgrades .site-upgrade-card button');
+  cards.forEach(btn => {
+    const key = btn.dataset.upgrade;
+    if(site.upgrades.includes(key)){
+      btn.disabled = true;
+      btn.textContent = 'Purchased';
+    } else {
+      btn.disabled = false;
     }
   });
 }
@@ -971,7 +1004,9 @@ function openSiteManagement(){
   const modal = document.getElementById('siteManagementModal');
   const nameEl = document.getElementById('siteManagementSiteName');
   if(nameEl) nameEl.innerText = state.sites[state.currentSiteIndex].name;
+  updateSiteLicenses();
   updateLicenseShop();
+  updateSiteUpgrades();
   modal.classList.add('visible');
   document.body.style.overflow = 'hidden';
   document.documentElement.style.overflow = 'hidden';

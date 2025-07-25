@@ -51,6 +51,7 @@ import {
   setFeedPurchaseMax,
   openSiteManagement as uiOpenSiteManagement,
   closeSiteManagement as uiCloseSiteManagement,
+  updateSiteUpgrades,
   openDevModal as uiOpenDevModal,
   closeDevModal as uiCloseDevModal
 } from "./ui.js";
@@ -77,11 +78,28 @@ function buyFeedStorageUpgrade(){
   state.cash-=up.cost; barge.feedCapacity=up.capacity;
   barge.storageUpgradeLevel++; updateDisplay();
 }
-function buyLicense(sp){
+function purchaseLicense(sp){
   const site = state.sites[state.currentSiteIndex];
-  const cost = speciesData[sp].licenseCost;
-  if(state.cash<cost) return openModal("Not enough cash to buy license.");
-  state.cash-=cost; site.licenses.push(sp); updateDisplay();
+  const cost = speciesData[sp]?.licenseCost || 0;
+  if(site.licenses.includes(sp)) return openModal('Already licensed');
+  if(state.cash < cost) return openModal('Insufficient funds');
+  state.cash -= cost;
+  site.licenses.push(sp);
+  updateDisplay();
+  openModal('License purchased successfully');
+}
+
+function purchaseSiteUpgrade(key){
+  const site = state.sites[state.currentSiteIndex];
+  if(!site.upgrades) site.upgrades = [];
+  if(site.upgrades.includes(key)) return openModal('Upgrade already purchased');
+  const cost = 25000;
+  if(state.cash < cost) return openModal('Insufficient funds');
+  state.cash -= cost;
+  site.upgrades.push(key);
+  updateDisplay();
+  updateSiteUpgrades();
+  openModal('Upgrade purchased successfully');
 }
 function buyNewSite(){
   if(state.cash<20000) return openModal("Not enough cash to buy a new site!");
@@ -1002,4 +1020,4 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export { buyFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeSilo, upgradeBlower, upgradeHousing, upgradeStaffHousing, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, startOffloading, finishOffloading, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openShipyard, closeShipyard, openCustomBuild, backToShipyardList, updateCustomBuildStats, buyShipyardVessel, confirmCustomBuild, openMarketReport, closeMarketReport, openSiteManagement, closeSiteManagement, openDevModal, closeDevModal, getTimeState, pauseTime, resumeTime, updateFeedPurchaseUI, syncFeedPurchase, confirmBuyFeed, setFeedPurchaseMax };
+export { buyFeed, buyFeedStorageUpgrade, purchaseLicense, purchaseSiteUpgrade, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeSilo, upgradeBlower, upgradeHousing, upgradeStaffHousing, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, startOffloading, finishOffloading, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openShipyard, closeShipyard, openCustomBuild, backToShipyardList, updateCustomBuildStats, buyShipyardVessel, confirmCustomBuild, openMarketReport, closeMarketReport, openSiteManagement, closeSiteManagement, openDevModal, closeDevModal, getTimeState, pauseTime, resumeTime, updateFeedPurchaseUI, syncFeedPurchase, confirmBuyFeed, setFeedPurchaseMax };
