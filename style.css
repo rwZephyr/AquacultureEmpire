@@ -426,6 +426,8 @@ button:active {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 #devModal.visible,
@@ -447,6 +449,8 @@ button:active {
   width: 90%;
   max-width: 800px;
   text-align: left;
+  padding-top: 20px;
+  padding-bottom: 80px;
 }
 
 #siteLicenses {
