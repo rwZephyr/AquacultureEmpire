@@ -29,6 +29,8 @@
         </div>
         <button onclick="openMarketReport()">Market Report</button>
         <button onclick="openShipyard()">Shipyard</button>
+        <button onclick="openSiteManagement()">Manage Site</button>
+        <button id="devCog" title="Developer Tools">⚙️</button>
       </div>
       </div>
     </div>
@@ -113,22 +115,6 @@
           </div>
         </div>
 
-    <div id="shop" class="shopPanel">
-      <h2>Shop</h2>
-
-
-
-
-      <div class="shopSection" onclick="toggleSection('devMenu')">Dev Menu</div>
-      <div id="devMenu" class="shopSection-content">
-        <button onclick="addDevCash()">Add $100k</button>
-        <button onclick="devHarvestAll()">Harvest All Pens</button>
-        <button onclick="devRestockAll()">Restock All (Free)</button>
-        <button onclick="devAddBiomass()">+10kg Biomass (Pen)</button>
-      </div>
-
-      <div id="licenseShop"></div>
-      </div>
     </aside>
     <section id="pensSection">
      
@@ -231,6 +217,43 @@
         <input type="text" id="renameInput">
         <button onclick="confirmRename()">Rename</button>
         <button onclick="closeRenameModal()">Cancel</button>
+      </div>
+    </div>
+
+    <div id="devModal">
+      <div id="devModalContent">
+        <h2>Developer Tools</h2>
+        <button onclick="addDevCash()">Add $100k</button>
+        <button onclick="devHarvestAll()">Harvest All Pens</button>
+        <button onclick="devRestockAll()">Restock All (Free)</button>
+        <button onclick="devAddBiomass()">+10kg Biomass (Pen)</button>
+        <button onclick="closeDevModal()">Close</button>
+      </div>
+    </div>
+
+    <div id="siteManagementModal">
+      <div id="siteManagementContent">
+        <button class="close-report-btn" onclick="closeSiteManagement()">Back</button>
+        <h2>Site Management – <span id="siteManagementSiteName"></span></h2>
+        <section id="licenseShop"></section>
+        <h3>Site Infrastructure Upgrades</h3>
+        <div id="upgradeGrid" class="site-upgrade-grid">
+          <div class="upgrade-card">
+            <h4>Dock Upgrade</h4>
+            <p>Increase docking capacity.</p>
+            <button>Upgrade ($X)</button>
+          </div>
+          <div class="upgrade-card">
+            <h4>Warehouse Expansion</h4>
+            <p>Expand storage space.</p>
+            <button>Upgrade ($X)</button>
+          </div>
+          <div class="upgrade-card">
+            <h4>Environmental Sensors</h4>
+            <p>Monitor water quality in real time.</p>
+            <button>Upgrade ($X)</button>
+          </div>
+        </div>
       </div>
     </div>
 
