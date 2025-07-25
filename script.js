@@ -1,6 +1,7 @@
 import state from './gameState.js';
 import * as ui from './ui.js';
 import * as actions from './actions.js';
+import { initMilestones, checkMilestones } from './milestones.js';
 
 Object.assign(window, actions);
 
@@ -37,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   adjustHeaderPadding();
   reflowTopBar();
   actions.loadGame();
+  initMilestones();
   ui.updateDisplay();
   ui.setupMapInteractions();
   if(state.lastOfflineInfo){
@@ -47,4 +49,5 @@ document.addEventListener('DOMContentLoaded', () => {
                  `${days} in-game days progressed and about ${feed}kg feed was used.`);
   }
   setInterval(actions.saveGame, state.AUTO_SAVE_INTERVAL_MS);
+  setInterval(checkMilestones, 1000);
 });
