@@ -449,6 +449,20 @@ button:active {
   text-align: left;
 }
 
+#siteLicenses {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.license-entry {
+  background: var(--bg-panel);
+  padding: 6px 8px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
 .site-upgrade-grid {
   display: flex;
   flex-wrap: wrap;
@@ -456,7 +470,7 @@ button:active {
   margin-top: 10px;
 }
 
-.upgrade-card {
+.site-upgrade-card {
   background: var(--bg-panel);
   border-radius: 10px;
   padding: 12px;
@@ -467,11 +481,11 @@ button:active {
   justify-content: space-between;
 }
 
-.upgrade-card h4 {
+.site-upgrade-card h4 {
   margin-top: 0;
 }
 
-.upgrade-card button {
+.site-upgrade-card button {
   margin-top: 8px;
   width: 100%;
 }
