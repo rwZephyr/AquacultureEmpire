@@ -76,6 +76,30 @@ function outsideMobileActionHandler(evt){
 
 document.addEventListener('click', outsideMobileActionHandler);
 
+function toggleSiteActions(){
+  const menu = document.getElementById('siteActionMenu');
+  if(!menu) return;
+  if(menu.classList.contains('visible')){
+    menu.classList.remove('visible');
+    menu.classList.add('hidden');
+  } else {
+    menu.classList.remove('hidden');
+    menu.classList.add('visible');
+    document.addEventListener('click', outsideSiteActionHandler);
+  }
+}
+
+function outsideSiteActionHandler(e){
+  const menu = document.getElementById('siteActionMenu');
+  const toggle = document.querySelector('img[onclick="toggleSiteActions()"]');
+  if(!menu || !toggle) return;
+  if(!menu.contains(e.target) && !toggle.contains(e.target)){
+    menu.classList.remove('visible');
+    menu.classList.add('hidden');
+    document.removeEventListener('click', outsideSiteActionHandler);
+  }
+}
+
 // Track counts to avoid re-rendering lists every tick
 let lastSiteIndex = -1;
 let lastPenCount = 0;
@@ -1242,6 +1266,8 @@ export {
   toggleSiteList,
   toggleMobileActions,
   outsideMobileActionHandler,
+  toggleSiteActions,
+  outsideSiteActionHandler,
   selectSite,
   populateSiteList
 };

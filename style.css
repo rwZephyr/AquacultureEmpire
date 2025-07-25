@@ -18,6 +18,7 @@
   --map-water: #14375a;
   --shadow-light: #0005;
   --shadow-medium: #0006;
+  --border: #444;
   --black: #000;
   --font-main: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   --header-height: 80px;
@@ -1009,6 +1010,60 @@ button:active {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
+}
+
+.icon-action-bar {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  filter: brightness(0) invert(1);
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.icon-button:hover,
+.icon-button:active {
+  filter: drop-shadow(0 0 4px var(--accent)) brightness(1.3) invert(0.9);
+  transform: scale(1.1);
+}
+
+.icon-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  padding: 6px 0;
+  min-width: 160px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+}
+
+.icon-menu.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.icon-menu div {
+  padding: 8px 12px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.icon-menu div:hover {
+  background-color: var(--accent);
+  color: var(--bg-darker);
 }
 
 @media (min-width: 601px) {
