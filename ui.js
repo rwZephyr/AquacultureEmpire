@@ -1155,6 +1155,7 @@ export {
   closeMarketReport,
   openSiteManagement,
   closeSiteManagement,
+  updateSiteUpgrades,
   openDevModal,
   closeDevModal,
   updateFeedPurchaseUI,
