@@ -84,6 +84,7 @@ export class Vessel {
     this.name = name;
     this.maxBiomassCapacity = maxBiomassCapacity;
     this.currentBiomassLoad = currentBiomassLoad;
+    // Deprecated: cargo is maintained for legacy saves but no longer used
     this.cargo = cargo;
     this.cargoSpecies = cargoSpecies;
     this.speed = speed;
