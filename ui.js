@@ -154,6 +154,7 @@ function updateDisplay(){
 // license shop
 function updateLicenseShop(){
   const licenseDiv = document.getElementById('licenseShop');
+  if(!licenseDiv) return;
   const site = state.sites[state.currentSiteIndex];
   licenseDiv.innerHTML = '<h3>Licenses</h3>';
   const sorted = Object.keys(speciesData).sort((a,b)=>a.localeCompare(b));
@@ -966,6 +967,30 @@ function closeMarketReport(){
   document.documentElement.style.overflow = '';
 }
 
+function openSiteManagement(){
+  const modal = document.getElementById('siteManagementModal');
+  const nameEl = document.getElementById('siteManagementSiteName');
+  if(nameEl) nameEl.innerText = state.sites[state.currentSiteIndex].name;
+  updateLicenseShop();
+  modal.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
+}
+
+function closeSiteManagement(){
+  document.getElementById('siteManagementModal').classList.remove('visible');
+  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
+}
+
+function openDevModal(){
+  document.getElementById('devModal').classList.add('visible');
+}
+
+function closeDevModal(){
+  document.getElementById('devModal').classList.remove('visible');
+}
+
 function updateMarketCharts(){
   const charts = document.querySelectorAll('.market-chart');
   charts.forEach(c => {
@@ -1093,6 +1118,10 @@ export {
   updateCustomBuildStats,
   openMarketReport,
   closeMarketReport,
+  openSiteManagement,
+  closeSiteManagement,
+  openDevModal,
+  closeDevModal,
   updateFeedPurchaseUI,
   syncFeedPurchase,
   confirmBuyFeed,

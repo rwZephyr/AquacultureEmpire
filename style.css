@@ -187,25 +187,6 @@ button:active {
   transition: background-color 0.3s;
 }
 
-/* Shop collapsible sections */
-.shopSection {
-  margin-top: 8px;
-  padding: 6px;
-  background-color: var(--bg-button);
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-.shopSection-content {
-  display: none;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-.shopSection-content.visible {
-  display: block;
-  max-height: 500px;
-}
 
 /* ===== MODAL OVERLAY ===== */
 #modal,
@@ -431,6 +412,68 @@ button:active {
   cursor: pointer;
   margin-bottom: 10px;
   z-index: 10;
+}
+
+#devModal,
+#siteManagementModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+#devModal.visible,
+#siteManagementModal.visible {
+  display: flex;
+}
+
+#devModalContent,
+#siteManagementContent {
+  background: var(--modal-bg);
+  color: var(--text-light);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 340px;
+}
+
+#siteManagementContent {
+  width: 90%;
+  max-width: 800px;
+  text-align: left;
+}
+
+.site-upgrade-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.upgrade-card {
+  background: var(--bg-panel);
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 2px 6px var(--shadow-light);
+  flex: 1 1 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.upgrade-card h4 {
+  margin-top: 0;
+}
+
+.upgrade-card button {
+  margin-top: 8px;
+  width: 100%;
 }
 
 #bargeUpgradeMessage {
@@ -886,18 +929,6 @@ button:active {
   flex-direction: column;
 }
 
-#shop.shopPanel {
-  background: var(--bg-panel);
-  border-radius: 10px;
-  padding: 16px;
-  margin-top: 16px;
-  box-shadow: 0 0 4px var(--shadow-light);
-}
-
-#shop button {
-  width: 100%;
-  margin: 4px 0;
-}
 
 /* Footer vessel section */
 #bottomSection {

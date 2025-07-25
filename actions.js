@@ -48,7 +48,11 @@ import {
   updateFeedPurchaseUI,
   syncFeedPurchase,
   confirmBuyFeed,
-  setFeedPurchaseMax
+  setFeedPurchaseMax,
+  openSiteManagement as uiOpenSiteManagement,
+  closeSiteManagement as uiCloseSiteManagement,
+  openDevModal as uiOpenDevModal,
+  closeDevModal as uiCloseDevModal
 } from "./ui.js";
 
 function buyFeed(amount=20){
@@ -322,6 +326,14 @@ function openShipyard(){
 function closeShipyard(){
   uiCloseShipyard();
 }
+function openSiteManagement(){
+  uiOpenSiteManagement();
+}
+function closeSiteManagement(){
+  uiCloseSiteManagement();
+}
+function openDevModal(){ uiOpenDevModal(); }
+function closeDevModal(){ uiCloseDevModal(); }
 function openCustomBuild(){
   uiOpenCustomBuild();
 }
@@ -641,10 +653,6 @@ if(toggleSidebarBtn){
   });
 }
 
-function toggleSection(id){
-  const el = document.getElementById(id);
-  if(el) el.classList.toggle('visible');
-}
 
 function closeSidebar(){
   const sb = document.getElementById('sidebar');
@@ -994,4 +1002,4 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export { buyFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeSilo, upgradeBlower, upgradeHousing, upgradeStaffHousing, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, startOffloading, finishOffloading, toggleSection, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openShipyard, closeShipyard, openCustomBuild, backToShipyardList, updateCustomBuildStats, buyShipyardVessel, confirmCustomBuild, openMarketReport, closeMarketReport, getTimeState, pauseTime, resumeTime, updateFeedPurchaseUI, syncFeedPurchase, confirmBuyFeed, setFeedPurchaseMax };
+export { buyFeed, buyFeedStorageUpgrade, buyLicense, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeSilo, upgradeBlower, upgradeHousing, upgradeStaffHousing, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, startOffloading, finishOffloading, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openShipyard, closeShipyard, openCustomBuild, backToShipyardList, updateCustomBuildStats, buyShipyardVessel, confirmCustomBuild, openMarketReport, closeMarketReport, openSiteManagement, closeSiteManagement, openDevModal, closeDevModal, getTimeState, pauseTime, resumeTime, updateFeedPurchaseUI, syncFeedPurchase, confirmBuyFeed, setFeedPurchaseMax };
