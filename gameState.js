@@ -162,8 +162,21 @@ state.advanceDays = advanceDays;
 
 function addStatusMessage(msg) {
   state.statusMessage = msg;
-  const el = document.getElementById('operationalTips');
-  if(el) el.innerText = msg;
+
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = 'toast-tip';
+  toast.textContent = msg;
+  container.appendChild(toast);
+
+  requestAnimationFrame(() => toast.classList.add('visible'));
+
+  setTimeout(() => {
+    toast.classList.remove('visible');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
 }
 
 state.addStatusMessage = addStatusMessage;
