@@ -533,12 +533,12 @@ button:active {
 }
 
 .species-badge {
-  /* small notification-style overlay */
-  width: 32px;
-  height: 32px;
+  /* notification-style overlay */
+  width: 40px;
+  height: 40px;
   position: absolute;
-  top: -8px;
-  right: -8px;
+  top: -12px;
+  right: -12px;
   z-index: 10;
   border-radius: 50%;
   background-color: rgba(0, 0, 0, 0.2);
