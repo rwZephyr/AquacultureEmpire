@@ -329,10 +329,13 @@ function estimateTravelTime(fromName, destLoc, vessel){
 
 function estimateSellPrice(vessel, market){
   let total = 0;
-  for(const sp in vessel.cargo){
-    const weight = vessel.cargo[sp];
-    const price = market.prices?.[sp] ?? (speciesData[sp].marketPrice * (market.modifiers[sp]||1));
-    total += weight * price;
+  if(vessel.fishBuffer){
+    vessel.fishBuffer.forEach(fish=>{
+      const sp = fish.species || vessel.cargoSpecies;
+      const base = speciesData[sp]?.marketPrice || 0;
+      const mod = market.modifiers[sp] || 1;
+      total += fish.weight * base * mod;
+    });
   }
   return total;
 }

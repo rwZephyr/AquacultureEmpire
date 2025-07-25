@@ -380,6 +380,21 @@ function updatePenWarning(el, pen){
   el.innerHTML = messages.join('<br>');
 }
 
+function getFishBufferInfo(buffer){
+  if(!buffer || buffer.length === 0) return '';
+  const counts = {};
+  const weights = {};
+  buffer.forEach(f => {
+    const sp = f.species;
+    counts[sp] = (counts[sp] || 0) + 1;
+    weights[sp] = (weights[sp] || 0) + f.weight;
+  });
+  return Object.keys(counts).map(sp => {
+    const w = weights[sp].toFixed(1);
+    return `${capitalizeFirstLetter(sp)} x${counts[sp]} (${w}kg)`;
+  }).join(', ');
+}
+
 function renderVesselGrid(){
   const grid = document.getElementById('vesselGridContainer');
   if(!grid) return;
@@ -409,6 +424,9 @@ function renderVesselGrid(){
     card.querySelector('.vessel-progress').style.width = loadPercent + '%';
     card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1);
     card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity;
+    const infoEl = card.querySelector('.fishbuffer-info');
+    const infoStr = getFishBufferInfo(vessel.fishBuffer);
+    if(infoEl){ infoEl.textContent = infoStr; infoEl.title = infoStr; }
     const harvestBtn = card.querySelector('.harvest-btn');
     harvestBtn.onclick = ()=>{ state.currentVesselIndex = idx; openHarvestModal(idx); };
     harvestBtn.style.display = (vessel.isHarvesting || vessel.unloading) ? 'none' : 'block';
@@ -463,6 +481,9 @@ function updateVesselCards(){
     card.querySelector('.vessel-progress').style.width = loadPercent + '%';
     card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1);
     card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity;
+    const infoEl2 = card.querySelector('.fishbuffer-info');
+    const infoStr2 = getFishBufferInfo(vessel.fishBuffer);
+    if(infoEl2){ infoEl2.textContent = infoStr2; infoEl2.title = infoStr2; }
     const harvestBtn2 = card.querySelector('.harvest-btn');
     harvestBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openHarvestModal(idx); };
     harvestBtn2.style.display = (vessel.isHarvesting || vessel.unloading) ? 'none' : 'block';
@@ -840,10 +861,13 @@ function startOffloading(vessel, market){
   // offloadPrices may be pre-set when the market was chosen. If not, lock prices now.
   if(!vessel.offloadPrices){
     vessel.offloadPrices = {};
-    for(const sp in vessel.cargo){
-      const price = market.prices?.[sp] ?? (speciesData[sp].marketPrice * (market.modifiers[sp]||1));
-      vessel.offloadPrices[sp] = price;
-    }
+    const speciesSet = new Set();
+    vessel.fishBuffer.forEach(f=> speciesSet.add(f.species || vessel.cargoSpecies));
+    speciesSet.forEach(sp=>{
+      const base = speciesData[sp]?.marketPrice || 0;
+      const mod = market.modifiers[sp] || 1;
+      vessel.offloadPrices[sp] = base * mod;
+    });
   }
   const rate = state.OFFLOAD_RATE;
   const updateEta = ()=>{ vessel.actionEndsAt = Date.now() + (vessel.currentBiomassLoad / rate) * 1000; };
@@ -855,19 +879,23 @@ function startOffloading(vessel, market){
     let dt = (now - last)/1000;
     last = now;
     let remaining = rate * dt;
-    while(remaining > 0 && vessel.currentBiomassLoad > 0){
-      const sp = Object.keys(vessel.cargo).find(s=>vessel.cargo[s]>0);
-      if(!sp) break;
-      const amt = Math.min(remaining, vessel.cargo[sp]);
-      vessel.cargo[sp] -= amt;
-      vessel.currentBiomassLoad -= amt;
-      vessel.offloadRevenue += amt * vessel.offloadPrices[sp];
-      if(market.daysSinceSale) market.daysSinceSale[sp] = 0;
-      if(vessel.cargo[sp] <= 0){
-        delete vessel.cargo[sp];
-        if(Object.keys(vessel.cargo).length===0) vessel.cargoSpecies = null;
+    while(remaining > 0 && vessel.currentBiomassLoad > 0 && vessel.fishBuffer.length > 0){
+      const fish = vessel.fishBuffer[0];
+      const sp = fish.species || vessel.cargoSpecies;
+      const price = vessel.offloadPrices[sp] || 0;
+      if(fish.weight <= remaining){
+        remaining -= fish.weight;
+        vessel.currentBiomassLoad -= fish.weight;
+        vessel.offloadRevenue += fish.weight * price;
+        if(market.daysSinceSale) market.daysSinceSale[sp] = 0;
+        vessel.fishBuffer.shift();
+      } else {
+        fish.weight -= remaining;
+        vessel.currentBiomassLoad -= remaining;
+        vessel.offloadRevenue += remaining * price;
+        if(market.daysSinceSale) market.daysSinceSale[sp] = 0;
+        remaining = 0;
       }
-      remaining -= amt;
     }
     updateEta();
     updateDisplay();
@@ -881,17 +909,17 @@ function finishOffloading(vessel, market, canceled=false){
   if(vessel.offloadInterval){ clearInterval(vessel.offloadInterval); vessel.offloadInterval = null; }
   vessel.unloading = false;
   vessel.actionEndsAt = 0;
-  const earned = vessel.offloadRevenue || 0;
+  let earned = vessel.offloadRevenue || 0;
   const prices = vessel.offloadPrices || {};
   state.cash += earned;
   vessel.offloadRevenue = 0;
   vessel.offloadPrices = null;
   vessel.offloadMarket = null;
   if(!canceled){
-    vessel.cargo = {};
-    vessel.cargoSpecies = null;
-    vessel.currentBiomassLoad = 0;
     vessel.fishBuffer = [];
+    vessel.currentBiomassLoad = 0;
+    vessel.cargoSpecies = null;
+    vessel.cargo = {};
     if(market && market.daysSinceSale){
       for(const sp in prices){ market.daysSinceSale[sp] = 0; }
     }
@@ -914,10 +942,13 @@ function sellCargo(idx){
   // lock in prices when the market is chosen
   vessel.offloadPrices = {};
   vessel.offloadMarket = market.name;
-  for(const sp in vessel.cargo){
-    const price = market.prices?.[sp] ?? (speciesData[sp].marketPrice * (market.modifiers[sp]||1));
-    vessel.offloadPrices[sp] = price;
-  }
+  const speciesSet = new Set();
+  vessel.fishBuffer.forEach(f=> speciesSet.add(f.species || vessel.cargoSpecies));
+  speciesSet.forEach(sp=>{
+    const base = speciesData[sp]?.marketPrice || 0;
+    const mod = market.modifiers[sp] || 1;
+    vessel.offloadPrices[sp] = base * mod;
+  });
   vessel.offloadRevenue = 0;
   const begin = ()=>{ startOffloading(vessel, market); updateDisplay(); };
   if(vessel.location === market.name){
