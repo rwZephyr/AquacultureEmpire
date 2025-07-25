@@ -217,7 +217,8 @@ button:active {
 #sellModal,
 #moveModal,
 #renameModal,
-#bargeUpgradeModal {
+#bargeUpgradeModal,
+#contractDeliveryModal {
   position: fixed;
   top: 0;
   left: 0;
@@ -253,7 +254,8 @@ button:active {
 #sellModal.visible,
 #moveModal.visible,
 #renameModal.visible,
-#bargeUpgradeModal.visible {
+#bargeUpgradeModal.visible,
+#contractDeliveryModal.visible {
   display: flex;
 }
 
@@ -268,7 +270,8 @@ button:active {
 #sellModalContent,
 #moveModalContent,
 #renameModalContent,
-#bargeUpgradeModalContent {
+#bargeUpgradeModalContent,
+#contractDeliveryContent {
   background: var(--modal-bg);
   color: var(--text-light);
   padding: 20px;

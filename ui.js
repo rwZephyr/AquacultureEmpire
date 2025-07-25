@@ -408,7 +408,7 @@ function renderVesselGrid(){
     card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;
     card.querySelector('.vessel-location').textContent = vessel.location;
     const statusEl = card.querySelector('.vessel-status');
-    let status = vessel.isHarvesting ? 'Harvesting' : vessel.unloading ? 'Unloading' : (vessel.location.startsWith('Traveling') ? 'Traveling' : 'Idle');
+    let status = vessel.isHarvesting ? 'Harvesting' : vessel.unloading ? 'Unloading' : vessel.deliveringContractId ? 'Delivering' : (vessel.location.startsWith('Traveling') ? 'Traveling' : 'Idle');
     if(vessel.actionEndsAt && vessel.actionEndsAt > Date.now()){
       const eta = Math.max(0, (vessel.actionEndsAt - Date.now())/1000);
       status += ` (${eta.toFixed(0)}s)`;
@@ -429,16 +429,16 @@ function renderVesselGrid(){
     if(infoEl){ infoEl.textContent = infoStr; infoEl.title = infoStr; }
     const harvestBtn = card.querySelector('.harvest-btn');
     harvestBtn.onclick = ()=>{ state.currentVesselIndex = idx; openHarvestModal(idx); };
-    harvestBtn.style.display = (vessel.isHarvesting || vessel.unloading) ? 'none' : 'block';
+    harvestBtn.style.display = (vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId) ? 'none' : 'block';
     const moveBtn = card.querySelector('.move-btn');
     moveBtn.onclick = ()=>{ state.currentVesselIndex = idx; openMoveVesselModal(); };
-    moveBtn.disabled = vessel.isHarvesting || vessel.unloading;
+    moveBtn.disabled = vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId;
     const sellBtn = card.querySelector('.sell-btn');
     sellBtn.onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
-    sellBtn.disabled = vessel.isHarvesting || vessel.unloading;
+    sellBtn.disabled = vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId;
     const upBtn = card.querySelector('.upgrade-btn');
     upBtn.onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
-    upBtn.disabled = vessel.isHarvesting || vessel.unloading;
+    upBtn.disabled = vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId;
     const cancelBtn = card.querySelector('.cancel-btn');
     cancelBtn.onclick = ()=>{
       state.currentVesselIndex = idx;
@@ -465,7 +465,7 @@ function updateVesselCards(){
     card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;
     card.querySelector('.vessel-location').textContent = vessel.location;
     const statusEl = card.querySelector('.vessel-status');
-    let status = vessel.isHarvesting ? 'Harvesting' : vessel.unloading ? 'Unloading' : (vessel.location.startsWith('Traveling') ? 'Traveling' : 'Idle');
+    let status = vessel.isHarvesting ? 'Harvesting' : vessel.unloading ? 'Unloading' : vessel.deliveringContractId ? 'Delivering' : (vessel.location.startsWith('Traveling') ? 'Traveling' : 'Idle');
     if(vessel.actionEndsAt && vessel.actionEndsAt > Date.now()){
       const eta = Math.max(0, (vessel.actionEndsAt - Date.now())/1000);
       status += ` (${eta.toFixed(0)}s)`;
@@ -486,15 +486,15 @@ function updateVesselCards(){
     if(infoEl2){ infoEl2.textContent = infoStr2; infoEl2.title = infoStr2; }
     const harvestBtn2 = card.querySelector('.harvest-btn');
     harvestBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openHarvestModal(idx); };
-    harvestBtn2.style.display = (vessel.isHarvesting || vessel.unloading) ? 'none' : 'block';
+    harvestBtn2.style.display = (vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId) ? 'none' : 'block';
     const moveBtn2 = card.querySelector('.move-btn');
-    moveBtn2.disabled = vessel.isHarvesting || vessel.unloading;
+    moveBtn2.disabled = vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId;
     moveBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openMoveVesselModal(); };
     const sellBtn2 = card.querySelector('.sell-btn');
-    sellBtn2.disabled = vessel.isHarvesting || vessel.unloading;
+    sellBtn2.disabled = vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId;
     sellBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
     const upBtn2 = card.querySelector('.upgrade-btn');
-    upBtn2.disabled = vessel.isHarvesting || vessel.unloading;
+    upBtn2.disabled = vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId;
     upBtn2.onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
     const cancelBtn = card.querySelector('.cancel-btn');
     cancelBtn.onclick = ()=>{
@@ -704,7 +704,8 @@ function openHarvestModal(vIdx){
   state.currentVesselIndex = vIdx;
   const site = state.sites[state.currentSiteIndex];
   const vessel = state.vessels[vIdx];
-  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
+  if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+    return openModal('Vessel currently busy.');
   const select = document.getElementById('harvestPenSelect');
   select.innerHTML = '';
   site.pens.forEach((pen, idx)=>{
@@ -734,7 +735,8 @@ function openSellModal(){
   const optionsDiv = document.getElementById('sellOptions');
   optionsDiv.innerHTML = '';
   const vessel = state.vessels[state.currentVesselIndex];
-  if(vessel.isHarvesting) return openModal('Vessel currently harvesting.');
+  if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+    return openModal('Vessel currently busy.');
   markets.forEach((m,idx)=>{
     const btn = document.createElement('button');
     const price = estimateSellPrice(vessel, m);
