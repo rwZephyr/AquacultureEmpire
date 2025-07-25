@@ -201,11 +201,11 @@ function updateSiteUpgrades(){
   const cards = document.querySelectorAll('#siteUpgrades .site-upgrade-card button');
   cards.forEach(btn => {
     const key = btn.dataset.upgrade;
+    btn.disabled = true;
     if(site.upgrades.includes(key)){
-      btn.disabled = true;
       btn.textContent = 'Purchased';
     } else {
-      btn.disabled = false;
+      btn.textContent = 'Work in Progress';
     }
   });
 }
