@@ -180,7 +180,8 @@ button:active {
 #harvestModal,
 #vesselHarvestModal,
 #sellModal,
-#moveModal {
+#moveModal,
+#siteManagementModal {
   position: fixed;
   top: 0;
   left: 0;
@@ -198,7 +199,8 @@ button:active {
 #harvestModal.visible,
 #vesselHarvestModal.visible,
 #sellModal.visible,
-#moveModal.visible {
+#moveModal.visible,
+#siteManagementModal.visible {
   display: flex;
 }
 
@@ -214,6 +216,26 @@ button:active {
   border-radius: 10px;
   text-align: center;
   width: 300px;
+}
+#siteManagementModalContent {
+  background: #293745;
+  color: #dbe5ed;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: left;
+  width: 80%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.license-entry {
+  margin: 4px 0;
+}
+.site-upgrade-card {
+  background: #1f2d35;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 8px 0;
 }
 #sidebarContent,
 #sidebar .panel {

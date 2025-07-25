@@ -16,6 +16,7 @@
         <button onclick="previousSite()">⟵</button>
         <button onclick="nextSite()">⟶</button>
         <button onclick="buyNewSite()">+ New Site</button>
+        <button id="manageSiteBtn" onclick="openSiteManagementModal()">Manage Site</button>
       </div>
       <div class="top-right">
         <div><strong>Cash:</strong> $<span id="cashCount">0</span></div>
@@ -190,6 +191,14 @@
         <h2>Select Destination</h2>
         <div id="moveOptions"></div>
         <button onclick="closeMoveModal()">Cancel</button>
+      </div>
+    </div>
+    <div id="siteManagementModal">
+      <div id="siteManagementModalContent">
+        <h2 id="siteManagementTitle">Site Management</h2>
+        <div id="siteLicenses"></div>
+        <div id="siteUpgrades"></div>
+        <button onclick="closeSiteManagementModal()">Close</button>
       </div>
     </div>
   </div>

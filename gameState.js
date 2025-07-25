@@ -131,7 +131,8 @@ state.sites = [
     licenses: ['shrimp'],
     pens: [
       new Pen({ species: 'shrimp', fishCount: 500, averageWeight: 0.01, bargeIndex: 0 })
-    ]
+    ],
+    upgrades: []
   })
 ];
 

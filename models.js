@@ -47,7 +47,8 @@ export class Site {
     barges = [],
     staff = [],
     licenses = [],
-    pens = []
+    pens = [],
+    upgrades = []
   } = {}) {
     this.name = name;
     this.location = location;
@@ -55,6 +56,7 @@ export class Site {
     this.staff = staff;
     this.licenses = licenses;
     this.pens = pens;
+    this.upgrades = upgrades;
   }
 }
 
