@@ -10,9 +10,9 @@
 
   <header id="topHeader">
     <div class="container">
-    <!-- Top bar: site nav on left, cash on right -->
+    <!-- Top bar grouped for easier styling -->
     <div id="topBar">
-      <div class="top-left">
+      <div class="top-bar-group" id="siteGroup">
         <strong>Site:</strong>
         <span id="siteName">-</span>
         <button onclick="previousSite()">⟵</button>
@@ -20,7 +20,7 @@
         <button onclick="buyNewSite()">+ New Site</button>
         <button id="manageSiteBtn" onclick="openSiteManagement()">Manage Site</button>
       </div>
-      <div class="top-right">
+      <div class="top-bar-group" id="statusGroup">
         <div><strong>Cash:</strong> $<span id="cashCount">0</span></div>
         <div>
           <strong>Date:</strong>
@@ -28,11 +28,13 @@
           <span id="pauseButton" class="time-btn" title="Pause" onclick="pauseTime()">⏸️</span>
           <span id="playButton" class="time-btn" title="Resume" onclick="resumeTime()">▶️</span>
         </div>
+      </div>
+      <div class="top-bar-group" id="toolsGroup">
         <button onclick="openMarketReport()">Market Report</button>
         <button onclick="openShipyard()">Shipyard</button>
         <button id="devCog" title="Developer Tools">⚙️</button>
       </div>
-      </div>
+    </div>
     </div>
   </header>
 
