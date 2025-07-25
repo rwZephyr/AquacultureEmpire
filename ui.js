@@ -21,6 +21,7 @@ import state, {
   estimateTravelTime,
   getSiteHarvestRate,
 } from "./gameState.js";
+import { milestones } from './milestones.js';
 
 const speciesColors = {
   shrimp: '#e74c3c',
@@ -1107,6 +1108,42 @@ function closeSpeciesData() {
   document.getElementById('speciesDataModal').classList.remove('visible');
 }
 
+function renderLogbook(){
+  const list = document.getElementById('milestoneList');
+  if(!list) return;
+  list.innerHTML = '';
+  milestones.forEach(m => {
+    const row = document.createElement('div');
+    row.className = 'milestone-entry';
+    const desc = document.createElement('span');
+    desc.textContent = m.description;
+    const status = document.createElement('span');
+    status.textContent = state.milestones[m.id] ? '✅' : '❌';
+    row.appendChild(desc);
+    row.appendChild(status);
+    list.appendChild(row);
+  });
+}
+
+function openLogbook(){
+  renderLogbook();
+  const modal = document.getElementById('logbookModal');
+  if(modal){
+    modal.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+  }
+}
+
+function closeLogbook(){
+  const modal = document.getElementById('logbookModal');
+  if(modal){
+    modal.classList.remove('visible');
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+  }
+}
+
 function updateMarketCharts(){
   const charts = document.querySelectorAll('.market-chart');
   charts.forEach(c => {
@@ -1278,6 +1315,8 @@ export {
   updateSiteUpgrades,
   openDevModal,
   closeDevModal,
+  openLogbook,
+  closeLogbook,
   openSpeciesData,
   closeSpeciesData,
   updateFeedPurchaseUI,
