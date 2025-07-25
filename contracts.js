@@ -1,27 +1,38 @@
-import state, { capitalizeFirstLetter } from './gameState.js';
+// Local state reference initialized via initContracts to avoid circular imports
+let state;
+let contracts = [];
 
-// Share the contracts array from game state so other modules reference the same list
-if(!state.contracts) state.contracts = [];
-const contracts = state.contracts;
+// Capitalize helper replicated here to keep module independent
+function capitalizeFirstLetter(str){
+  if(!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function initContracts(gameState){
+  state = gameState;
+  if(!state.contracts) state.contracts = [];
+  contracts = state.contracts;
+  // seed a starter contract for the logbook
+  if(contracts.length === 0){
+    contracts.push({
+      id: 1,
+      species: 'shrimp',
+      type: 'biomass',
+      biomassGoalKg: 100,
+      destination: 'Capital Wharf',
+      startDay: state.totalDaysElapsed,
+      durationDays: 10,
+      rewardCash: 500,
+      flavorKey: 'basicDelivery',
+      status: 'active',
+    });
+  }
+}
 
 export const contractFlavors = {
   basicDelivery: "Ship {species} to {destination} on time.",
   bigOrder: "A bulk request for {species} has come in from {destination}.",
 };
-
-// Example starter contract so the Logbook has initial data
-contracts.push({
-  id: 1,
-  species: 'shrimp',
-  type: 'biomass',
-  biomassGoalKg: 100,
-  destination: 'Capital Wharf',
-  startDay: state.totalDaysElapsed,
-  durationDays: 10,
-  rewardCash: 500,
-  flavorKey: 'basicDelivery',
-  status: 'active',
-});
 
 export function getContractFlavor(contract){
   let text = contractFlavors[contract.flavorKey] || '';
