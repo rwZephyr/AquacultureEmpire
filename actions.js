@@ -549,7 +549,7 @@ function harvestPen(amount=null){
         pen.fishCount -= remove;
         vessel.harvestFishBuffer -= remove;
         for(let i=0;i<remove;i++){
-          vessel.fishBuffer.push({ weight: lockedWeight });
+          vessel.fishBuffer.push({ species: pen.species, weight: lockedWeight });
         }
         if(pen.fishCount<=0) pen.averageWeight = 0;
       }
