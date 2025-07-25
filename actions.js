@@ -659,6 +659,75 @@ function devAddBiomass(amount = 10){
   updateDisplay();
 }
 
+function devRestartGame() {
+  if (confirm("Restart the game?")) {
+    localStorage.clear();
+    location.reload();
+  }
+}
+
+function devAdvanceTime(days) {
+  for (let i = 0; i < days; i++) state.advanceDay();
+  updateDisplay();
+}
+
+function devSetDatePrompt() {
+  const season = prompt("Season (Spring, Summer, Fall, Winter):");
+  const year = parseInt(prompt("Year:"), 10);
+  if (season && !isNaN(year)) {
+    state.season = season;
+    state.year = year;
+    updateDisplay();
+  }
+}
+
+function devSetTimeScalePrompt() {
+  const scale = parseFloat(prompt("Set game speed multiplier:"));
+  if (!isNaN(scale) && scale > 0) state.timeScale = scale;
+}
+
+function devResetMarketPrices() {
+  state.markets.forEach(market => {
+    Object.keys(market.basePrices).forEach(species => {
+      market.prices[species] = market.basePrices[species];
+    });
+  });
+  updateDisplay();
+}
+
+function devRandomizeMarket() {
+  updateMarketPrices();
+}
+
+function devSetMarketModifierPrompt() {
+  const market = prompt("Market name:");
+  const species = prompt("Species name:");
+  const modifier = parseFloat(prompt("Modifier (e.g. 1.2):"));
+  const target = state.markets.find(m => m.name === market);
+  if (target && !isNaN(modifier)) {
+    target.priceModifiers[species] = modifier;
+  }
+  updateDisplay();
+}
+
+function calculateHarvestIncome(pen) {
+  const species = pen.species;
+  const biomass = pen.fishCount * pen.averageWeight;
+  const price = state.markets[0].prices?.[species] ?? speciesData[species].marketPrice;
+  return biomass * price;
+}
+
+function devInstantSellAll() {
+  state.sites.forEach(site => {
+    site.pens.forEach(pen => {
+      state.cash += calculateHarvestIncome(pen);
+      pen.fishCount = 0;
+      pen.averageWeight = 0;
+    });
+  });
+  updateDisplay();
+}
+
 // sidebar nav
 function togglePanel(id){
   const p = document.getElementById(id);
@@ -1030,4 +1099,98 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export { buyFeed, buyFeedStorageUpgrade, purchaseLicense, purchaseSiteUpgrade, buyNewSite, buyNewPen, buyNewBarge, hireStaff, fireStaff, assignStaff, unassignStaff, upgradeSilo, upgradeBlower, upgradeHousing, upgradeStaffHousing, addDevCash, devHarvestAll, devRestockAll, devAddBiomass, togglePanel, openModal, closeModal, openRestockModal, closeRestockModal, closeHarvestModal, confirmHarvest, harvestPen, cancelVesselHarvest, feedFishPen, restockPen, restockPenUI, upgradeFeeder, assignBarge, openSellModal, closeSellModal, sellCargo, startOffloading, finishOffloading, saveGame, loadGame, resetGame, previousSite, nextSite, previousBarge, nextBarge, previousVessel, nextVessel, upgradeVessel, buyNewVessel, renameVessel, closeRenameModal, confirmRename, openMoveVesselModal, closeMoveModal, moveVesselTo, showTab, updateSelectedBargeDisplay, openBargeUpgradeModal, closeBargeUpgradeModal, openShipyard, closeShipyard, openCustomBuild, backToShipyardList, updateCustomBuildStats, buyShipyardVessel, confirmCustomBuild, openMarketReport, closeMarketReport, openSiteManagement, closeSiteManagement, openDevModal, closeDevModal, toggleDevTools, getTimeState, pauseTime, resumeTime, updateFeedPurchaseUI, syncFeedPurchase, confirmBuyFeed, setFeedPurchaseMax, toggleSiteList, toggleMobileActions, toggleSiteActions, selectSite, populateSiteList };
+export {
+  buyFeed,
+  buyFeedStorageUpgrade,
+  purchaseLicense,
+  purchaseSiteUpgrade,
+  buyNewSite,
+  buyNewPen,
+  buyNewBarge,
+  hireStaff,
+  fireStaff,
+  assignStaff,
+  unassignStaff,
+  upgradeSilo,
+  upgradeBlower,
+  upgradeHousing,
+  upgradeStaffHousing,
+  addDevCash,
+  devHarvestAll,
+  devRestockAll,
+  devAddBiomass,
+  devRestartGame,
+  devAdvanceTime,
+  devSetDatePrompt,
+  devSetTimeScalePrompt,
+  devResetMarketPrices,
+  devRandomizeMarket,
+  devSetMarketModifierPrompt,
+  devInstantSellAll,
+  togglePanel,
+  openModal,
+  closeModal,
+  openRestockModal,
+  closeRestockModal,
+  closeHarvestModal,
+  confirmHarvest,
+  harvestPen,
+  cancelVesselHarvest,
+  feedFishPen,
+  restockPen,
+  restockPenUI,
+  upgradeFeeder,
+  assignBarge,
+  openSellModal,
+  closeSellModal,
+  sellCargo,
+  startOffloading,
+  finishOffloading,
+  saveGame,
+  loadGame,
+  resetGame,
+  previousSite,
+  nextSite,
+  previousBarge,
+  nextBarge,
+  previousVessel,
+  nextVessel,
+  upgradeVessel,
+  buyNewVessel,
+  renameVessel,
+  closeRenameModal,
+  confirmRename,
+  openMoveVesselModal,
+  closeMoveModal,
+  moveVesselTo,
+  showTab,
+  updateSelectedBargeDisplay,
+  openBargeUpgradeModal,
+  closeBargeUpgradeModal,
+  openShipyard,
+  closeShipyard,
+  openCustomBuild,
+  backToShipyardList,
+  updateCustomBuildStats,
+  buyShipyardVessel,
+  confirmCustomBuild,
+  openMarketReport,
+  closeMarketReport,
+  openSiteManagement,
+  closeSiteManagement,
+  openDevModal,
+  closeDevModal,
+  toggleDevTools,
+  getTimeState,
+  pauseTime,
+  resumeTime,
+  updateFeedPurchaseUI,
+  syncFeedPurchase,
+  confirmBuyFeed,
+  setFeedPurchaseMax,
+  toggleSiteList,
+  toggleMobileActions,
+  toggleSiteActions,
+  selectSite,
+  populateSiteList
+};

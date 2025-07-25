@@ -241,11 +241,39 @@
     <div id="devModal">
       <div id="devModalContent">
         <h2>Developer Tools</h2>
+        <h3>Cash &amp; Fish</h3>
         <button onclick="addDevCash()">Add $100k</button>
         <button onclick="devHarvestAll()">Harvest All Pens</button>
         <button onclick="devRestockAll()">Restock All (Free)</button>
         <button onclick="devAddBiomass()">+10kg Biomass (Pen)</button>
+
+        <h3>Time Control</h3>
+        <button onclick="devAdvanceTime(1)">+1 Day</button>
+        <button onclick="devAdvanceTime(7)">+1 Week</button>
+        <button onclick="devSetDatePrompt()">Set Date</button>
+        <button onclick="devSetTimeScalePrompt()">Adjust Time Scale</button>
+
+        <h3>Market Tools</h3>
+        <button onclick="devResetMarketPrices()">Reset Market Prices</button>
+        <button onclick="devRandomizeMarket()">Randomize Market</button>
+        <button onclick="devSetMarketModifierPrompt()">Set Market Modifier</button>
+        <button onclick="devInstantSellAll()">Instant Sell All Biomass</button>
+
+        <h3>Utilities</h3>
+        <button onclick="devRestartGame()">Restart Game</button>
+        <button onclick="openSpeciesData()">Species Data</button>
         <button onclick="closeDevModal()">Close</button>
+      </div>
+    </div>
+
+    <div id="speciesDataModal">
+      <div id="speciesDataContent">
+        <h2>Species Data</h2>
+        <table id="speciesTable">
+          <thead><tr><th>Name</th><th>FCR</th><th>Restock</th><th>Growth</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <button onclick="closeSpeciesData()">Close</button>
       </div>
     </div>
 
