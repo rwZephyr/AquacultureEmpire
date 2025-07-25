@@ -105,6 +105,7 @@ function outsideSiteActionHandler(e){
 let lastSiteIndex = -1;
 let lastPenCount = 0;
 let lastVesselCount = 0;
+let logbookSection = 'milestones';
 
 // --- UPDATE UI ---
 function updateDisplay(){
@@ -1125,8 +1126,20 @@ function renderLogbook(){
   });
 }
 
+function switchLogbookSection(section){
+  logbookSection = section;
+  const sections = ['milestones','species','contracts','upgrades'];
+  sections.forEach(s => {
+    const content = document.getElementById('logbook' + capitalizeFirstLetter(s));
+    const tab = document.getElementById('tab' + capitalizeFirstLetter(s));
+    if(content) content.classList.toggle('hidden', s !== section);
+    if(tab) tab.classList.toggle('active', s === section);
+  });
+  if(section === 'milestones') renderLogbook();
+}
+
 function openLogbook(){
-  renderLogbook();
+  switchLogbookSection('milestones');
   const modal = document.getElementById('logbookModal');
   if(modal){
     modal.classList.add('visible');
@@ -1315,6 +1328,7 @@ export {
   updateSiteUpgrades,
   openDevModal,
   closeDevModal,
+  switchLogbookSection,
   openLogbook,
   closeLogbook,
   openSpeciesData,

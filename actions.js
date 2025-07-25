@@ -61,7 +61,8 @@ import {
   closeSiteManagement as uiCloseSiteManagement,
   updateSiteUpgrades,
   openDevModal as uiOpenDevModal,
-  closeDevModal as uiCloseDevModal
+  closeDevModal as uiCloseDevModal,
+  switchLogbookSection
 } from "./ui.js";
 
 function buyFeed(amount=20){
@@ -1190,6 +1191,7 @@ export {
   confirmCustomBuild,
   openMarketReport,
   closeMarketReport,
+  switchLogbookSection,
   openLogbook,
   closeLogbook,
   openSiteManagement,

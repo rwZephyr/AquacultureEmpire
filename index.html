@@ -339,14 +339,24 @@
       <button class="close-report-btn" onclick="closeLogbook()">Back</button>
       <div id="logbookContent" class="logbook-content">
         <h2>Logbook</h2>
-        <h3>Milestones</h3>
-        <div id="milestoneList"></div>
-        <h3>Species Info</h3>
-        <div id="speciesInfoPlaceholder"></div>
-        <h3>Contracts</h3>
-        <div id="contractsPlaceholder"></div>
-        <h3>Upgrades</h3>
-        <div id="upgradesPlaceholder"></div>
+        <div id="tabBar">
+          <button id="tabMilestones" onclick="switchLogbookSection('milestones')">Milestones</button>
+          <button id="tabSpecies" onclick="switchLogbookSection('species')">Species Info</button>
+          <button id="tabContracts" onclick="switchLogbookSection('contracts')">Contracts</button>
+          <button id="tabUpgrades" onclick="switchLogbookSection('upgrades')">Upgrades</button>
+        </div>
+        <div id="logbookMilestones">
+          <div id="milestoneList"></div>
+        </div>
+        <div id="logbookSpecies" class="hidden">
+          <div id="speciesInfoPlaceholder"></div>
+        </div>
+        <div id="logbookContracts" class="hidden">
+          <div id="contractsPlaceholder"></div>
+        </div>
+        <div id="logbookUpgrades" class="hidden">
+          <div id="upgradesPlaceholder"></div>
+        </div>
       </div>
     </div>
     <div id="marketReportPage" class="market-report-page">
