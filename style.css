@@ -1044,6 +1044,16 @@ button:active {
   margin-top: 6px;
 }
 
+#mobileIconBar {
+  display: none;
+}
+
+@media (max-width: 500px) {
+  #mobileIconBar {
+    display: flex;
+  }
+}
+
 .icon-button {
   width: 72px;
   height: 72px;
