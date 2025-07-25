@@ -789,8 +789,8 @@ button:active {
   margin: 6px 0;
 }
 .staff-icon {
-  flex: 0 0 60%;
-  width: 60%;
+  flex: 0 0 50%;
+  width: 50%;
   height: auto;
   margin-right: 8px;
   object-fit: contain;
