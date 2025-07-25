@@ -22,6 +22,7 @@ import {
   markets,
 } from './data.js';
 import { Site, Barge, Pen, Vessel } from './models.js';
+import { checkContractExpirations, contracts } from "./contracts.js";
 
 // Core Game State wrapped in a mutable object so other modules can update it
 const state = {
@@ -57,6 +58,7 @@ const state = {
   lastMarketUpdateString: 'Spring 1, Year 1',
   harvestsCompleted: 0,
   milestones: {},
+  contracts,
 };
 
 // Expose read-only accessors for external logic
@@ -136,6 +138,7 @@ function updateMarketPrices(){
 state.setupMarketData = setupMarketData;
 state.updateMarketPrices = updateMarketPrices;
 
+
 function advanceDay() {
   state.lastMarketUpdateString = getDateString();
   state.totalDaysElapsed++;
@@ -149,6 +152,7 @@ function advanceDay() {
     }
   }
   updateMarketPrices();
+  checkContractExpirations();
 }
 
 state.advanceDay = advanceDay;
@@ -248,10 +252,6 @@ state.vessels = [
 
 generateShipyardInventory();
 
-// Upgrades & Species constants are imported from data.js
-
-// UTILITIES
-function capitalizeFirstLetter(str){ return str.charAt(0).toUpperCase()+str.slice(1); }
 function generateRandomSiteName(){
   const p = siteNamePrefixes[Math.floor(Math.random()*siteNamePrefixes.length)];
   const s = siteNameSuffixes[Math.floor(Math.random()*siteNameSuffixes.length)];

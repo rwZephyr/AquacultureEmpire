@@ -12,7 +12,7 @@ import {
   CUSTOM_BUILD_MARKUP,
   siloUpgrades,
   blowerUpgrades,
-  housingUpgrades
+  housingUpgrades,
 } from "./data.js";
 import state, {
   capitalizeFirstLetter,
@@ -21,6 +21,7 @@ import state, {
   estimateTravelTime,
   getSiteHarvestRate,
 } from "./gameState.js";
+import { renderContracts } from "./contracts.js";
 import { milestones } from './milestones.js';
 
 const speciesColors = {
@@ -210,6 +211,7 @@ function updateDisplay(){
   if(tsEl) tsEl.innerText = `Prices last updated: ${state.lastMarketUpdateString}`;
   updateFeedPurchaseUI();
   updateMarketCharts();
+  if(logbookSection === 'contracts') renderContracts();
 }
 
 // harvest preview
@@ -1188,6 +1190,7 @@ function switchLogbookSection(section){
   });
   if(section === 'milestones') renderLogbook();
   if(section === 'species') renderSpeciesInfo();
+  if(section === 'contracts') renderContracts();
 }
 
 function openLogbook(){
