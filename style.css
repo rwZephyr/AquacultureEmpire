@@ -1058,6 +1058,19 @@ button:active {
   filter: drop-shadow(0 0 6px var(--accent)) brightness(1.3) invert(0.9);
   transform: scale(1.05);
 }
+.icon-inline {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  margin-right: 12px;
+}
+
+@media (max-width: 600px) {
+  .icon-inline {
+    display: none;
+  }
+}
 
 .icon-menu {
   position: absolute;
