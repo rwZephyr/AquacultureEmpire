@@ -211,6 +211,9 @@ function renderPenGrid(site){
       icon.src = 'assets/species-icons/' + pen.species + '.png';
       icon.alt = pen.species;
       badge.appendChild(icon);
+      badge.style.backgroundColor = speciesColors[pen.species] || 'rgba(0,0,0,0.2)';
+    } else {
+      badge.style.backgroundColor = 'rgba(0,0,0,0.2)';
     }
     card.appendChild(badge);
     card.querySelector('.feed-btn').onclick = () => feedFishPen(idx);
@@ -251,6 +254,9 @@ function updatePenCards(site){
       icon.src = 'assets/species-icons/' + pen.species + '.png';
       icon.alt = pen.species;
       badge.appendChild(icon);
+      badge.style.backgroundColor = speciesColors[pen.species] || 'rgba(0,0,0,0.2)';
+    } else {
+      badge.style.backgroundColor = 'rgba(0,0,0,0.2)';
     }
   });
 }
