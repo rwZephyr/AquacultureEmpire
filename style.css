@@ -898,6 +898,10 @@ button:active {
   #topBar {
     flex-direction: column;
     gap: 6px;
+    padding: 8px 12px;
+  }
+  .top-bar-group {
+    gap: 6px;
   }
 }
 
@@ -1051,6 +1055,13 @@ button:active {
 @media (max-width: 500px) {
   #mobileIconBar {
     display: flex;
+  }
+  .icon-action-bar {
+    gap: 8px;
+  }
+  .icon-button {
+    width: 48px;
+    height: 48px;
   }
 }
 
