@@ -102,6 +102,7 @@ export class Vessel {
     Object.defineProperty(this, 'harvestTimeout', { value: null, writable: true, enumerable: false });
     Object.defineProperty(this, 'harvestProgress', { value: 0, writable: true, enumerable: false });
     Object.defineProperty(this, 'harvestFishBuffer', { value: 0, writable: true, enumerable: false });
+    Object.defineProperty(this, 'fishBuffer', { value: [], writable: true, enumerable: false });
     Object.defineProperty(this, 'harvestingPenIndex', { value: null, writable: true, enumerable: false });
     Object.defineProperty(this, 'travelInterval', { value: null, writable: true, enumerable: false });
     Object.defineProperty(this, 'offloadInterval', { value: null, writable: true, enumerable: false });

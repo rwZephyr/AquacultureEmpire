@@ -521,6 +521,7 @@ function harvestPen(amount=null){
     if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
     vessel.harvestProgress = 0;
     vessel.harvestFishBuffer = 0;
+    const lockedWeight = pen.averageWeight;
     const startFishCount = pen.fishCount;
     let last = Date.now();
     const updateEta = () => {
@@ -547,6 +548,9 @@ function harvestPen(amount=null){
       if(remove>0){
         pen.fishCount -= remove;
         vessel.harvestFishBuffer -= remove;
+        for(let i=0;i<remove;i++){
+          vessel.fishBuffer.push({ weight: lockedWeight });
+        }
         if(pen.fishCount<=0) pen.averageWeight = 0;
       }
       updateEta();
@@ -1026,6 +1030,7 @@ function loadGame() {
         Object.defineProperty(v, 'harvestTimeout', { value: null, writable: true, enumerable: false });
         Object.defineProperty(v, 'harvestProgress', { value: 0, writable: true, enumerable: false });
         Object.defineProperty(v, 'harvestFishBuffer', { value: 0, writable: true, enumerable: false });
+        Object.defineProperty(v, 'fishBuffer', { value: [], writable: true, enumerable: false });
         Object.defineProperty(v, 'harvestingPenIndex', { value: null, writable: true, enumerable: false });
         Object.defineProperty(v, 'travelInterval', { value: null, writable: true, enumerable: false });
         Object.defineProperty(v, 'offloadInterval', { value: null, writable: true, enumerable: false });
