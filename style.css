@@ -65,6 +65,10 @@ button:active {
   transform: scale(0.97);
 }
 
+.hidden {
+  display: none !important;
+}
+
 /* Tab Bar */
 #tabBar {
   margin-top: 10px;
@@ -921,6 +925,49 @@ button:active {
 .top-bar-group button:hover {
   background-color: var(--accent);
   color: var(--bg-darker);
+}
+
+.site-switcher {
+  position: relative;
+  display: inline-block;
+}
+
+.site-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--bg-panel);
+  border-radius: 6px;
+  box-shadow: 0 2px 6px var(--shadow-light);
+  padding: 4px 0;
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 200;
+  min-width: 120px;
+  text-align: left;
+}
+
+.site-list.visible {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.site-list div {
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.site-list div:hover {
+  background-color: var(--accent);
+  color: var(--bg-darker);
+}
+
+.site-list .active {
+  background-color: var(--accent-translucent);
+  font-weight: bold;
 }
 
 /* Mobile sidebar behavior */

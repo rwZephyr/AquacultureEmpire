@@ -39,6 +39,18 @@ const vesselIcons = {
   wellboat: '🚤'
 };
 
+// close site dropdown when clicking outside
+document.addEventListener('click', evt => {
+  const list = document.getElementById('siteDropdownList');
+  const btn  = document.getElementById('siteNameBtn');
+  if(!list || !btn) return;
+  if(list.classList.contains('visible') &&
+     !list.contains(evt.target) && !btn.contains(evt.target)){
+    list.classList.remove('visible');
+    list.classList.add('hidden');
+  }
+});
+
 // Track counts to avoid re-rendering lists every tick
 let lastSiteIndex = -1;
 let lastPenCount = 0;
@@ -51,6 +63,7 @@ function updateDisplay(){
 
   // top-bar
   document.getElementById('siteName').innerText = site.name;
+  populateSiteList();
   document.getElementById('cashCount').innerText = state.cash.toFixed(2);
   const dateEl = document.getElementById('dateDisplay');
   if(dateEl) dateEl.innerText = getDateString();
@@ -1124,6 +1137,45 @@ function setFeedPurchaseMax(){
   updateFeedPurchaseCost();
 }
 
+// --- Site Switcher ---
+function toggleSiteList(){
+  const list = document.getElementById('siteDropdownList');
+  if(!list) return;
+  if(list.classList.contains('visible')){
+    list.classList.remove('visible');
+    list.classList.add('hidden');
+  } else {
+    list.classList.remove('hidden');
+    list.classList.add('visible');
+  }
+}
+
+function selectSite(index){
+  if(index < 0 || index >= state.sites.length) return;
+  state.currentSiteIndex = index;
+  state.currentPenIndex = 0;
+  state.currentBargeIndex = 0;
+  updateDisplay();
+  const list = document.getElementById('siteDropdownList');
+  if(list){
+    list.classList.remove('visible');
+    list.classList.add('hidden');
+  }
+}
+
+function populateSiteList(){
+  const list = document.getElementById('siteDropdownList');
+  if(!list) return;
+  list.innerHTML = '';
+  state.sites.forEach((s, i) => {
+    const item = document.createElement('div');
+    item.textContent = s.name;
+    if(i === state.currentSiteIndex) item.classList.add('active');
+    item.onclick = () => selectSite(i);
+    list.appendChild(item);
+  });
+}
+
 // --- PURCHASES & ACTIONS ---
 export {
   updateDisplay,
@@ -1161,5 +1213,8 @@ export {
   updateFeedPurchaseUI,
   syncFeedPurchase,
   confirmBuyFeed,
-  setFeedPurchaseMax
+  setFeedPurchaseMax,
+  toggleSiteList,
+  selectSite,
+  populateSiteList
 };
