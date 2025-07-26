@@ -4,6 +4,7 @@ import * as actions from './actions.js';
 import { initMilestones, checkMilestones } from './milestones.js';
 
 Object.assign(window, actions);
+Object.assign(window, ui);
 
 function adjustHeaderPadding(){
   const header = document.getElementById('topHeader');
