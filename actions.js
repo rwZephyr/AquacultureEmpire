@@ -61,6 +61,8 @@ import {
   openSiteManagement as uiOpenSiteManagement,
   closeSiteManagement as uiCloseSiteManagement,
   updateSiteUpgrades,
+  updateLicenseDropdown,
+  updateSiteLicenses,
   openDevModal as uiOpenDevModal,
   closeDevModal as uiCloseDevModal,
   switchLogbookSection
@@ -96,6 +98,8 @@ function purchaseLicense(sp){
   state.cash -= cost;
   site.licenses.push(sp);
   updateDisplay();
+  updateSiteLicenses();
+  updateLicenseDropdown();
   openModal('License purchased successfully');
 }
 
