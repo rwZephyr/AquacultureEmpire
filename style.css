@@ -1098,6 +1098,23 @@ button:active {
   pointer-events: none;
 }
 
+/* License dropdown specific styling */
+#licenseDropdownList {
+  min-width: 220px;
+}
+
+#licenseDropdownList div {
+  display: flex;
+  align-items: center;
+}
+
+#licenseDropdownList img {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  pointer-events: none;
+}
+
 #mobileActionGroup {
   position: absolute;
   right: 0;

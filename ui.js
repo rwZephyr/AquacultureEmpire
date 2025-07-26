@@ -251,7 +251,13 @@ function populateLicenseDropdown(){
     const data = speciesData[sp];
     if(!site.licenses.includes(sp) && data.licenseCost>0){
       const item = document.createElement('div');
-      item.textContent = `${capitalizeFirstLetter(sp)} - $${data.licenseCost}`;
+      const icon = document.createElement('img');
+      icon.src = `assets/species-icons/${sp}.png`;
+      icon.alt = sp;
+      item.appendChild(icon);
+      const label = document.createElement('span');
+      label.textContent = `${capitalizeFirstLetter(sp)} - $${data.licenseCost}`;
+      item.appendChild(label);
       item.onclick = () => {
         purchaseLicense(sp);
         const list = document.getElementById('licenseDropdownList');
