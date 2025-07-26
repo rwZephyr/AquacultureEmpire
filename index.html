@@ -288,7 +288,12 @@
         <button class="close-report-btn" onclick="closeSiteManagement()">Back</button>
         <h2>Site Management – <span id="siteManagementSiteName"></span></h2>
         <div id="siteLicenses"></div>
-        <section id="licenseShop"></section>
+        <section id="licenseShop">
+          <div class="site-switcher">
+            <button id="licenseDropdownBtn" onclick="toggleLicenseList()">Buy License ⌄</button>
+            <div id="licenseDropdownList" class="site-list hidden"></div>
+          </div>
+        </section>
         <h3>Site Upgrades</h3>
         <div id="siteUpgrades" class="site-upgrade-grid">
           <div class="site-upgrade-card">

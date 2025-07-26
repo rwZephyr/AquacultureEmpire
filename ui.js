@@ -53,6 +53,18 @@ document.addEventListener('click', evt => {
   }
 });
 
+// close license dropdown when clicking outside
+document.addEventListener('click', evt => {
+  const list = document.getElementById('licenseDropdownList');
+  const btn  = document.getElementById('licenseDropdownBtn');
+  if(!list || !btn) return;
+  if(list.classList.contains('visible') &&
+     !list.contains(evt.target) && !btn.contains(evt.target)){
+    list.classList.remove('visible');
+    list.classList.add('hidden');
+  }
+});
+
 function toggleMobileActions(){
   const group = document.getElementById('mobileActionGroup');
   if(!group) return;
@@ -189,7 +201,7 @@ function updateDisplay(){
   const penPurchaseEl = document.getElementById('penPurchaseInfo');
   if(penPurchaseEl) penPurchaseEl.innerText = `Next Pen Purchase: $${state.penPurchaseCost.toFixed(0)}`;
 
-  updateLicenseShop();
+
 
   if(lastSiteIndex !== state.currentSiteIndex || site.pens.length !== lastPenCount){
     renderPenGrid(site);
@@ -229,34 +241,48 @@ function updateSiteLicenses(){
   });
 }
 
-function updateLicenseShop(){
-  const licenseDiv = document.getElementById('licenseShop');
-  if(!licenseDiv) return;
-  updateSiteLicenses();
+function populateLicenseDropdown(){
+  const list = document.getElementById('licenseDropdownList');
+  if(!list) return;
+  list.innerHTML = '';
   const site = state.sites[state.currentSiteIndex];
-  licenseDiv.innerHTML = '';
-  const select = document.createElement('select');
-  select.id = 'licenseSelect';
   const sorted = Object.keys(speciesData).sort((a,b)=>a.localeCompare(b));
-  sorted.forEach(sp=>{
+  sorted.forEach(sp => {
     const data = speciesData[sp];
     if(!site.licenses.includes(sp) && data.licenseCost>0){
-      const option = document.createElement('option');
-      option.value = sp;
-      option.textContent = `${capitalizeFirstLetter(sp)} - $${data.licenseCost}`;
-      select.appendChild(option);
+      const item = document.createElement('div');
+      item.textContent = `${capitalizeFirstLetter(sp)} - $${data.licenseCost}`;
+      item.onclick = () => {
+        purchaseLicense(sp);
+        const list = document.getElementById('licenseDropdownList');
+        if(list){
+          list.classList.remove('visible');
+          list.classList.add('hidden');
+        }
+      };
+      list.appendChild(item);
     }
   });
-  if(select.options.length===0){
-    licenseDiv.innerText = 'All licenses purchased.';
-    return;
+  if(list.children.length===0){
+    list.textContent = 'All licenses purchased.';
   }
-  const btn = document.createElement('button');
-  btn.id = 'buyLicenseBtn';
-  btn.textContent = 'Buy License';
-  btn.onclick = () => purchaseLicense(select.value);
-  licenseDiv.appendChild(select);
-  licenseDiv.appendChild(btn);
+}
+
+function toggleLicenseList(){
+  const list = document.getElementById('licenseDropdownList');
+  if(!list) return;
+  if(list.classList.contains('visible')){
+    list.classList.remove('visible');
+    list.classList.add('hidden');
+  } else {
+    populateLicenseDropdown();
+    list.classList.remove('hidden');
+    list.classList.add('visible');
+  }
+}
+
+function updateLicenseDropdown(){
+  populateLicenseDropdown();
 }
 
 function updateSiteUpgrades(){
@@ -1105,7 +1131,7 @@ function openSiteManagement(){
   const nameEl = document.getElementById('siteManagementSiteName');
   if(nameEl) nameEl.innerText = state.sites[state.currentSiteIndex].name;
   updateSiteLicenses();
-  updateLicenseShop();
+  updateLicenseDropdown();
   updateSiteUpgrades();
   modal.classList.add('visible');
   document.body.style.overflow = 'hidden';
@@ -1365,6 +1391,7 @@ function selectSite(index){
   state.currentPenIndex = 0;
   state.currentBargeIndex = 0;
   updateDisplay();
+  updateLicenseDropdown();
   const list = document.getElementById('siteDropdownList');
   if(list){
     list.classList.remove('visible');
@@ -1388,7 +1415,8 @@ function populateSiteList(){
 // --- PURCHASES & ACTIONS ---
 export {
   updateDisplay,
-  updateLicenseShop,
+  updateLicenseDropdown,
+  updateSiteLicenses,
   renderPenGrid,
   renderVesselGrid,
   renderMap,
@@ -1434,5 +1462,6 @@ export {
   toggleSiteActions,
   outsideSiteActionHandler,
   selectSite,
-  populateSiteList
+  populateSiteList,
+  toggleLicenseList
 };
