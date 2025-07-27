@@ -449,12 +449,18 @@ function renderVesselGrid(){
     card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;
     card.querySelector('.vessel-location').textContent = vessel.location;
     const statusEl = card.querySelector('.vessel-status');
-    let status = vessel.isHarvesting ? 'Harvesting' : vessel.unloading ? 'Unloading' : vessel.deliveringContractId ? 'Delivering' : (vessel.location.startsWith('Traveling') ? 'Traveling' : 'Idle');
+    let statusClass = 'status-idle';
+    let status = 'Idle';
+    if(vessel.isHarvesting){ status='Harvesting'; statusClass='status-harvesting'; }
+    else if(vessel.unloading || vessel.deliveringContractId){ status='Delivering'; statusClass='status-delivering'; }
+    else if(vessel.location === 'Dock'){ status='Docked'; statusClass='status-docked'; }
+    else if(vessel.location.startsWith('Traveling')){ status='Traveling'; }
     if(vessel.actionEndsAt && vessel.actionEndsAt > Date.now()){
       const eta = Math.max(0, (vessel.actionEndsAt - Date.now())/1000);
       status += ` (${eta.toFixed(0)}s)`;
     }
     statusEl.textContent = status;
+    card.classList.add(statusClass);
     const speciesEl = card.querySelector('.harvest-species');
     if(vessel.unloading){
       speciesEl.textContent = `Revenue $${vessel.offloadRevenue.toFixed(2)}`;
@@ -465,6 +471,7 @@ function renderVesselGrid(){
     card.querySelector('.vessel-progress').style.width = loadPercent + '%';
     card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1);
     card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity;
+    card.querySelector('.load-percent').textContent = loadPercent.toFixed(0);
     const infoEl = card.querySelector('.fishbuffer-info');
     const infoStr = getFishBufferInfo(vessel.fishBuffer);
     if(infoEl){ infoEl.textContent = infoStr; infoEl.title = infoStr; }
@@ -492,6 +499,15 @@ function renderVesselGrid(){
     };
     cancelBtn.textContent = vessel.unloading ? 'Cancel Offloading' : 'Cancel';
     cancelBtn.style.display = (vessel.isHarvesting || vessel.unloading) ? 'block' : 'none';
+
+    const detailsToggle = card.querySelector('.details-toggle');
+    const details = card.querySelector('.vessel-details');
+    if(detailsToggle && details){ detailsToggle.onclick = ()=>{ details.classList.toggle('hidden'); }; }
+    const actionsToggle = card.querySelector('.actions-toggle');
+    const actionMenu = card.querySelector('.action-menu');
+    if(actionsToggle && actionMenu){
+      actionsToggle.onclick = (e)=>{ e.stopPropagation(); actionMenu.classList.toggle('hidden'); };
+    }
     grid.appendChild(clone);
   });
 }
@@ -511,16 +527,23 @@ function updateVesselCards(){
         iconCont.textContent = '🛥️';
       }
     }
-    card.querySelector('.vessel-name').textContent = vessel.name;
+    card.querySelector('.vessel-name .name-text').textContent = vessel.name;
     card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;
     card.querySelector('.vessel-location').textContent = vessel.location;
     const statusEl = card.querySelector('.vessel-status');
-    let status = vessel.isHarvesting ? 'Harvesting' : vessel.unloading ? 'Unloading' : vessel.deliveringContractId ? 'Delivering' : (vessel.location.startsWith('Traveling') ? 'Traveling' : 'Idle');
+    let statusClass = 'status-idle';
+    let status = 'Idle';
+    if(vessel.isHarvesting){ status='Harvesting'; statusClass='status-harvesting'; }
+    else if(vessel.unloading || vessel.deliveringContractId){ status='Delivering'; statusClass='status-delivering'; }
+    else if(vessel.location === 'Dock'){ status='Docked'; statusClass='status-docked'; }
+    else if(vessel.location.startsWith('Traveling')){ status='Traveling'; }
     if(vessel.actionEndsAt && vessel.actionEndsAt > Date.now()){
       const eta = Math.max(0, (vessel.actionEndsAt - Date.now())/1000);
       status += ` (${eta.toFixed(0)}s)`;
     }
     statusEl.textContent = status;
+    card.classList.remove('status-harvesting','status-idle','status-delivering','status-docked');
+    card.classList.add(statusClass);
     const speciesEl = card.querySelector('.harvest-species');
     if(vessel.unloading){
       speciesEl.textContent = `Revenue $${vessel.offloadRevenue.toFixed(2)}`;
@@ -531,6 +554,8 @@ function updateVesselCards(){
     card.querySelector('.vessel-progress').style.width = loadPercent + '%';
     card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1);
     card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity;
+    const lp = card.querySelector('.load-percent');
+    if(lp) lp.textContent = loadPercent.toFixed(0);
     const infoEl2 = card.querySelector('.fishbuffer-info');
     const infoStr2 = getFishBufferInfo(vessel.fishBuffer);
     if(infoEl2){ infoEl2.textContent = infoStr2; infoEl2.title = infoStr2; }
