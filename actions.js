@@ -22,7 +22,7 @@ import {
 import { Site, Barge, Pen, Vessel } from "./models.js";
 import state, { getTimeState, addStatusMessage, advanceDays, setupMarketData, updateMarketPrices } from "./gameState.js";
 import { initMilestones } from './milestones.js';
-import { openContractDeliveryModal, closeContractDeliveryModal, deliverContract, checkVesselContractEligibility } from './contracts.js';
+import { initContracts, openContractDeliveryModal, closeContractDeliveryModal, deliverContract, checkVesselContractEligibility } from './contracts.js';
 
 const OFFLINE_STEP_SECONDS = 60; // simulation granularity for offline progress
 import {
