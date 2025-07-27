@@ -56,3 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(actions.saveGame, state.AUTO_SAVE_INTERVAL_MS);
   setInterval(checkMilestones, 1000);
 });
+
+// Ensure progress is persisted if the tab is closed before the next
+// auto-save interval fires. Because saveGame writes synchronously to
+// localStorage, invoking it during page unload reliably stores the state.
+window.addEventListener('pagehide', actions.saveGame);
+window.addEventListener('beforeunload', actions.saveGame);
