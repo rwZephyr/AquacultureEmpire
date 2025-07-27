@@ -1335,22 +1335,14 @@ html.modal-open {
   pointer-events: auto;
 }
 
-.icon-action-bar {
+#actionIconsWrapper {
   display: flex;
-  justify-content: center;
+  align-items: center;
   gap: 16px;
-  margin-top: 6px;
-}
-
-#mobileIconBar {
-  display: none;
 }
 
 @media (max-width: 500px) {
-  #mobileIconBar {
-    display: flex;
-  }
-  .icon-action-bar {
+  #actionIconsWrapper {
     gap: 8px;
   }
   .icon-button {
@@ -1420,50 +1412,6 @@ html.modal-open {
   color: var(--bg-darker);
 }
 
-@media (min-width: 601px) {
-  #mobileActionToggle {
-    display: none;
-  }
-  #mobileActionGroup {
-    position: static;
-    flex-direction: row;
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
-    display: flex;
-  }
-  #mobileActionGroup.hidden {
-    display: flex !important;
-  }
-  #siteActionToggle {
-    display: none;
-  }
-  #siteActionMenu {
-    position: static;
-    flex-direction: row;
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
-    display: flex;
-  }
-  #siteActionMenu.hidden {
-    display: flex !important;
-  }
-  #bankActionToggle {
-    display: none;
-  }
-  #bankActionMenu {
-    position: static;
-    flex-direction: row;
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
-    display: flex;
-  }
-  #bankActionMenu.hidden {
-    display: flex !important;
-  }
-}
 
 /* Mobile sidebar behavior */
 @media (max-width: 700px) {
