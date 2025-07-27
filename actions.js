@@ -1027,6 +1027,7 @@ function saveGame() {
     contractsCompletedByTier: state.contractsCompletedByTier,
     unlockedContractTiers: state.unlockedContractTiers,
     milestones: state.milestones,
+    bank: state.bank,
     marketStates: markets.map(m => ({
       name: m.name,
       prices: m.prices,
@@ -1069,6 +1070,12 @@ function loadGame() {
       state.contractsCompletedByTier = obj.contractsCompletedByTier ?? {};
       state.unlockedContractTiers = obj.unlockedContractTiers ?? [0];
       state.milestones = obj.milestones ?? {};
+      if(obj.bank){
+        state.bank.deposit = obj.bank.deposit ?? state.bank.deposit;
+        state.bank.depositInterestRate = obj.bank.depositInterestRate ?? state.bank.depositInterestRate;
+        state.bank.loans = obj.bank.loans ?? [];
+        state.bank.nextLoanId = obj.bank.nextLoanId ?? state.bank.nextLoanId;
+      }
       state.sites = obj.sites;
       state.sites.forEach(s => { if(!s.location) s.location = { x: Math.random()*100, y: Math.random()*100 }; });
       state.vessels = obj.vessels ?? state.vessels;
