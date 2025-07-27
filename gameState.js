@@ -42,6 +42,10 @@ const state = {
   TRAVEL_TIME_FACTOR: 1000, // ms per distance unit
   OFFLOAD_RATE: 10, // kg per second
 
+  // --- Shipyard Restock ---
+  SHIPYARD_RESTOCK_INTERVAL: 5, // days
+  shipyardLastRefreshDay: 0,
+
   // --- Game Time System ---
   SEASONS: ['Spring', 'Summer', 'Fall', 'Winter'],
   DAYS_PER_SEASON: 30,
@@ -159,6 +163,7 @@ function advanceDay() {
   updateMarketPrices();
   checkContractExpirations();
   generateDailyContracts();
+  checkShipyardRestock();
 }
 
 state.advanceDay = advanceDay;
@@ -291,9 +296,9 @@ function generateShipyardInventory(){
     const conditionLabels = ['Well-Used','Overhauled','Retrofit'];
     const label = conditionLabels[Math.floor(Math.random()*conditionLabels.length)];
     const notes = {
-      'Well-Used': 'Serviceable with some wear',
+      'Well-Used': 'Lots of stories, lots of rust.',
       'Overhauled': 'Refitted two seasons ago',
-      'Retrofit': 'Upgraded from older model'
+      'Retrofit': 'This vessel was refitted two seasons ago. Watch for reliability issues.'
     };
     state.shipyardInventory.push({
       class: cls,
@@ -306,6 +311,7 @@ function generateShipyardInventory(){
       conditionNote: notes[label]
     });
   }
+  state.shipyardLastRefreshDay = state.totalDaysElapsed;
 }
 
 // expose utility functions on the state object for legacy callers
@@ -313,6 +319,7 @@ state.capitalizeFirstLetter = capitalizeFirstLetter;
 state.generateRandomSiteName = generateRandomSiteName;
 state.generateRandomVesselName = generateRandomVesselName;
 state.generateShipyardInventory = generateShipyardInventory;
+state.checkShipyardRestock = checkShipyardRestock;
 state.findSiteByName = findSiteByName;
 state.findMarketByName = findMarketByName;
 state.getLocationByName = getLocationByName;
@@ -328,6 +335,13 @@ function getLocationByName(n){
   const market = findMarketByName(n);
   if(market) return market.location;
   return null;
+}
+
+function checkShipyardRestock(){
+  if(state.totalDaysElapsed - state.shipyardLastRefreshDay >= state.SHIPYARD_RESTOCK_INTERVAL){
+    generateShipyardInventory();
+    addStatusMessage('New used vessels have arrived at auction.');
+  }
 }
 
 function estimateTravelTime(fromName, destLoc, vessel){
@@ -386,6 +400,7 @@ export {
   advanceDay,
   advanceDays,
   addStatusMessage,
+  checkShipyardRestock,
   pauseTime,
   resumeTime,
   getSiteHarvestRate,
