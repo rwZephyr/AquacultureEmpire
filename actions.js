@@ -991,6 +991,9 @@ function saveGame() {
     sites: state.sites,
     vessels: state.vessels,
     harvestsCompleted: state.harvestsCompleted,
+    contracts: state.contracts,
+    contractsCompletedByTier: state.contractsCompletedByTier,
+    unlockedContractTiers: state.unlockedContractTiers,
     milestones: state.milestones,
     marketStates: markets.map(m => ({
       name: m.name,
@@ -1030,6 +1033,9 @@ function loadGame() {
       state.cash = obj.cash ?? state.cash;
       state.penPurchaseCost = obj.penPurchaseCost ?? state.penPurchaseCost;
       state.harvestsCompleted = obj.harvestsCompleted ?? 0;
+      state.contracts = obj.contracts ?? state.contracts;
+      state.contractsCompletedByTier = obj.contractsCompletedByTier ?? {};
+      state.unlockedContractTiers = obj.unlockedContractTiers ?? [0];
       state.milestones = obj.milestones ?? {};
       state.sites = obj.sites;
       state.sites.forEach(s => { if(!s.location) s.location = { x: Math.random()*100, y: Math.random()*100 }; });
@@ -1106,6 +1112,7 @@ function loadGame() {
     console.error('Load failed', e);
   }
   setupMarketData();
+  initContracts(state);
   state.generateShipyardInventory();
   initMilestones();
 }

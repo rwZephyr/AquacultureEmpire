@@ -1,6 +1,6 @@
 // Local state reference initialized via initContracts to avoid circular imports
 import { updateDisplay } from './ui.js';
-import { speciesData } from './data.js';
+import { speciesData, markets, contractBuyers } from './data.js';
 let state;
 let contracts = [];
 
@@ -13,11 +13,14 @@ function capitalizeFirstLetter(str){
 export function initContracts(gameState){
   state = gameState;
   if(!state.contracts) state.contracts = [];
+  if(!state.contractsCompletedByTier) state.contractsCompletedByTier = {};
+  if(!state.unlockedContractTiers) state.unlockedContractTiers = [0];
   contracts = state.contracts;
   // seed a starter contract for the logbook
   if(contracts.length === 0){
     contracts.push({
       id: 1,
+      tier: 0,
       species: 'shrimp',
       type: 'biomass',
       biomassGoalKg: 100,
@@ -27,6 +30,7 @@ export function initContracts(gameState){
       rewardCash: 500,
       priceMultiplier: 1.15,
       flavorKey: 'basicDelivery',
+      buyer: 'Local Co-op',
       status: 'active',
       reminders: {}
     });
@@ -37,6 +41,95 @@ export const contractFlavors = {
   basicDelivery: "Ship {species} to {destination} on time.",
   bigOrder: "A bulk request for {species} has come in from {destination}.",
 };
+
+export const contractTiers = [
+  {
+    tier: 0,
+    biomassRange: [50, 300],
+    rewardMultiplier: 1.1,
+    priceMultiplier: 1.1,
+    flavorKeys: ['basicDelivery'],
+    minContractsFulfilled: 0,
+  },
+  {
+    tier: 1,
+    biomassRange: [300, 1000],
+    rewardMultiplier: 1.3,
+    priceMultiplier: 1.15,
+    flavorKeys: ['basicDelivery', 'bigOrder'],
+    minContractsFulfilled: 3,
+  },
+  {
+    tier: 2,
+    biomassRange: [1000, 2500],
+    rewardMultiplier: 1.5,
+    priceMultiplier: 1.25,
+    flavorKeys: ['bigOrder'],
+    minContractsFulfilled: 8,
+  },
+];
+
+function selectBuyerForTier(tier){
+  if(!contractBuyers) return null;
+  const options = contractBuyers.filter(b=>!b.tiers || b.tiers.includes(tier));
+  if(options.length === 0) return null;
+  return options[Math.floor(Math.random()*options.length)].name;
+}
+
+function rollContractTier(){
+  const unlocked = state.unlockedContractTiers || [0];
+  const weights = {0:0.6,1:0.3,2:0.1};
+  const total = unlocked.reduce((sum,t)=>sum+(weights[t]||0),0);
+  let r = Math.random()*total;
+  for(const t of unlocked){
+    r -= (weights[t]||0);
+    if(r<=0) return t;
+  }
+  return unlocked[0];
+}
+
+export function generateDailyContracts(count=2){
+  for(let i=0;i<count;i++){
+    const tierIdx = rollContractTier();
+    const meta = contractTiers.find(t=>t.tier===tierIdx);
+    if(!meta) continue;
+    const speciesKeys = Object.keys(speciesData);
+    const species = speciesKeys[Math.floor(Math.random()*speciesKeys.length)];
+    const biomass = Math.round(meta.biomassRange[0] + Math.random()*(meta.biomassRange[1]-meta.biomassRange[0]));
+    const flavor = meta.flavorKeys[Math.floor(Math.random()*meta.flavorKeys.length)];
+    const market = markets[Math.floor(Math.random()*markets.length)];
+    const base = speciesData[species].marketPrice;
+    const reward = Math.round(biomass * base * meta.rewardMultiplier);
+    const id = contracts.length>0 ? Math.max(...contracts.map(c=>c.id))+1 : 1;
+    contracts.push({
+      id,
+      tier: tierIdx,
+      species,
+      type:'biomass',
+      biomassGoalKg: biomass,
+      destination: market.name,
+      startDay: state.totalDaysElapsed,
+      durationDays: 10,
+      rewardCash: reward,
+      priceMultiplier: meta.priceMultiplier,
+      flavorKey: flavor,
+      buyer: selectBuyerForTier(tierIdx),
+      status:'active',
+      reminders:{}
+    });
+  }
+}
+
+function checkContractTierUnlocks(){
+  contractTiers.forEach(tier=>{
+    if(state.unlockedContractTiers.includes(tier.tier)) return;
+    const completed = state.contractsCompletedByTier[tier.tier] || 0;
+    if(completed >= (tier.minContractsFulfilled||0)){
+      state.unlockedContractTiers.push(tier.tier);
+      state.addStatusMessage(`New contract tier ${tier.tier} unlocked!`);
+    }
+  });
+}
 
 export function getContractFlavor(contract){
   let text = contractFlavors[contract.flavorKey] || '';
@@ -126,6 +219,10 @@ function finishContractDelivery(vessel, contract){
   if(market) payout *= (market.modifiers[contract.species] || 1);
   payout *= (contract.priceMultiplier || 1.1);
   state.cash += payout;
+  const tier = contract.tier || 0;
+  if(!state.contractsCompletedByTier[tier]) state.contractsCompletedByTier[tier] = 0;
+  state.contractsCompletedByTier[tier]++;
+  checkContractTierUnlocks();
   contract.status = 'fulfilled';
   if(contract.reminders) contract.reminders = {};
   state.addStatusMessage(`Contract fulfilled for $${payout.toFixed(2)}.`);
@@ -201,6 +298,9 @@ export function renderContracts(){
     const reward = document.createElement('div');
     reward.textContent = `Reward: $${c.rewardCash}`;
 
+    const buyer = document.createElement('div');
+    if(c.buyer) buyer.textContent = `Buyer: ${c.buyer}`;
+
     const flavor = document.createElement('div');
     flavor.className = 'contract-flavor';
     flavor.textContent = getContractFlavor(c);
@@ -218,6 +318,7 @@ export function renderContracts(){
     info.appendChild(dest);
     info.appendChild(time);
     info.appendChild(reward);
+    if(c.buyer) info.appendChild(buyer);
     info.appendChild(flavor);
     info.appendChild(btn);
 
