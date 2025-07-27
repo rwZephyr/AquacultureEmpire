@@ -225,5 +225,11 @@ export const markets = [
   }
 ];
 
+export const contractBuyers = [
+  { name: 'Local Co-op', tiers: [0] },
+  { name: 'Atlantic Exports', tiers: [1] },
+  { name: 'NorFed Genetics', tiers: [2] }
+];
+
 
 

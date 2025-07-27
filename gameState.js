@@ -22,7 +22,7 @@ import {
   markets,
 } from './data.js';
 import { Site, Barge, Pen, Vessel } from './models.js';
-import { initContracts, checkContractExpirations } from "./contracts.js";
+import { initContracts, checkContractExpirations, generateDailyContracts } from "./contracts.js";
 
 // Core Game State wrapped in a mutable object so other modules can update it
 const state = {
@@ -58,6 +58,8 @@ const state = {
   lastMarketUpdateString: 'Spring 1, Year 1',
   harvestsCompleted: 0,
   milestones: {},
+  contractsCompletedByTier: {},
+  unlockedContractTiers: [0],
 
 };
 
@@ -156,6 +158,7 @@ function advanceDay() {
   }
   updateMarketPrices();
   checkContractExpirations();
+  generateDailyContracts();
 }
 
 state.advanceDay = advanceDay;
