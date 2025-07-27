@@ -26,7 +26,7 @@ import { initContracts, checkContractExpirations, generateDailyContracts } from 
 
 // Core Game State wrapped in a mutable object so other modules can update it
 const state = {
-  cash: 200,
+  cash: 1000,
   BASE_HARVEST_RATE: 5, // kg per second
   HARVESTER_RATE: 10, // additional kg/s per harvester
   penPurchaseCost: 1000,
