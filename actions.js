@@ -391,6 +391,14 @@ function backToShipyardList(){
 function updateCustomBuildStats(){
   uiUpdateCustomBuildStats();
 }
+
+function refreshShipyardListings(){
+  const daysSince = state.totalDaysElapsed - state.shipyardLastRefreshDay;
+  if(daysSince < state.SHIPYARD_RESTOCK_INTERVAL) return;
+  state.generateShipyardInventory();
+  state.addStatusMessage('New used vessels have arrived at auction.');
+  openShipyard();
+}
 function buyShipyardVessel(idx){
   const item = state.shipyardInventory[idx];
   if(!item) return;
@@ -412,7 +420,7 @@ function buyShipyardVessel(idx){
   state.generateShipyardInventory();
   closeShipyard();
   updateDisplay();
-  const msg = `You acquired a used vessel: ${item.name} (Condition: ${item.conditionLabel})`;
+  const msg = `You acquired a used vessel: ${item.name} (Condition: ${item.conditionLabel}). You haggled a fair price at the dockside classifieds.`;
   openModal(msg);
 }
 
@@ -1235,6 +1243,7 @@ export {
   openCustomBuild,
   backToShipyardList,
   updateCustomBuildStats,
+  refreshShipyardListings,
   buyShipyardVessel,
   confirmCustomBuild,
   openMarketReport,

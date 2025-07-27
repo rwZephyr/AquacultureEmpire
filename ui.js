@@ -864,6 +864,11 @@ function closeBargeUpgradeModal(){
 function openShipyard(){
   const list = document.getElementById('shipyardList');
   list.innerHTML = '';
+  const refreshBtn = document.getElementById('refreshListingsBtn');
+  if(refreshBtn){
+    const daysSince = state.totalDaysElapsed - state.shipyardLastRefreshDay;
+    refreshBtn.disabled = daysSince < state.SHIPYARD_RESTOCK_INTERVAL;
+  }
   state.shipyardInventory.forEach((v, idx)=>{
     const row = document.createElement('div');
     row.className = 'shipyard-row shipyard-card used-vessel-card';
