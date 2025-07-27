@@ -949,6 +949,8 @@ function simulateFeedManagers(){
 // Run simplified game ticks to account for offline progress
 // Locked pens are ignored when calculating feed usage
 function simulateOfflineProgress(ms){
+  state.isSimulatingOffline = true;
+  state.shipyardRestockedDuringOffline = false;
   const totalSeconds = Math.floor(ms / 1000);
   const daySeconds = state.DAY_DURATION_MS / 1000;
   let feedUsed = 0;
@@ -1004,8 +1006,8 @@ function simulateOfflineProgress(ms){
 
   const daysPassed = Math.floor(totalSeconds / daySeconds);
   advanceDays(daysPassed);
-
-  return { daysPassed, feedUsed };
+  state.isSimulatingOffline = false;
+  return { daysPassed, feedUsed, shipyardRestocked: state.shipyardRestockedDuringOffline };
 }
 
 // --- GAME TIME LOOP ---

@@ -59,6 +59,8 @@ const state = {
 
   statusMessage: '',
   lastOfflineInfo: null,
+  isSimulatingOffline: false,
+  shipyardRestockedDuringOffline: false,
   lastMarketUpdateString: 'Spring 1, Year 1',
   harvestsCompleted: 0,
   milestones: {},
@@ -358,7 +360,11 @@ function getLocationByName(n){
 function checkShipyardRestock(){
   if(state.totalDaysElapsed - state.shipyardLastRefreshDay >= state.SHIPYARD_RESTOCK_INTERVAL){
     generateShipyardInventory();
-    addStatusMessage('New used vessels have arrived at auction.');
+    if(state.isSimulatingOffline){
+      state.shipyardRestockedDuringOffline = true;
+    } else {
+      addStatusMessage('New used vessels have arrived at auction.');
+    }
   }
 }
 
