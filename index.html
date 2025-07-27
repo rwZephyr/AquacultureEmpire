@@ -335,18 +335,19 @@
             <h3>Used Vessels</h3>
             <div id="shipyardList" class="shipyard-list"></div>
           </div>
-          <div id="customBuildPanel" class="custom-build-page shipyard-card">
+          <div id="customBuildPanel" class="custom-build-page">
             <h3>Custom Build</h3>
-            <div>
+            <div class="build-row">
               <label for="buildClassSelect">Class:</label>
+              <span id="classIconPreview" class="build-icon"></span>
               <select id="buildClassSelect" onchange="updateCustomBuildStats()"></select>
             </div>
             <div id="buildStats"></div>
-            <div>
+            <div class="build-row">
               <label for="buildNameInput">Name:</label>
               <input type="text" id="buildNameInput">
             </div>
-            <div>Cost: $<span id="buildCost"></span></div>
+            <div id="buildCostRow" class="shipyard-stat price"></div>
             <div id="buildLockMessage" class="lock-message" style="display:none"></div>
             <button onclick="confirmCustomBuild()">Purchase</button>
           </div>

@@ -473,11 +473,30 @@ button:active {
 
 .custom-build-page {
   margin-top: 20px;
-  padding: 12px;
+  padding: 16px;
   background: var(--bg-panel);
+  border: 1px solid var(--border);
   border-radius: 10px;
   box-shadow: 0 0 4px var(--shadow-light);
-  border-top: 1px solid var(--bg-button);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 420px;
+}
+
+.build-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.build-icon {
+  font-size: 28px;
+}
+
+.input-error {
+  border: 1px solid #e74c3c;
 }
 
 #marketReportPage {
