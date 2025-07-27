@@ -23,6 +23,7 @@ import state, {
 } from "./gameState.js";
 import { renderContracts } from "./contracts.js";
 import { milestones } from './milestones.js';
+import { depositToBank, withdrawFromBank, takeLoan, repayLoan } from "./bank.js";
 
 const speciesColors = {
   shrimp: '#e74c3c',
@@ -1267,7 +1268,65 @@ function closeMarketReport(){
 }
 
 function openBank(){
-  openModal('Bank feature not implemented yet.');
+  const modal = document.getElementById('bankModal');
+  if(modal){
+    updateBankDisplay();
+    modal.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+  }
+}
+
+function handleDeposit() {
+  const amount = parseFloat(document.getElementById('bankDepositInput').value);
+  depositToBank(amount);
+  updateBankDisplay();
+}
+
+function handleWithdraw() {
+  const amount = parseFloat(document.getElementById('bankWithdrawInput').value);
+  withdrawFromBank(amount);
+  updateBankDisplay();
+}
+
+function handleTakeLoan() {
+  const amount = parseFloat(document.getElementById('loanAmountInput').value);
+  takeLoan(amount);
+  updateBankDisplay();
+}
+
+function updateBankDisplay() {
+  const depositEl = document.getElementById('bankDepositDisplay');
+  if(depositEl) depositEl.textContent = state.bank.deposit.toFixed(2);
+
+  const list = document.getElementById('loanList');
+  if(!list) return;
+  list.innerHTML = '';
+  if(state.bank.loans.length === 0){
+    list.textContent = 'No active loans';
+    return;
+  }
+
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  thead.innerHTML = '<tr><th>Remaining</th><th>Days</th><th></th></tr>';
+  table.appendChild(thead);
+  const tbody = document.createElement('tbody');
+
+  state.bank.loans.forEach(loan => {
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>$${loan.remaining.toFixed(2)}</td><td>${loan.daysActive}</td>`;
+    const btnCell = document.createElement('td');
+    const btn = document.createElement('button');
+    btn.textContent = 'Repay';
+    btn.onclick = () => { repayLoan(loan.id, loan.remaining); updateBankDisplay(); };
+    btnCell.appendChild(btn);
+    row.appendChild(btnCell);
+    tbody.appendChild(row);
+  });
+
+  table.appendChild(tbody);
+  list.appendChild(table);
 }
 
 function openMarketReports(){
@@ -1591,6 +1650,10 @@ export {
   openMarketReport,
   closeMarketReport,
   openBank,
+  handleDeposit,
+  handleWithdraw,
+  handleTakeLoan,
+  updateBankDisplay,
   openMarketReports,
   openSiteManagement,
   closeSiteManagement,

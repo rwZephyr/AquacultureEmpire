@@ -218,6 +218,7 @@ button:active {
 #moveModal,
 #renameModal,
 #bargeUpgradeModal,
+#bankModal,
 #contractDeliveryModal {
   position: fixed;
   top: 0;
@@ -254,6 +255,7 @@ button:active {
 #moveModal.visible,
 #renameModal.visible,
 #bargeUpgradeModal.visible,
+#bankModal.visible,
 #contractDeliveryModal.visible {
   display: flex;
 }
@@ -277,6 +279,7 @@ html.modal-open {
 #moveModalContent,
 #renameModalContent,
 #bargeUpgradeModalContent,
+#bankModalContent,
 #contractDeliveryContent {
   background: var(--modal-bg);
   color: var(--text-light);

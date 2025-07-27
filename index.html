@@ -304,6 +304,25 @@
       </div>
     </div>
 
+    <div id="bankModal">
+      <div id="bankModalContent">
+        <h2>Bank</h2>
+        <p>Deposit: $<span id="bankDepositDisplay">0.00</span> (2% daily interest)</p>
+        <input id="bankDepositInput" type="number" min="0" />
+        <button onclick="handleDeposit()">Deposit</button>
+
+        <input id="bankWithdrawInput" type="number" min="0" />
+        <button onclick="handleWithdraw()">Withdraw</button>
+
+        <h3>Take a Loan</h3>
+        <input id="loanAmountInput" type="number" min="0" />
+        <button onclick="handleTakeLoan()">Take Loan</button>
+
+        <h3>Active Loans</h3>
+        <div id="loanList"></div>
+      </div>
+    </div>
+
     <div id="siteManagementModal">
       <div id="siteManagementContent">
         <button class="close-report-btn" onclick="closeSiteManagement()">Back</button>
