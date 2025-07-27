@@ -892,17 +892,19 @@ function startOffloading(vessel, market){
   vessel.unloading = true;
   vessel.offloadRevenue = 0;
   vessel.offloadMarket = market.name;
-  // offloadPrices may be pre-set when the market was chosen. If not, lock prices now.
-  if(!vessel.offloadPrices){
-    vessel.offloadPrices = {};
-    const speciesSet = new Set();
-    vessel.fishBuffer.forEach(f=> speciesSet.add(f.species || vessel.cargoSpecies));
-    speciesSet.forEach(sp=>{
-      const base = speciesData[sp]?.marketPrice || 0;
-      const mod = market.modifiers[sp] || 1;
-      vessel.offloadPrices[sp] = base * mod;
-    });
-  }
+  vessel.fishBuffer.forEach(fish => {
+    if(fish.salePrice === undefined){
+      const sp = fish.species || vessel.cargoSpecies;
+      const mp = market.prices?.[sp];
+      if(mp !== undefined){
+        fish.salePrice = mp;
+      } else {
+        const base = speciesData[sp]?.marketPrice || 0;
+        const mod  = market.modifiers[sp] || 1;
+        fish.salePrice = base * mod;
+      }
+    }
+  });
   const rate = state.OFFLOAD_RATE;
   const updateEta = ()=>{ vessel.actionEndsAt = Date.now() + (vessel.currentBiomassLoad / rate) * 1000; };
   updateEta();
@@ -916,7 +918,7 @@ function startOffloading(vessel, market){
     while(remaining > 0 && vessel.currentBiomassLoad > 0 && vessel.fishBuffer.length > 0){
       const fish = vessel.fishBuffer[0];
       const sp = fish.species || vessel.cargoSpecies;
-      const price = vessel.offloadPrices[sp] || 0;
+      const price = fish.salePrice || 0;
       if(fish.weight <= remaining){
         remaining -= fish.weight;
         vessel.currentBiomassLoad -= fish.weight;
@@ -946,10 +948,8 @@ function finishOffloading(vessel, market, canceled=false){
   vessel.unloading = false;
   vessel.actionEndsAt = 0;
   let earned = vessel.offloadRevenue || 0;
-  const prices = vessel.offloadPrices || {};
   state.cash += earned;
   vessel.offloadRevenue = 0;
-  vessel.offloadPrices = null;
   vessel.offloadMarket = null;
   if(!canceled){
     vessel.fishBuffer = [];
@@ -957,7 +957,7 @@ function finishOffloading(vessel, market, canceled=false){
     vessel.cargoSpecies = null;
     vessel.cargo = {};
     if(market && market.daysSinceSale){
-      for(const sp in prices){ market.daysSinceSale[sp] = 0; }
+      // daysSinceSale already updated during offload
     }
   }
   const msg = canceled ? `Offloading canceled. Earned $${earned.toFixed(2)} so far.` :
@@ -975,16 +975,7 @@ function sellCargo(idx){
     closeSellModal();
     return openModal('Vessel already en route to this market.');
   }
-  // lock in prices when the market is chosen
-  vessel.offloadPrices = {};
   vessel.offloadMarket = market.name;
-  const speciesSet = new Set();
-  vessel.fishBuffer.forEach(f=> speciesSet.add(f.species || vessel.cargoSpecies));
-  speciesSet.forEach(sp=>{
-    const base = speciesData[sp]?.marketPrice || 0;
-    const mod = market.modifiers[sp] || 1;
-    vessel.offloadPrices[sp] = base * mod;
-  });
   vessel.offloadRevenue = 0;
   const begin = ()=>{ startOffloading(vessel, market); updateDisplay(); };
   if(vessel.location === market.name){
