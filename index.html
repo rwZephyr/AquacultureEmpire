@@ -57,86 +57,99 @@
           </div>
         </div>
       </div>
+      <div id="quickStatusBar">
+        <div id="feedStatusIcon" class="status-icon" onclick="toggleStatusPanel('feed')">
+          <img src="assets/general-icons/bulkbag.png" alt="Feed">
+          <div class="status-label">Feed</div>
+          <div class="status-badge" id="feedStatusBadge">0/0kg</div>
+        </div>
+        <div id="bargeStatusIcon" class="status-icon" onclick="toggleStatusPanel('barge')">
+          <img src="assets/general-icons/cagesystem.png" alt="Barge">
+          <div class="status-label">Barge</div>
+          <div class="status-badge" id="bargeStatusBadge"></div>
+        </div>
+        <div id="staffStatusIcon" class="status-icon" onclick="toggleStatusPanel('staff')">
+          <img src="assets/general-icons/bulkbag.png" alt="Staff">
+          <div class="status-label">Staff</div>
+          <div class="status-badge" id="staffStatusBadge"></div>
+        </div>
+      </div>
     </div>
     </div>
   </header>
 
-  <main id="mainLayout">
-      <aside id="rightSidebar">
-        <!-- Status cards -->
-        <div id="cardContainer" class="cardContainer">
-          <div id="feedOverviewCard" class="logisticsCard">
-            <h2>Feed Management</h2>
-            <div class="progressBar"><div id="feedProgress" class="progress"></div></div>
-            <div><span id="totalFeed">0</span> / <span id="totalFeedCapacity">0</span> kg</div>
-            <div id="feedPurchaseSection" class="feed-purchase">
-              <div class="feed-purchase-row">
-                <input type="range" id="feedPurchaseSlider" min="0" value="0" step="1" oninput="syncFeedPurchase('slider')">
-                <input type="number" id="feedPurchaseInput" min="0" value="0" step="1" oninput="syncFeedPurchase('input')">
-              </div>
-              <div id="feedPurchaseCost">Cost: $0.00</div>
-              <div class="feed-purchase-buttons">
-                <button onclick="confirmBuyFeed()">Buy</button>
-                <button onclick="setFeedPurchaseMax()">Buy Max</button>
-              </div>
-            </div>
-          </div>
-          <div id="bargeCard" class="bargeCard">
-            <h2>Barge Status</h2>
-            <div>
-              <button class="staff-button" onclick="previousBarge()">⟵</button>
-              Barge <span id="bargeIndex">1</span>/<span id="bargeCount">1</span>
-              <button class="staff-button" onclick="nextBarge()">⟶</button>
-            </div>
-            <div>Feeders: <span id="bargeFeedersUsed">0</span>/<span id="bargeFeederLimit">0</span> (Max Tier <span id="bargeMaxFeederTier">0</span>)</div>
-            <div>Feed: <span id="bargeFeed">0</span> / <span id="bargeFeedCapacity">0</span> kg</div>
-            <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
-            <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
-            <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
-            <div id="bargeHousingInfo"></div>
-            <button class="staff-button" onclick="openBargeUpgradeModal()">Barge Upgrades</button>
-          </div>
-          <div id="staffCard" class="staffCard">
-            <h2>Staffing</h2>
-            <div class="staff-stats">
-              <img src="assets/general-icons/farmer.png" alt="Staff icon" class="staff-icon">
-              <div class="staff-info">
-                <div>Total: <span id="staffTotal">0</span> / <span id="staffCapacity">0</span></div>
-                <div>Unassigned: <span id="staffUnassigned">0</span></div>
-              </div>
-            </div>
-            <div class="staff-buttons">
-              <button class="staff-button" onclick="hireStaff()">&#x2795; Hire ($500)</button>
-              <button class="staff-button" onclick="fireStaff()">&#x1f5d1; Fire</button>
-            </div>
-            <div class="staff-role">
-              <span>Feeders:</span>
-              <div class="role-controls">
-                <button class="staff-button" onclick="unassignStaff('feeder')" aria-label="Remove feeder">&#x2212;</button>
-                <span id="staffFeeders">0</span>
-                <button class="staff-button" onclick="assignStaff('feeder')" aria-label="Add feeder">&#x2b;</button>
-              </div>
-            </div>
-            <div class="staff-role">
-              <span>Harvesters:</span>
-              <div class="role-controls">
-                <button class="staff-button" onclick="unassignStaff('harvester')" aria-label="Remove harvester">&#x2212;</button>
-                <span id="staffHarvesters">0</span>
-                <button class="staff-button" onclick="assignStaff('harvester')" aria-label="Add harvester">&#x2b;</button>
-              </div>
-            </div>
-            <div class="staff-role">
-              <span>Feed Managers:</span>
-              <div class="role-controls">
-                <button class="staff-button" onclick="unassignStaff('feedManager')" aria-label="Remove feed manager">&#x2212;</button>
-                <span id="staffManagers">0</span>
-                <button class="staff-button" onclick="assignStaff('feedManager')" aria-label="Add feed manager">&#x2b;</button>
-              </div>
-            </div>
-          </div>
-        </div>
+  <div id="feedPanel" class="status-panel">
+    <h2>Feed Management</h2>
+    <div class="progressBar"><div id="feedProgress" class="progress"></div></div>
+    <div><span id="totalFeed">0</span> / <span id="totalFeedCapacity">0</span> kg</div>
+    <div id="feedPurchaseSection" class="feed-purchase">
+      <div class="feed-purchase-row">
+        <input type="range" id="feedPurchaseSlider" min="0" value="0" step="1" oninput="syncFeedPurchase('slider')">
+        <input type="number" id="feedPurchaseInput" min="0" value="0" step="1" oninput="syncFeedPurchase('input')">
+      </div>
+      <div id="feedPurchaseCost">Cost: $0.00</div>
+      <div class="feed-purchase-buttons">
+        <button onclick="confirmBuyFeed()">Buy</button>
+        <button onclick="setFeedPurchaseMax()">Buy Max</button>
+      </div>
+    </div>
+  </div>
 
-    </aside>
+  <div id="bargePanel" class="status-panel">
+    <h2>Barge Management</h2>
+    <div>
+      <button class="staff-button" onclick="previousBarge()">⟵</button>
+      Barge <span id="bargeIndex">1</span>/<span id="bargeCount">1</span>
+      <button class="staff-button" onclick="nextBarge()">⟶</button>
+    </div>
+    <div>Feeders: <span id="bargeFeedersUsed">0</span>/<span id="bargeFeederLimit">0</span> (Max Tier <span id="bargeMaxFeederTier">0</span>)</div>
+    <div>Feed: <span id="bargeFeed">0</span> / <span id="bargeFeedCapacity">0</span> kg</div>
+    <div>Silo Capacity: <span id="bargeSiloCapacity">0</span> kg</div>
+    <div>Staff: <span id="bargeStaffCount">0</span> / <span id="bargeStaffCapacity">0</span></div>
+    <div>Unassigned: <span id="bargeStaffUnassigned">0</span></div>
+    <div id="bargeHousingInfo"></div>
+    <button class="staff-button" onclick="openBargeUpgradeModal()">Barge Upgrades</button>
+  </div>
+
+  <div id="staffPanel" class="status-panel">
+    <h2>Staffing</h2>
+    <div class="staff-stats">
+      <div class="staff-info">
+        <div>Total: <span id="staffTotal">0</span> / <span id="staffCapacity">0</span></div>
+        <div>Unassigned: <span id="staffUnassigned">0</span></div>
+      </div>
+    </div>
+    <div class="staff-buttons">
+      <button class="staff-button" onclick="hireStaff()">&#x2795; Hire ($500)</button>
+      <button class="staff-button" onclick="fireStaff()">&#x1f5d1; Fire</button>
+    </div>
+    <div class="staff-role">
+      <span>Feeders:</span>
+      <div class="role-controls">
+        <button class="staff-button" onclick="unassignStaff('feeder')" aria-label="Remove feeder">&#x2212;</button>
+        <span id="staffFeeders">0</span>
+        <button class="staff-button" onclick="assignStaff('feeder')" aria-label="Add feeder">&#x2b;</button>
+      </div>
+    </div>
+    <div class="staff-role">
+      <span>Harvesters:</span>
+      <div class="role-controls">
+        <button class="staff-button" onclick="unassignStaff('harvester')" aria-label="Remove harvester">&#x2212;</button>
+        <span id="staffHarvesters">0</span>
+        <button class="staff-button" onclick="assignStaff('harvester')" aria-label="Add harvester">&#x2b;</button>
+      </div>
+    </div>
+    <div class="staff-role">
+      <span>Feed Managers:</span>
+      <div class="role-controls">
+        <button class="staff-button" onclick="unassignStaff('feedManager')" aria-label="Remove feed manager">&#x2212;</button>
+        <span id="staffManagers">0</span>
+        <button class="staff-button" onclick="assignStaff('feedManager')" aria-label="Add feed manager">&#x2b;</button>
+      </div>
+    </div>
+  </div>
+
+  <main id="mainLayout">
     <section id="pensSection">
      
     <!-- Pen grid -->

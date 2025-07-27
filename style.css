@@ -1417,6 +1417,80 @@ html.modal-open {
   color: var(--bg-darker);
 }
 
+/* Quick Status Bar */
+#quickStatusBar {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.status-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--bg-button);
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 0 4px var(--shadow-light);
+  transition: box-shadow 0.2s ease;
+}
+
+.status-icon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  margin-bottom: 2px;
+}
+
+.status-label {
+  font-size: 12px;
+}
+
+.status-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: var(--accent);
+  color: var(--text-dark);
+  border-radius: 10px;
+  padding: 1px 4px;
+  font-size: 10px;
+}
+
+.status-badge.alert {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.status-icon.active {
+  box-shadow: 0 0 8px var(--accent);
+}
+
+.status-panel {
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--bg-panel);
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 0 8px var(--shadow-medium);
+  margin-top: 10px;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.status-panel.visible {
+  max-height: 1000px;
+  opacity: 1;
+}
+
 
 /* Mobile sidebar behavior */
 @media (max-width: 700px) {

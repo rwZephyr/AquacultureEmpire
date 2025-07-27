@@ -215,6 +215,21 @@ function updateDisplay(){
   if(totalFeedEl) totalFeedEl.innerText = totalFeed.toFixed(1);
   const totalFeedCapEl = document.getElementById('totalFeedCapacity');
   if(totalFeedCapEl) totalFeedCapEl.innerText = totalFeedCap;
+  const feedBadge = document.getElementById('feedStatusBadge');
+  if(feedBadge) feedBadge.textContent = `${totalFeed.toFixed(0)}/${totalFeedCap}kg`;
+  const bargeBadge = document.getElementById('bargeStatusBadge');
+  if(bargeBadge) bargeBadge.textContent = `${site.pens.filter(p=>p.feeder && p.bargeIndex===state.currentBargeIndex).length}/${barge.feederLimit}`;
+  const staffBadge = document.getElementById('staffStatusBadge');
+  const unassigned = site.staff.filter(s=>!s.role).length;
+  if(staffBadge){
+    if(unassigned>0){
+      staffBadge.textContent = `Idle:${unassigned}`;
+      staffBadge.classList.add('alert');
+    } else {
+      staffBadge.textContent = site.staff.length;
+      staffBadge.classList.remove('alert');
+    }
+  }
 
   // vessel grid
 
@@ -1640,6 +1655,27 @@ function populateSiteList(){
   });
 }
 
+function toggleStatusPanel(key){
+  const panels = { feed: 'feedPanel', barge: 'bargePanel', staff: 'staffPanel' };
+  const icons  = { feed: 'feedStatusIcon', barge: 'bargeStatusIcon', staff: 'staffStatusIcon' };
+  const panel = document.getElementById(panels[key]);
+  if(!panel) return;
+  const isVisible = panel.classList.contains('visible');
+  Object.values(panels).forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.classList.remove('visible');
+  });
+  Object.values(icons).forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.classList.remove('active');
+  });
+  if(!isVisible){
+    panel.classList.add('visible');
+    const icon = document.getElementById(icons[key]);
+    if(icon) icon.classList.add('active');
+  }
+}
+
 // --- PURCHASES & ACTIONS ---
 export {
   updateDisplay,
@@ -1700,5 +1736,6 @@ export {
   outsideBankActionHandler,
   selectSite,
   populateSiteList,
-  toggleLicenseList
+  toggleLicenseList,
+  toggleStatusPanel
 };
