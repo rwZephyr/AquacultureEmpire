@@ -268,9 +268,18 @@ export function renderContracts(){
   if(!container) return;
   container.innerHTML = '';
   const now = state.totalDaysElapsed;
-  contracts.forEach(c => {
+  const activeContracts = contracts.filter(c =>
+    c.status === 'active' && now <= c.startDay + c.durationDays
+  );
+  activeContracts.sort((a,b)=>{
+    const aEligible = getEligibleVessels(a).length>0;
+    const bEligible = getEligibleVessels(b).length>0;
+    if(aEligible && !bEligible) return -1;
+    if(!aEligible && bEligible) return 1;
+    return 0;
+  });
+  activeContracts.forEach(c => {
     const endDay = c.startDay + c.durationDays;
-    if(c.status !== 'active' || now > endDay) return;
     const row = document.createElement('div');
     row.className = 'contract-entry';
 
@@ -309,6 +318,7 @@ export function renderContracts(){
     btn.textContent = 'Deliver to Contract';
     const eligible = getEligibleVessels(c);
     if(eligible.length > 0){
+      row.classList.add('eligible');
       btn.onclick = ()=>openContractDeliveryModal(c.id);
     } else {
       btn.disabled = true;
