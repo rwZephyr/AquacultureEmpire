@@ -50,6 +50,18 @@
           </div>
         </div>
       </div>
+      <div class="top-bar-group" id="bankGroup">
+        <img src="assets/general-icons/bank.png" alt="Financials" class="icon-inline" />
+        <div class="mobile-action-wrapper" id="bankActionGroup">
+          <img id="bankActionToggle" src="assets/general-icons/bank.png"
+               alt="Bank" class="icon-button" onclick="toggleBankActions()" />
+          <div id="bankActionMenu" class="hidden">
+            <button onclick="openBank()">Bank</button>
+            <button onclick="openMarketReports()">Market Reports</button>
+            <button disabled>Fiscal Data (WIP)</button>
+          </div>
+        </div>
+      </div>
       <div id="mobileIconBar" class="icon-action-bar"></div>
     </div>
     </div>

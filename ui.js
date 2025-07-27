@@ -114,6 +114,41 @@ function outsideSiteActionHandler(e){
   }
 }
 
+function toggleBankActions(){
+  const menu = document.getElementById('bankActionMenu');
+  if(!menu) return;
+  if(menu.classList.contains('visible')){
+    menu.classList.remove('visible');
+    menu.classList.add('hidden');
+    document.removeEventListener('click', outsideBankActionHandler);
+  } else {
+    menu.classList.remove('hidden');
+    menu.classList.add('visible');
+    const otherMenus = [
+      document.getElementById('siteActionMenu'),
+      document.getElementById('mobileActionGroup')
+    ];
+    otherMenus.forEach(m=>{
+      if(m && m.classList.contains('visible')){
+        m.classList.remove('visible');
+        m.classList.add('hidden');
+      }
+    });
+    document.addEventListener('click', outsideBankActionHandler);
+  }
+}
+
+function outsideBankActionHandler(e){
+  const menu = document.getElementById('bankActionMenu');
+  const toggle = document.getElementById('bankActionToggle');
+  if(!menu || !toggle) return;
+  if(!menu.contains(e.target) && !toggle.contains(e.target)){
+    menu.classList.remove('visible');
+    menu.classList.add('hidden');
+    document.removeEventListener('click', outsideBankActionHandler);
+  }
+}
+
 // Track counts to avoid re-rendering lists every tick
 let lastSiteIndex = -1;
 let lastPenCount = 0;
@@ -1231,6 +1266,14 @@ function closeMarketReport(){
   document.documentElement.style.overflow = '';
 }
 
+function openBank(){
+  openModal('Bank feature not implemented yet.');
+}
+
+function openMarketReports(){
+  openMarketReport();
+}
+
 function openSiteManagement(){
   const modal = document.getElementById('siteManagementModal');
   const nameEl = document.getElementById('siteManagementSiteName');
@@ -1547,6 +1590,8 @@ export {
   updateCustomBuildStats,
   openMarketReport,
   closeMarketReport,
+  openBank,
+  openMarketReports,
   openSiteManagement,
   closeSiteManagement,
   updateSiteUpgrades,
@@ -1566,6 +1611,8 @@ export {
   outsideMobileActionHandler,
   toggleSiteActions,
   outsideSiteActionHandler,
+  toggleBankActions,
+  outsideBankActionHandler,
   selectSite,
   populateSiteList,
   toggleLicenseList
