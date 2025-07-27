@@ -1365,6 +1365,11 @@ html.modal-open {
   filter: drop-shadow(0 0 6px var(--accent)) brightness(1.3) invert(0.9);
   transform: scale(1.05);
 }
+
+/* Active state when menu toggles remain open */
+.icon-button.active {
+  filter: drop-shadow(0 0 8px var(--accent-translucent)) brightness(1.3) invert(0.9);
+}
 .icon-inline {
   width: 64px;
   height: 64px;
