@@ -1549,6 +1549,10 @@ button:active {
   margin-bottom: 6px;
   flex-wrap: wrap;
 }
+.contract-entry.eligible {
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 8px var(--accent-translucent);
+}
 .contract-species-icon {
   width: 48px;
   height: 48px;
