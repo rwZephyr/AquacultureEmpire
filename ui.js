@@ -68,13 +68,16 @@ document.addEventListener('click', evt => {
 
 function toggleMobileActions(){
   const group = document.getElementById('mobileActionGroup');
-  if(!group) return;
+  const toggle = document.getElementById('mobileActionToggle');
+  if(!group || !toggle) return;
   if(group.classList.contains('visible')){
     group.classList.remove('visible');
     group.classList.add('hidden');
+    toggle.classList.remove('active');
   } else {
     group.classList.remove('hidden');
     group.classList.add('visible');
+    toggle.classList.add('active');
   }
 }
 
@@ -86,6 +89,7 @@ function outsideMobileActionHandler(evt){
      !group.contains(evt.target) && !toggle.contains(evt.target)){
     group.classList.remove('visible');
     group.classList.add('hidden');
+    toggle.classList.remove('active');
   }
 }
 
@@ -93,13 +97,16 @@ document.addEventListener('click', outsideMobileActionHandler);
 
 function toggleSiteActions(){
   const menu = document.getElementById('siteActionMenu');
-  if(!menu) return;
+  const toggle = document.getElementById('siteActionToggle');
+  if(!menu || !toggle) return;
   if(menu.classList.contains('visible')){
     menu.classList.remove('visible');
     menu.classList.add('hidden');
+    toggle.classList.remove('active');
   } else {
     menu.classList.remove('hidden');
     menu.classList.add('visible');
+    toggle.classList.add('active');
     document.addEventListener('click', outsideSiteActionHandler);
   }
 }
@@ -111,20 +118,24 @@ function outsideSiteActionHandler(e){
   if(!menu.contains(e.target) && !toggle.contains(e.target)){
     menu.classList.remove('visible');
     menu.classList.add('hidden');
+    toggle.classList.remove('active');
     document.removeEventListener('click', outsideSiteActionHandler);
   }
 }
 
 function toggleBankActions(){
   const menu = document.getElementById('bankActionMenu');
-  if(!menu) return;
+  const toggle = document.getElementById('bankActionToggle');
+  if(!menu || !toggle) return;
   if(menu.classList.contains('visible')){
     menu.classList.remove('visible');
     menu.classList.add('hidden');
+    toggle.classList.remove('active');
     document.removeEventListener('click', outsideBankActionHandler);
   } else {
     menu.classList.remove('hidden');
     menu.classList.add('visible');
+    toggle.classList.add('active');
     const otherMenus = [
       document.getElementById('siteActionMenu'),
       document.getElementById('mobileActionGroup')
@@ -146,6 +157,7 @@ function outsideBankActionHandler(e){
   if(!menu.contains(e.target) && !toggle.contains(e.target)){
     menu.classList.remove('visible');
     menu.classList.add('hidden');
+    toggle.classList.remove('active');
     document.removeEventListener('click', outsideBankActionHandler);
   }
 }
