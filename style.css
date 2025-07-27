@@ -235,16 +235,15 @@ button:active {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   box-sizing: border-box;
   background: var(--bg-darker);
   color: var(--text-light);
-  overflow-y: auto;
-  overflow-x: hidden;
   padding: 20px;
   display: none;
-  z-index: 900;
+  z-index: 9999;
 }
 
 #modal.visible,
@@ -261,6 +260,13 @@ button:active {
 
 #shipyardModal.visible {
   display: block;
+}
+
+body.modal-open,
+html.modal-open {
+  overflow: hidden !important;
+  height: 100%;
+  touch-action: none;
 }
 
 #modalContent,
@@ -382,10 +388,12 @@ button:active {
 }
 
 #shipyardList {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
-  justify-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  max-width: 100%;
   margin-bottom: 20px;
 }
 
@@ -448,6 +456,10 @@ button:active {
   border: 2px solid #7a5547;
   background: #262a2e;
   filter: grayscale(0.2);
+  flex: 1 1 300px;
+  min-width: 280px;
+  max-width: 360px;
+  box-sizing: border-box;
 }
 
 .used-label {
