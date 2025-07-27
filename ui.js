@@ -35,10 +35,10 @@ const speciesColors = {
 };
 
 const vesselIcons = {
-  skiff: '🛶',
-  lobsterBoat: '⚓',
-  retiredTrawler: '🚢',
-  wellboat: '🚤'
+  skiff: 'assets/vessel-icons/skiff.png',
+  lobsterBoat: 'assets/vessel-icons/lobsterboat.png',
+  retiredTrawler: 'assets/vessel-icons/oldwellboat.png',
+  wellboat: 'assets/vessel-icons/modernwellboat.png'
 };
 
 // close site dropdown when clicking outside
@@ -435,6 +435,15 @@ function renderVesselGrid(){
   state.vessels.forEach((vessel, idx)=>{
     const clone = tmpl.content.cloneNode(true);
     const card = clone.querySelector('.vesselCard');
+    const iconCont = clone.querySelector('.vessel-icon');
+    const iconPath = vesselIcons[vessel.class];
+    if(iconCont){
+      if(iconPath){
+        iconCont.innerHTML = `<img src="${iconPath}" class="vessel-icon" alt="${vessel.class}">`;
+      } else {
+        iconCont.textContent = '🛥️';
+      }
+    }
     card.querySelector('.vessel-name .name-text').textContent = vessel.name;
     card.querySelector('.rename-icon').onclick = ()=>{ state.currentVesselIndex = idx; renameVessel(); };
     card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;
@@ -493,6 +502,15 @@ function updateVesselCards(){
   state.vessels.forEach((vessel, idx)=>{
     const card = grid.children[idx];
     if(!card) return;
+    const iconCont = card.querySelector('.vessel-icon');
+    const iconPath = vesselIcons[vessel.class];
+    if(iconCont){
+      if(iconPath){
+        iconCont.innerHTML = `<img src="${iconPath}" class="vessel-icon" alt="${vessel.class}">`;
+      } else {
+        iconCont.textContent = '🛥️';
+      }
+    }
     card.querySelector('.vessel-name').textContent = vessel.name;
     card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;
     card.querySelector('.vessel-location').textContent = vessel.location;
@@ -825,11 +843,13 @@ function openShipyard(){
     const row = document.createElement('div');
     row.className = 'shipyard-row shipyard-card used-vessel-card';
     if(v.conditionNote) row.title = v.conditionNote;
-    const icon = vesselIcons[v.class] || '🛥️';
+    const iconPath = vesselIcons[v.class];
+    const iconHTML = iconPath ?
+      `<img src="${iconPath}" class="vessel-icon-small" alt="${v.class}">` : '🛥️';
     row.innerHTML = `
       <div class="used-label">Used Vessel - ${v.conditionLabel}</div>
       <div class="vessel-name">${v.name}</div>
-      <div class="vessel-class">${icon} ${vesselClasses[v.class].name}</div>
+      <div class="vessel-class">${iconHTML} ${vesselClasses[v.class].name}</div>
       <div class="shipyard-stat"><span>Capacity</span><span>${v.cargoCapacity} kg</span></div>
       <div class="shipyard-stat"><span>Speed</span><span>${v.speed}</span></div>
       <div class="shipyard-stat"><span>Slots</span><span>${v.upgradeSlots}</span></div>
@@ -905,8 +925,15 @@ function updateCustomBuildStats(){
     <div class="shipyard-stat"><span>Capacity</span><span>${data.baseCapacity} kg</span></div>
     <div class="shipyard-stat"><span>Speed</span><span>${data.baseSpeed}</span></div>
     <div class="shipyard-stat"><span>Slots</span><span>${data.slots}</span></div>`;
-  const icon = vesselIcons[cls] || '';
-  document.getElementById('classIconPreview').textContent = icon;
+  const iconPath = vesselIcons[cls];
+  const iconEl = document.getElementById('classIconPreview');
+  if(iconEl){
+    if(iconPath){
+      iconEl.innerHTML = `<img src="${iconPath}" class="build-icon" alt="${cls}">`;
+    } else {
+      iconEl.textContent = '🛥️';
+    }
+  }
   const msgEl = document.getElementById('buildLockMessage');
   const req = vesselUnlockDays[cls] || 0;
   if(state.totalDaysElapsed < req && cls !== 'skiff'){
