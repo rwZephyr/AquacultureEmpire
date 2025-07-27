@@ -1051,7 +1051,7 @@ function loadGame() {
         Object.defineProperty(v, 'harvestTimeout', { value: null, writable: true, enumerable: false });
         Object.defineProperty(v, 'harvestProgress', { value: 0, writable: true, enumerable: false });
         Object.defineProperty(v, 'harvestFishBuffer', { value: 0, writable: true, enumerable: false });
-        Object.defineProperty(v, 'fishBuffer', { value: [], writable: true, enumerable: false });
+        if(!v.fishBuffer) v.fishBuffer = [];
         Object.defineProperty(v, 'harvestingPenIndex', { value: null, writable: true, enumerable: false });
         Object.defineProperty(v, 'travelInterval', { value: null, writable: true, enumerable: false });
         Object.defineProperty(v, 'offloadInterval', { value: null, writable: true, enumerable: false });
