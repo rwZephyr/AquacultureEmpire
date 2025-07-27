@@ -335,9 +335,18 @@ function estimateSellPrice(vessel, market){
   if(vessel.fishBuffer){
     vessel.fishBuffer.forEach(fish=>{
       const sp = fish.species || vessel.cargoSpecies;
-      const base = speciesData[sp]?.marketPrice || 0;
-      const mod = market.modifiers[sp] || 1;
-      total += fish.weight * base * mod;
+      let price = fish.salePrice;
+      if(price === undefined){
+        const marketPrice = market.prices?.[sp];
+        if(marketPrice !== undefined){
+          price = marketPrice;
+        } else {
+          const base = speciesData[sp]?.marketPrice || 0;
+          const mod = market.modifiers[sp] || 1;
+          price = base * mod;
+        }
+      }
+      total += fish.weight * price;
     });
   }
   return total;
