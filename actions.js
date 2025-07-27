@@ -16,6 +16,7 @@ import {
   markets,
   vesselClasses,
   vesselUnlockDays,
+  VESSEL_RENAME_FEE,
   CUSTOM_BUILD_MARKUP
 } from "./data.js";
 import { Site, Barge, Pen, Vessel } from "./models.js";
@@ -299,6 +300,9 @@ function buyNewVessel(){
 
 function renameVessel(){
   const vessel = state.vessels[state.currentVesselIndex];
+  if(!vessel) return;
+  if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+    return openModal('Vessel currently busy.');
   const input = document.getElementById('renameInput');
   if(input){
     input.value = vessel.name;
@@ -311,14 +315,19 @@ function closeRenameModal(){
 }
 
 function confirmRename(){
+  const vessel = state.vessels[state.currentVesselIndex];
+  if(!vessel) return closeRenameModal();
+  if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+    return openModal('Vessel currently busy.');
   const input = document.getElementById('renameInput');
   const newName = input.value.trim();
-  if(newName){
-    const vessel = state.vessels[state.currentVesselIndex];
-    vessel.name = newName;
-  }
+  if(!newName) return closeRenameModal();
+  if(state.cash < VESSEL_RENAME_FEE) return openModal('Insufficient funds');
+  state.cash -= VESSEL_RENAME_FEE;
+  vessel.name = newName;
   closeRenameModal();
   updateDisplay();
+  openModal(`A Vessel Registry Update Fee of $${VESSEL_RENAME_FEE} has been applied for renaming.`);
 }
 
 function openMoveVesselModal(){
