@@ -65,6 +65,14 @@ const state = {
   contractsCompletedByTier: {},
   unlockedContractTiers: [0],
 
+  // --- Banking System ---
+  bank: {
+    deposit: 0,
+    depositInterestRate: 0.02,
+    loans: [],
+    nextLoanId: 1,
+  },
+
 };
 
 // initialize contracts module with state reference
@@ -160,6 +168,16 @@ function advanceDay() {
       state.year++;
     }
   }
+
+  // --- Bank System Interest ---
+  if (state.bank.deposit > 0) {
+    state.bank.deposit += state.bank.deposit * state.bank.depositInterestRate;
+  }
+  state.bank.loans.forEach(loan => {
+    loan.remaining += loan.remaining * loan.interestRate;
+    loan.daysActive++;
+  });
+
   updateMarketPrices();
   checkContractExpirations();
   generateDailyContracts();
