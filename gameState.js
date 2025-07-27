@@ -288,13 +288,22 @@ function generateShipyardInventory(){
     const base = vesselClasses[cls];
     const capacity = Math.round(base.baseCapacity * (0.9 + Math.random()*0.2));
     const speed = +(base.baseSpeed * (0.9 + Math.random()*0.2)).toFixed(1);
+    const conditionLabels = ['Well-Used','Overhauled','Retrofit'];
+    const label = conditionLabels[Math.floor(Math.random()*conditionLabels.length)];
+    const notes = {
+      'Well-Used': 'Serviceable with some wear',
+      'Overhauled': 'Refitted two seasons ago',
+      'Retrofit': 'Upgraded from older model'
+    };
     state.shipyardInventory.push({
       class: cls,
       name: generateRandomVesselName(),
       cargoCapacity: capacity,
       speed: speed,
       upgradeSlots: base.slots,
-      cost: base.cost
+      cost: base.cost,
+      conditionLabel: label,
+      conditionNote: notes[label]
     });
   }
 }
