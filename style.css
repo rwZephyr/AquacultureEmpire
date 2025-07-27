@@ -294,8 +294,57 @@ button:active {
 }
 
 #shipyardModalContent {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
+}
+
+.shipyard-panels {
+  display: flex;
+  gap: 20px;
+}
+
+#usedVesselsPanel,
+#customBuildPanel {
+  flex: 1;
+  min-width: 0;
+}
+
+#shipyardToggleButtons {
+  display: none;
+  margin-bottom: 10px;
+  gap: 10px;
+  justify-content: center;
+}
+
+#shipyardToggleButtons button {
+  background: var(--bg-button);
+  color: var(--text-light);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+#shipyardToggleButtons button.active {
+  background-color: var(--accent);
+  color: var(--text-dark);
+}
+
+@media (max-width: 700px) {
+  .shipyard-panels {
+    flex-direction: column;
+  }
+  #shipyardToggleButtons {
+    display: flex;
+  }
+  #usedVesselsPanel,
+  #customBuildPanel {
+    display: none;
+  }
+  #usedVesselsPanel.active,
+  #customBuildPanel.active {
+    display: block;
+  }
 }
 
 #logbookModal {
@@ -411,7 +460,6 @@ button:active {
   background: var(--bg-panel);
   border-radius: 10px;
   box-shadow: 0 0 4px var(--shadow-light);
-  display: none;
   border-top: 1px solid var(--bg-button);
 }
 

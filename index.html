@@ -329,23 +329,27 @@
       <div id="shipyardModalContent">
         <button class="close-shipyard-btn" onclick="closeShipyard()">Back</button>
         <h2>Shipyard</h2>
-        <div id="shipyardList" class="shipyard-list"></div>
-        <button id="openCustomBuildBtn" class="shipyard-main-btn" onclick="openCustomBuild()">Custom Build</button>
-        <div id="customBuildPage" class="custom-build-page shipyard-card" style="display:none">
-          <button class="close-shipyard-btn" onclick="backToShipyardList()">Back</button>
-          <h3>Custom Build</h3>
-          <div>
-            <label for="buildClassSelect">Class:</label>
-            <select id="buildClassSelect" onchange="updateCustomBuildStats()"></select>
+        <div id="shipyardToggleButtons"></div>
+        <div class="shipyard-panels">
+          <div id="usedVesselsPanel">
+            <h3>Used Vessels</h3>
+            <div id="shipyardList" class="shipyard-list"></div>
           </div>
-          <div id="buildStats"></div>
-          <div>
-            <label for="buildNameInput">Name:</label>
-            <input type="text" id="buildNameInput">
+          <div id="customBuildPanel" class="custom-build-page shipyard-card">
+            <h3>Custom Build</h3>
+            <div>
+              <label for="buildClassSelect">Class:</label>
+              <select id="buildClassSelect" onchange="updateCustomBuildStats()"></select>
+            </div>
+            <div id="buildStats"></div>
+            <div>
+              <label for="buildNameInput">Name:</label>
+              <input type="text" id="buildNameInput">
+            </div>
+            <div>Cost: $<span id="buildCost"></span></div>
+            <div id="buildLockMessage" class="lock-message" style="display:none"></div>
+            <button onclick="confirmCustomBuild()">Purchase</button>
           </div>
-          <div>Cost: $<span id="buildCost"></span></div>
-          <div id="buildLockMessage" class="lock-message" style="display:none"></div>
-          <button onclick="confirmCustomBuild()">Purchase</button>
         </div>
       </div>
     </div>
