@@ -839,12 +839,25 @@ function openShipyard(){
     row.appendChild(btn);
     list.appendChild(row);
   });
-  document.getElementById('customBuildPage').style.display = 'none';
-  document.getElementById('shipyardList').style.display = 'block';
-  document.getElementById('openCustomBuildBtn').style.display = 'block';
+  prepareCustomBuildPanel();
+  const toggles = document.getElementById('shipyardToggleButtons');
+  toggles.innerHTML = `
+    <button id="toggleUsedBtn" onclick="backToShipyardList()">Used</button>
+    <button id="toggleBuildBtn" onclick="openCustomBuild()">Custom Build</button>
+  `;
+  backToShipyardList();
   document.getElementById('shipyardModal').classList.add('visible');
   document.body.style.overflow = 'hidden';
   document.documentElement.style.overflow = 'hidden';
+}
+
+function prepareCustomBuildPanel(){
+  const select = document.getElementById('buildClassSelect');
+  select.innerHTML = Object.entries(vesselClasses)
+    .map(([cls,data])=>`<option value="${cls}">${data.name}</option>`).join('');
+  select.value = Object.keys(vesselClasses)[0];
+  document.getElementById('buildNameInput').value = '';
+  updateCustomBuildStats();
 }
 function closeShipyard(){
   document.getElementById('shipyardModal').classList.remove('visible');
@@ -853,21 +866,26 @@ function closeShipyard(){
 }
 
 function openCustomBuild(){
-  const select = document.getElementById('buildClassSelect');
-  select.innerHTML = Object.entries(vesselClasses)
-    .map(([cls,data])=>`<option value="${cls}">${data.name}</option>`).join('');
-  select.value = Object.keys(vesselClasses)[0];
-  document.getElementById('buildNameInput').value = '';
-  updateCustomBuildStats();
-  document.getElementById('shipyardList').style.display = 'none';
-  document.getElementById('openCustomBuildBtn').style.display = 'none';
-  document.getElementById('customBuildPage').style.display = 'block';
+  prepareCustomBuildPanel();
+  document.getElementById('customBuildPanel').classList.add('active');
+  document.getElementById('usedVesselsPanel').classList.remove('active');
+  const usedBtn = document.getElementById('toggleUsedBtn');
+  const buildBtn = document.getElementById('toggleBuildBtn');
+  if(usedBtn && buildBtn){
+    usedBtn.classList.remove('active');
+    buildBtn.classList.add('active');
+  }
 }
 
 function backToShipyardList(){
-  document.getElementById('customBuildPage').style.display = 'none';
-  document.getElementById('shipyardList').style.display = 'block';
-  document.getElementById('openCustomBuildBtn').style.display = 'block';
+  document.getElementById('customBuildPanel').classList.remove('active');
+  document.getElementById('usedVesselsPanel').classList.add('active');
+  const usedBtn = document.getElementById('toggleUsedBtn');
+  const buildBtn = document.getElementById('toggleBuildBtn');
+  if(usedBtn && buildBtn){
+    usedBtn.classList.add('active');
+    buildBtn.classList.remove('active');
+  }
 }
 
 function updateCustomBuildStats(){
