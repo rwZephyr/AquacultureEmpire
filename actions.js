@@ -409,11 +409,20 @@ function buyShipyardVessel(idx){
 
 function confirmCustomBuild(){
   const cls = document.getElementById('buildClassSelect').value;
-  const name = document.getElementById('buildNameInput').value.trim();
-  if(!name) return openModal('Enter a vessel name.');
+  const input = document.getElementById('buildNameInput');
+  const name = input.value.trim();
+  if(!name){
+    input.classList.add('input-error');
+    input.title = 'Enter a vessel name';
+    return openModal('Enter a vessel name.');
+  }
   if(state.vessels.some(v=>v.name.toLowerCase()===name.toLowerCase())){
+    input.classList.add('input-error');
+    input.title = 'Name already exists';
     return openModal('A vessel with that name already exists.');
   }
+  input.classList.remove('input-error');
+  input.title = '';
   const req = vesselUnlockDays[cls] || 0;
   if(state.totalDaysElapsed < req && cls !== 'skiff'){
     return openModal('This vessel class is not unlocked yet.');

@@ -858,7 +858,12 @@ function prepareCustomBuildPanel(){
   select.innerHTML = Object.entries(vesselClasses)
     .map(([cls,data])=>`<option value="${cls}">${data.name}</option>`).join('');
   select.value = Object.keys(vesselClasses)[0];
-  document.getElementById('buildNameInput').value = '';
+  const nameInput = document.getElementById('buildNameInput');
+  nameInput.value = '';
+  nameInput.classList.remove('input-error');
+  nameInput.title = '';
+  nameInput.removeEventListener('input', validateBuildName);
+  nameInput.addEventListener('input', validateBuildName);
   updateCustomBuildStats();
 }
 function closeShipyard(){
@@ -894,9 +899,14 @@ function updateCustomBuildStats(){
   const cls = document.getElementById('buildClassSelect').value;
   const data = vesselClasses[cls];
   const cost = Math.round(data.cost * CUSTOM_BUILD_MARKUP);
-  document.getElementById('buildCost').innerText = cost;
-  document.getElementById('buildStats').innerText =
-    `Cap ${data.baseCapacity}kg | Speed ${data.baseSpeed} | Slots ${data.slots}`;
+  const costRow = document.getElementById('buildCostRow');
+  costRow.innerHTML = `<span>Cost</span><span>$${cost}</span>`;
+  document.getElementById('buildStats').innerHTML = `
+    <div class="shipyard-stat"><span>Capacity</span><span>${data.baseCapacity} kg</span></div>
+    <div class="shipyard-stat"><span>Speed</span><span>${data.baseSpeed}</span></div>
+    <div class="shipyard-stat"><span>Slots</span><span>${data.slots}</span></div>`;
+  const icon = vesselIcons[cls] || '';
+  document.getElementById('classIconPreview').textContent = icon;
   const msgEl = document.getElementById('buildLockMessage');
   const req = vesselUnlockDays[cls] || 0;
   if(state.totalDaysElapsed < req && cls !== 'skiff'){
@@ -905,6 +915,23 @@ function updateCustomBuildStats(){
   } else {
     msgEl.style.display = 'none';
     msgEl.innerText = '';
+  }
+}
+
+function validateBuildName(){
+  const input = document.getElementById('buildNameInput');
+  const name = input.value.trim();
+  if(!name){
+    input.classList.remove('input-error');
+    input.title = '';
+    return;
+  }
+  if(state.vessels.some(v=>v.name.toLowerCase()===name.toLowerCase())){
+    input.classList.add('input-error');
+    input.title = 'Name already exists';
+  } else {
+    input.classList.remove('input-error');
+    input.title = '';
   }
 }
 
