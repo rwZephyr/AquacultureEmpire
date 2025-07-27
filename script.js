@@ -22,14 +22,18 @@ function reflowTopBar(){
   const siteActions = document.getElementById('siteActionGroup');
   const toolsGroup = document.getElementById('toolsGroup');
   const toolsActions = document.getElementById('toolsActionGroup');
+  const bankGroup = document.getElementById('bankGroup');
+  const bankActions = document.getElementById('bankActionGroup');
   const mobileBar = document.getElementById('mobileIconBar');
-  if(!siteGroup || !siteActions || !toolsGroup || !toolsActions || !mobileBar) return;
+  if(!siteGroup || !siteActions || !toolsGroup || !toolsActions || !bankGroup || !bankActions || !mobileBar) return;
   if(window.innerWidth <= mobileBreak){
     if(!mobileBar.contains(siteActions)) mobileBar.appendChild(siteActions);
     if(!mobileBar.contains(toolsActions)) mobileBar.appendChild(toolsActions);
+    if(!mobileBar.contains(bankActions)) mobileBar.appendChild(bankActions);
   } else {
     if(!siteGroup.contains(siteActions)) siteGroup.appendChild(siteActions);
     if(!toolsGroup.contains(toolsActions)) toolsGroup.appendChild(toolsActions);
+    if(!bankGroup.contains(bankActions)) bankGroup.appendChild(bankActions);
   }
 }
 

@@ -1296,6 +1296,24 @@ html.modal-open {
   z-index: 200;
 }
 
+#bankActionMenu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: var(--bg-panel);
+  box-shadow: 0 2px 6px var(--shadow-light);
+  border-radius: 6px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 200;
+}
+
 #mobileActionGroup.visible {
   opacity: 1;
   transform: translateY(0);
@@ -1303,6 +1321,12 @@ html.modal-open {
 }
 
 #siteActionMenu.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+#bankActionMenu.visible {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
@@ -1420,6 +1444,20 @@ html.modal-open {
     display: flex;
   }
   #siteActionMenu.hidden {
+    display: flex !important;
+  }
+  #bankActionToggle {
+    display: none;
+  }
+  #bankActionMenu {
+    position: static;
+    flex-direction: row;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    display: flex;
+  }
+  #bankActionMenu.hidden {
     display: flex !important;
   }
 }
