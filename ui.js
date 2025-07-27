@@ -1277,6 +1277,15 @@ function openBank(){
   }
 }
 
+function closeBank(){
+  const modal = document.getElementById('bankModal');
+  if(modal){
+    modal.classList.remove('visible');
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+  }
+}
+
 function handleDeposit() {
   const amount = parseFloat(document.getElementById('bankDepositInput').value);
   depositToBank(amount);
@@ -1650,6 +1659,7 @@ export {
   openMarketReport,
   closeMarketReport,
   openBank,
+  closeBank,
   handleDeposit,
   handleWithdraw,
   handleTakeLoan,
