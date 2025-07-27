@@ -823,9 +823,11 @@ function openShipyard(){
   list.innerHTML = '';
   state.shipyardInventory.forEach((v, idx)=>{
     const row = document.createElement('div');
-    row.className = 'shipyard-row shipyard-card';
+    row.className = 'shipyard-row shipyard-card used-vessel-card';
+    if(v.conditionNote) row.title = v.conditionNote;
     const icon = vesselIcons[v.class] || '🛥️';
     row.innerHTML = `
+      <div class="used-label">Used Vessel - ${v.conditionLabel}</div>
       <div class="vessel-name">${v.name}</div>
       <div class="vessel-class">${icon} ${vesselClasses[v.class].name}</div>
       <div class="shipyard-stat"><span>Capacity</span><span>${v.cargoCapacity} kg</span></div>

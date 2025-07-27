@@ -403,7 +403,8 @@ function buyShipyardVessel(idx){
   state.generateShipyardInventory();
   closeShipyard();
   updateDisplay();
-  openModal(`Purchased ${item.name}!`);
+  const msg = `You acquired a used vessel: ${item.name} (Condition: ${item.conditionLabel})`;
+  openModal(msg);
 }
 
 function confirmCustomBuild(){
