@@ -895,14 +895,19 @@ button:active {
 .vesselCard {
   background: var(--bg-panel);
   border-radius: 10px;
-  padding: 16px;
+  padding: 12px;
   margin: 0 0 16px;
   color: var(--text-light);
   box-shadow: 0 0 4px var(--shadow-light);
   max-width: 90vw;
-  flex: 1 1 250px;
+  flex: 1 1 200px;
   transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
 }
+.status-harvesting { border-left: 6px solid #2ecc71; }
+.status-idle { border-left: 6px solid #3498db; }
+.status-delivering { border-left: 6px solid #e67e22; }
+.status-docked { border-left: 6px solid #7f8c8d; }
 .vesselCard.placeholder { opacity: 0.6; }
 .staffCard {
   background: var(--bg-panel);
@@ -947,7 +952,7 @@ button:active {
 .progressBar {
   background: var(--bg-darker);
   border-radius: 6px;
-  height: 12px;
+  height: 16px;
   margin-bottom: 6px;
   overflow: hidden;
   position: relative;
@@ -981,6 +986,48 @@ button:active {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.vessel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.actions-toggle {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  font-size: 16px;
+}
+.action-menu {
+  position: absolute;
+  top: 28px;
+  right: 4px;
+  background: var(--bg-panel);
+  padding: 6px;
+  border-radius: 6px;
+  box-shadow: 0 0 4px var(--shadow-light);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 5;
+}
+.action-menu.hidden {
+  display: none;
+}
+.details-toggle {
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 12px;
+  margin-top: 4px;
+}
+.load-line {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.vessel-details.hidden {
+  display: none;
 }
 .rename-icon {
   cursor: pointer;

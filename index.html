@@ -166,24 +166,32 @@
     <div class="container">
       <div id="vesselGridContainer" class="vesselGrid">
       </div>
-      <template id="vesselCardTemplate">
-        <div class="vesselCard">
-          <div class="vessel-icon"></div>
-          <h3 class="vessel-name"><span class="name-text"></span><span class="rename-icon" title="Rename">&#9998;</span></h3>
-          <div class="stat">Tier: <span class="vessel-tier"></span></div>
-          <div class="stat">Location: <span class="vessel-location"></span></div>
-          <div class="stat">Status: <span class="vessel-status"></span></div>
-          <div class="stat harvest-species"></div>
-          <div class="progressBar"><div class="progress vessel-progress"></div></div>
-          <div class="stat"><span class="vessel-load"></span> / <span class="vessel-capacity"></span> kg</div>
-          <div class="stat fishbuffer-info"></div>
-          <button class="harvest-btn">Harvest</button>
-          <button class="move-btn">Move Vessel</button>
-          <button class="sell-btn">Sell Cargo</button>
-          <button class="upgrade-btn">Vessel Upgrades</button>
-          <button class="cancel-btn">Cancel</button>
-        </div>
-      </template>
+        <template id="vesselCardTemplate">
+          <div class="vesselCard compact">
+            <div class="vessel-header">
+              <div class="vessel-icon"></div>
+              <h3 class="vessel-name"><span class="name-text"></span><span class="rename-icon" title="Rename">&#9998;</span></h3>
+              <button class="actions-toggle" title="Actions">⚙</button>
+              <div class="action-menu hidden">
+                <button class="harvest-btn">Harvest</button>
+                <button class="move-btn">Move</button>
+                <button class="sell-btn">Sell</button>
+                <button class="upgrade-btn">Upgrade</button>
+                <button class="cancel-btn">Cancel</button>
+              </div>
+            </div>
+            <div class="stat status-line">Status: <span class="vessel-status"></span></div>
+            <div class="progressBar"><div class="progress vessel-progress"></div></div>
+            <div class="stat load-line"><span class="vessel-load"></span> / <span class="vessel-capacity"></span> kg (<span class="load-percent"></span>%)</div>
+            <div class="details-toggle">Details ⌄</div>
+            <div class="vessel-details hidden">
+              <div class="stat">Tier: <span class="vessel-tier"></span></div>
+              <div class="stat">Location: <span class="vessel-location"></span></div>
+              <div class="stat harvest-species"></div>
+              <div class="stat fishbuffer-info"></div>
+            </div>
+          </div>
+        </template>
     </div>
   </footer>
 
