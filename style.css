@@ -238,7 +238,9 @@ button:active {
   left: 0;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
   box-sizing: border-box;
   background: var(--bg-darker);
   color: var(--text-light);
@@ -316,6 +318,10 @@ html.modal-open {
 #customBuildPanel {
   flex: 1;
   min-width: 0;
+}
+
+#usedVesselsPanel {
+  overflow-y: auto;
 }
 
 #shipyardToggleButtons {
