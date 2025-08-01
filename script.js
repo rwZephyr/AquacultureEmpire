@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   actions.loadGame();
   initMilestones();
   ui.updateDisplay();
+  ui.setupStatusTooltips();
   ui.setupMapInteractions();
   if(state.lastOfflineInfo){
     const days = state.lastOfflineInfo.daysPassed;
