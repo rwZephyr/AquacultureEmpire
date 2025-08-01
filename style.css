@@ -925,6 +925,43 @@ html.modal-open {
   transition: transform 0.2s, box-shadow 0.2s;
   position: relative;
 }
+
+/* Status tooltip for quick icons */
+.status-tooltip {
+  position: fixed;
+  pointer-events: none;
+  background: var(--bg-darker);
+  color: var(--text-light);
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, -4px);
+  transition: opacity 0.15s ease;
+  z-index: 20;
+}
+
+.status-tooltip.visible {
+  opacity: 1;
+}
+
+.status-tooltip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--bg-darker);
+  top: 100%;
+}
+
+.status-tooltip.below::after {
+  border-top-color: transparent;
+  border-bottom-color: var(--bg-darker);
+  top: auto;
+  bottom: 100%;
+}
 .status-harvesting { border-left: 6px solid #2ecc71; }
 .status-idle { border-left: 6px solid #3498db; }
 .status-delivering { border-left: 6px solid #e67e22; }

@@ -755,6 +755,86 @@ function setupMapInteractions(){
   canvas.addEventListener('mouseleave', ()=>{ tooltip.style.display='none'; });
 }
 
+// tooltip for quick status icons
+function setupStatusTooltips(){
+  const tooltip = document.getElementById('statusTooltip');
+  if(!tooltip) return;
+
+  const getInfo = {
+    feedStatusIcon(){
+      const site = state.sites[state.currentSiteIndex];
+      const total = site.barges.reduce((t,b)=>t+b.feed,0);
+      const cap = site.barges.reduce((t,b)=>t+b.feedCapacity,0);
+      return total >= cap ? 'Feed silos full' : `Feed: ${total.toFixed(0)}/${cap} kg`;
+    },
+    bargeStatusIcon(){
+      const site = state.sites[state.currentSiteIndex];
+      const barge = site.barges[state.currentBargeIndex];
+      const feeders = site.pens.filter(p=>p.feeder && p.bargeIndex===state.currentBargeIndex).length;
+      return feeders >= barge.feederLimit ? 'Feeder capacity full' : `${feeders}/${barge.feederLimit} feeders in use`;
+    },
+    staffStatusIcon(){
+      const site = state.sites[state.currentSiteIndex];
+      const unassigned = site.staff.filter(s=>!s.role).length;
+      if(unassigned>0) return `${unassigned} unassigned workers`;
+      const cap = site.barges.reduce((t,b)=>t+b.staffCapacity,0);
+      return `${site.staff.length}/${cap} staff`;
+    }
+  };
+
+  const attach = id => {
+    const icon = document.getElementById(id);
+    if(!icon) return;
+    let pressTimer;
+    let autoHide;
+    const show = () => {
+      tooltip.textContent = getInfo[id]();
+      tooltip.classList.add('visible');
+      tooltip.classList.remove('below');
+      const rect = icon.getBoundingClientRect();
+      tooltip.style.left = `${rect.left + rect.width/2}px`;
+      tooltip.style.top = `${rect.top - 8}px`;
+      requestAnimationFrame(()=>{
+        const tRect = tooltip.getBoundingClientRect();
+        let top = rect.top - tRect.height - 8;
+        let below = false;
+        if(window.innerWidth <= 700){
+          top = rect.bottom + 8;
+          below = true;
+        }
+        if(top < 4){ top = rect.bottom + 8; below = true; }
+        if(top + tRect.height > window.innerHeight){ top = rect.top - tRect.height - 8; below = false; }
+        tooltip.style.top = `${top}px`;
+        if(below) tooltip.classList.add('below'); else tooltip.classList.remove('below');
+        const left = Math.min(window.innerWidth - tRect.width/2 - 4, Math.max(tRect.width/2 + 4, rect.left + rect.width/2));
+        tooltip.style.left = `${left}px`;
+      });
+    };
+    const hide = () => {
+      tooltip.classList.remove('visible');
+    };
+    icon.addEventListener('mouseenter', show);
+    icon.addEventListener('mouseleave', hide);
+    icon.addEventListener('focus', show);
+    icon.addEventListener('blur', hide);
+    icon.addEventListener('touchstart', () => {
+      pressTimer = setTimeout(()=>{ show(); autoHide=setTimeout(hide,1500); }, 500);
+    });
+    icon.addEventListener('touchend', () => {
+      clearTimeout(pressTimer);
+    });
+    icon.addEventListener('touchcancel', () => {
+      clearTimeout(pressTimer);
+      clearTimeout(autoHide);
+      hide();
+    });
+  };
+
+  ['feedStatusIcon','bargeStatusIcon','staffStatusIcon'].forEach(attach);
+  window.addEventListener('scroll', () => tooltip.classList.remove('visible'));
+  window.addEventListener('resize', () => tooltip.classList.remove('visible'));
+}
+
 // --- MODALS ---
 function openModal(msg){
   const bargeModal = document.getElementById('bargeUpgradeModal');
@@ -1685,6 +1765,7 @@ export {
   renderVesselGrid,
   renderMap,
   setupMapInteractions,
+  setupStatusTooltips,
   openModal,
   closeModal,
   openRestockModal,
