@@ -57,6 +57,9 @@ const state = {
   seasonIndex: 0,
   year: 1,
 
+  dev: false,
+  debugLog: [],
+
   statusMessage: '',
   lastOfflineInfo: null,
   isSimulatingOffline: false,
