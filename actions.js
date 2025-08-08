@@ -74,6 +74,24 @@ import {
   switchLogbookSection
 } from "./ui.js";
 
+function lockPen(pen, reason){
+  pen.locked = true;
+  pen.lastLockReason = reason;
+  pen.lockedAt = Date.now();
+  if(state.dev){
+    state.debugLog.push(`lock:${reason}`);
+  }
+}
+
+function unlockPen(pen, reason){
+  pen.locked = false;
+  pen.lastUnlockReason = reason;
+  pen.unlockedAt = Date.now();
+  if(state.dev){
+    state.debugLog.push(`unlock:${reason}`);
+  }
+}
+
 function buyFeed(amount=20){
   const site = state.sites[state.currentSiteIndex];
   const barge = site.barges[state.currentBargeIndex];
@@ -555,7 +573,7 @@ function harvestPen(amount=null){
   fishNum = Math.min(fishNum, pen.fishCount);
   const biomass = fishNum * pen.averageWeight;
   const performHarvest = ()=>{
-    pen.locked = true;
+    lockPen(pen, 'harvest:start');
     vessel.harvestingPenIndex = state.currentPenIndex;
     if(!vessel.cargoSpecies) vessel.cargoSpecies = pen.species;
     if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
@@ -608,7 +626,7 @@ function harvestPen(amount=null){
           }
         }
         vessel.harvestFishBuffer = 0;
-        pen.locked = false;
+        unlockPen(pen, 'harvest:end');
         vessel.harvestingPenIndex = null;
         vessel.location = site.name;
         vessel.isHarvesting = false;
@@ -661,7 +679,7 @@ function cancelVesselHarvest(idx){
   if(vessel.harvestingPenIndex !== null){
     const site = state.sites[state.currentSiteIndex];
     const pen = site.pens[vessel.harvestingPenIndex];
-    if(pen) pen.locked = false;
+    if(pen) unlockPen(pen, 'harvest:cancel');
     vessel.harvestingPenIndex = null;
   }
   openModal('Harvest cancelled.');
@@ -877,7 +895,8 @@ setInterval(()=>{
     site.barges.forEach((barge,bIdx)=>{
       let activeFeeders = 0;
       site.pens.forEach(pen=>{
-        if(pen.locked || pen.bargeIndex!==bIdx) return;
+        if(pen.locked) return; // skip growth while locked
+        if(pen.bargeIndex!==bIdx) return;
         let rate = staffRate;
         const feederRate = getFeederRate(pen.feeder);
         if(feederRate>0 && activeFeeders < barge.feederLimit){
@@ -963,7 +982,8 @@ function simulateOfflineProgress(ms){
       site.barges.forEach((barge, bIdx) => {
         let activeFeeders = 0;
         site.pens.forEach(pen => {
-          if(pen.locked || pen.bargeIndex !== bIdx) return;
+          if(pen.locked) return; // skip growth while locked
+          if(pen.bargeIndex !== bIdx) return;
           let rate = staffRate;
           const fr = getFeederRate(pen.feeder);
           if(fr > 0 && activeFeeders < barge.feederLimit){
@@ -1105,7 +1125,7 @@ function loadGame() {
       });
       state.sites.forEach(site => {
         site.pens.forEach(pen => {
-          if(pen.locked === undefined) pen.locked = false;
+          if(pen.locked === undefined) unlockPen(pen, 'init');
         });
         site.barges.forEach(barge => {
           if(barge.siloUpgradeLevel === undefined) barge.siloUpgradeLevel = 0;
@@ -1195,6 +1215,8 @@ export {
   hireStaff,
   fireStaff,
   assignStaff,
+  lockPen,
+  unlockPen,
   unassignStaff,
   upgradeSilo,
   upgradeBlower,

@@ -410,6 +410,13 @@ function renderPenGrid(site){
       badge.style.backgroundColor = 'rgba(0,0,0,0.2)';
     }
     card.appendChild(badge);
+
+    const lockBadge = document.createElement('div');
+    lockBadge.className = 'status-badge pen-locked';
+    lockBadge.title = 'Locked during harvest';
+    lockBadge.textContent = 'Locked';
+    if(!pen.locked) lockBadge.style.display = 'none';
+    card.appendChild(lockBadge);
     card.querySelector('.feed-btn').onclick = () => feedFishPen(idx);
     card.querySelector('.restock-btn').onclick = () => restockPenUI(idx);
     card.querySelector('.upgrade-btn').onclick = () => upgradeFeeder(idx);
@@ -453,6 +460,16 @@ function updatePenCards(site){
     } else {
       badge.style.backgroundColor = 'rgba(0,0,0,0.2)';
     }
+
+    let lockBadge = card.querySelector('.pen-locked');
+    if(!lockBadge){
+      lockBadge = document.createElement('div');
+      lockBadge.className = 'status-badge pen-locked';
+      lockBadge.title = 'Locked during harvest';
+      lockBadge.textContent = 'Locked';
+      card.appendChild(lockBadge);
+    }
+    lockBadge.style.display = pen.locked ? '' : 'none';
   });
 }
 
