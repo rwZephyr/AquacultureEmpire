@@ -560,18 +560,18 @@ function harvestPen(amount=null){
   if(vessel.currentBiomassLoad>0 && vessel.cargoSpecies && vessel.cargoSpecies !== pen.species){
     return openModal('Vessel already contains a different species.');
   }
+  const vesselRemaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
   const totalBiomass = pen.fishCount * pen.averageWeight;
-  const maxHarvest = Math.min(
-    totalBiomass,
-    vessel.maxBiomassCapacity - vessel.currentBiomassLoad
-  );
+  const maxHarvest = Math.min(totalBiomass, vesselRemaining);
   if(maxHarvest <= 0) return openModal("Vessel capacity full.");
   if(pen.locked) return openModal('Pen currently busy.');
-  let desired = amount === null ? maxHarvest : Math.max(0, Math.min(amount, maxHarvest));
-  let fishNum = Math.floor((desired + pen.averageWeight * 0.0001) / pen.averageWeight);
-  if(fishNum === 0 && desired > 0) fishNum = 1;
+  const requested = amount === null ? maxHarvest : Math.max(0, Math.min(amount, maxHarvest));
+  const avg = pen.averageWeight > 0 ? pen.averageWeight : 1;
+  let fishNum = Math.floor(requested / avg);
   fishNum = Math.min(fishNum, pen.fishCount);
-  const biomass = fishNum * pen.averageWeight;
+  fishNum = Math.min(fishNum, Math.floor(vesselRemaining / avg));
+  if(fishNum <= 0) return;
+  const biomass = fishNum * avg;
   const performHarvest = ()=>{
     lockPen(pen, 'harvest:start');
     vessel.harvestingPenIndex = state.currentPenIndex;
@@ -609,7 +609,6 @@ function harvestPen(amount=null){
         for(let i=0;i<remove;i++){
           vessel.fishBuffer.push({ species: pen.species, weight: lockedWeight });
         }
-        if(pen.fishCount<=0) pen.averageWeight = 0;
       }
       updateEta();
       if(vessel.harvestProgress >= biomass){
@@ -618,7 +617,6 @@ function harvestPen(amount=null){
         vessel.harvestProgress = 0;
         // ensure final fish count accounts for rounding
         pen.fishCount = Math.max(0, startFishCount - fishNum);
-        if(pen.fishCount === 0) pen.averageWeight = 0;
         const leftover = Math.round(vessel.harvestFishBuffer);
         if(leftover > 0){
           for(let i=0; i<leftover; i++){
