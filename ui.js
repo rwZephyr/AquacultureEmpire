@@ -929,11 +929,15 @@ function updateHarvestModal(){
   document.getElementById('harvestMax').innerText = maxHarvest.toFixed(2);
   const input = document.getElementById('harvestAmount');
   const requested = parseFloat(input.value) || 0;
-  const clamped = Math.max(0, Math.min(requested, maxHarvest));
+  const avg = pen.averageWeight > 0 ? pen.averageWeight : 1;
+  let fishToMove = Math.floor(requested / avg);
+  fishToMove = Math.min(fishToMove, pen.fishCount);
+  fishToMove = Math.min(fishToMove, Math.floor(vesselRemaining / avg));
+  const effectiveKg = fishToMove * avg;
   input.max = maxHarvest;
-  input.value = clamped.toFixed(3);
+  input.value = effectiveKg.toFixed(3);
   const rate = getSiteHarvestRate(site);
-  const secs = Math.max(0, clamped / rate);
+  const secs = Math.max(0, effectiveKg / rate);
   document.getElementById('harvestModalContent').querySelector('h2').innerText =
     `Start Harvest (~${secs.toFixed(1)}s)`;
 }
@@ -957,6 +961,7 @@ function openHarvestModal(vIdx){
   if(select.options.length===0) return openModal('No available pens to harvest.');
   select.onchange = updateHarvestModal;
   select.value = select.options[0].value;
+  document.getElementById('harvestAmount').oninput = updateHarvestModal;
   updateHarvestModal();
   document.getElementById('harvestModal').classList.add('visible');
 }
