@@ -905,15 +905,18 @@ function updateHarvestModal(){
   const vessel = state.vessels[state.currentVesselIndex];
   const penIdx = Number(document.getElementById('harvestPenSelect').value);
   state.currentPenIndex = penIdx;
-  const pen  = site.pens[penIdx];
-  const remaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
-  const maxHarvest = Math.min(pen.fishCount * pen.averageWeight, remaining);
-  const rate = getSiteHarvestRate(site);
-  const secs = maxHarvest / rate;
+  const pen = site.pens[penIdx];
+  const vesselRemaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
+  const penBiomass = pen.fishCount * pen.averageWeight;
+  const maxHarvest = Math.min(penBiomass, vesselRemaining);
   document.getElementById('harvestMax').innerText = maxHarvest.toFixed(2);
   const input = document.getElementById('harvestAmount');
+  const requested = parseFloat(input.value) || 0;
+  const clamped = Math.max(0, Math.min(requested, maxHarvest));
   input.max = maxHarvest;
-  input.value = maxHarvest.toFixed(3);
+  input.value = clamped.toFixed(3);
+  const rate = getSiteHarvestRate(site);
+  const secs = Math.max(0, clamped / rate);
   document.getElementById('harvestModalContent').querySelector('h2').innerText =
     `Start Harvest (~${secs.toFixed(1)}s)`;
 }
