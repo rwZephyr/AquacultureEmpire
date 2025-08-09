@@ -74,8 +74,6 @@ const state = {
 
 };
 
-// initialize contracts module with state reference
-initContracts(state);
 // expose state globally for boot readiness
 window.state = state;
 
@@ -86,17 +84,6 @@ Object.defineProperties(window, {
   currentYear:        { get: () => state.year },
   totalDaysElapsed:   { get: () => state.totalDaysElapsed },
 });
-
-function getTimeState() {
-  return {
-    currentDayInSeason: state.dayInSeason,
-    currentSeason: state.SEASONS[state.seasonIndex],
-    currentYear: state.year,
-    totalDaysElapsed: state.totalDaysElapsed,
-  };
-}
-
-state.getTimeState = getTimeState;
 
 function getDateString() {
   return `${state.SEASONS[state.seasonIndex]} ${state.dayInSeason}, Year ${state.year}`;
@@ -440,7 +427,5 @@ function getSiteHarvestRate(site) {
 }
 
 state.getSiteHarvestRate = getSiteHarvestRate;
-
-export default state;
 
 
