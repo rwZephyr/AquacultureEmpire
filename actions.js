@@ -571,13 +571,21 @@ function feedFish(){
   }
   pen.averageWeight += gain/pen.fishCount;
 }
-function harvestPen(amount=null){
+function harvestPen(amount=null, holdIdx=0){
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
   const vessel = state.vessels[state.currentVesselIndex];
-  const holdIndex = 0;
-  const hold = vessel.holds?.[holdIndex];
-  if(!hold) return;
+  let holds = Array.isArray(vessel.holds) && vessel.holds.length>0 ? vessel.holds : null;
+  if(holds){
+    holdIdx = Math.max(0, Math.min(holdIdx, holds.length-1));
+  } else {
+    holdIdx = 0;
+  }
+  let hold = holds ? holds[holdIdx] : {
+    species: vessel.cargoSpecies ?? null,
+    biomass: vessel.currentBiomassLoad ?? 0,
+    capacity: vessel.maxBiomassCapacity ?? 0
+  };
   if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
     return openModal('Vessel currently busy.');
   if(pen.fishCount===0) return;
@@ -623,7 +631,12 @@ function harvestPen(amount=null){
       vessel.harvestProgress += delta;
       hold.biomass = Math.min(hold.biomass + delta, hold.capacity);
       if(!hold.species) hold.species = pen.species;
-      syncLegacyVesselFields(vessel);
+      if(holds){
+        syncLegacyVesselFields(vessel);
+      } else {
+        vessel.currentBiomassLoad = hold.biomass;
+        vessel.cargoSpecies = hold.species;
+      }
       if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
       vessel.cargo[pen.species] += delta;
       vessel.harvestFishBuffer += delta / pen.averageWeight;
