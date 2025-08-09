@@ -66,6 +66,12 @@ document.addEventListener('click', evt => {
   }
 });
 
+function pulseOnce(el){
+  if(!el) return;
+  el.classList.add('pulse-once');
+  setTimeout(()=>el.classList.remove('pulse-once'), 1500);
+}
+
 function toggleMobileActions(){
   const group = document.getElementById('mobileActionGroup');
   const toggle = document.getElementById('mobileActionToggle');
@@ -198,6 +204,11 @@ function updateDisplay(){
   if(shipyardBtn){
     shipyardBtn.disabled = !shipyardUnlocked;
     if(shipyardReason) shipyardReason.textContent = shipyardUnlocked ? '' : 'Unlocks after stocking your first pen.';
+    if(shipyardUnlocked && !state.tips.vesselUnlocked){
+      pulseOnce(shipyardBtn);
+      openModal('Now you can buy another vessel to speed up harvesting.');
+      state.tips.vesselUnlocked = true;
+    }
   }
   const penBtn = document.getElementById('buyPenBtn');
   const penReason = document.getElementById('penLockReason');
@@ -205,6 +216,11 @@ function updateDisplay(){
   if(penBtn){
     penBtn.disabled = !penUnlocked;
     if(penReason) penReason.textContent = penUnlocked ? '' : 'Unlocks after your first harvest & sale.';
+    if(penUnlocked && !state.tips.penUnlocked){
+      pulseOnce(penBtn);
+      openModal('Now you can buy another pen to expand your farm.');
+      state.tips.penUnlocked = true;
+    }
   }
 
   // barge card & feed overview

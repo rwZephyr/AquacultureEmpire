@@ -69,6 +69,10 @@ const state = {
   milestones: {},
   contractsCompletedByTier: {},
   unlockedContractTiers: [0],
+  tips: {
+    vesselUnlocked: false,
+    penUnlocked: false,
+  },
 
   // --- Banking System ---
   bank: {

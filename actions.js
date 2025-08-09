@@ -1123,6 +1123,7 @@ function saveGame() {
     unlockedContractTiers: state.unlockedContractTiers,
     milestones: state.milestones,
     bank: state.bank,
+    tips: state.tips,
     marketStates: markets.map(m => ({
       name: m.name,
       prices: m.prices,
@@ -1165,6 +1166,7 @@ function loadGame() {
       state.contractsCompletedByTier = obj.contractsCompletedByTier ?? {};
       state.unlockedContractTiers = obj.unlockedContractTiers ?? [0];
       state.milestones = obj.milestones ?? {};
+      state.tips = Object.assign({ vesselUnlocked:false, penUnlocked:false }, obj.tips);
       if(obj.bank){
         state.bank.deposit = obj.bank.deposit ?? state.bank.deposit;
         state.bank.depositInterestRate = obj.bank.depositInterestRate ?? state.bank.depositInterestRate;
