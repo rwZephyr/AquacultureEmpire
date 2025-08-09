@@ -983,6 +983,7 @@ function openModal(msg){
   document.getElementById('modalText').innerText = msg;
   document.getElementById('modal').classList.add('visible');
 }
+window.openModal = openModal;
 function closeModal(){ document.getElementById('modal').classList.remove('visible'); }
 let restockSpecies = null;
 let restockUnitCost = 0;
