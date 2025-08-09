@@ -366,31 +366,10 @@ function closeMoveModal(){
   document.getElementById('moveModal').classList.remove('visible');
 }
 
-function openBargeUpgradeModal(){
-  uiOpenBargeUpgradeModal();
-}
-function closeBargeUpgradeModal(){
-  uiCloseBargeUpgradeModal();
-}
-
-function openShipyard(){
-  uiOpenShipyard();
-}
-function closeShipyard(){
-  uiCloseShipyard();
-}
-function openSiteManagement(){
-  uiOpenSiteManagement();
-}
-function closeSiteManagement(){
-  uiCloseSiteManagement();
-}
-function openDevModal(){ uiOpenDevModal(); }
-function closeDevModal(){ uiCloseDevModal(); }
 function toggleDevTools(){
   const modal = document.getElementById('devModal');
-  if(modal.classList.contains('visible')) uiCloseDevModal();
-  else uiOpenDevModal();
+  if(modal.classList.contains('visible')) closeDevModal();
+  else openDevModal();
 }
 
 function toggleOnboarding(){
@@ -402,15 +381,6 @@ function toggleOnboarding(){
   }
   updateDisplay();
   saveGame();
-}
-function openCustomBuild(){
-  uiOpenCustomBuild();
-}
-function backToShipyardList(){
-  uiBackToShipyardList();
-}
-function updateCustomBuildStats(){
-  uiUpdateCustomBuildStats();
 }
 
 function refreshShipyardListings(){
@@ -1300,12 +1270,6 @@ const actions = {
   devSetMarketModifierPrompt,
   devInstantSellAll,
   togglePanel,
-  openModal,
-  closeModal,
-  openRestockModal,
-  closeRestockModal,
-  closeHarvestModal,
-  confirmHarvest,
   harvestPen,
   cancelVesselHarvest,
   feedFishPen,
@@ -1313,11 +1277,6 @@ const actions = {
   restockPenUI,
   upgradeFeeder,
   assignBarge,
-  openSellModal,
-  closeSellModal,
-  sellCargo,
-  startOffloading,
-  finishOffloading,
   saveGame,
   loadGame,
   resetGame,
@@ -1337,43 +1296,13 @@ const actions = {
   moveVesselTo,
   showTab,
   updateSelectedBargeDisplay,
-  openBargeUpgradeModal,
-  closeBargeUpgradeModal,
-  openShipyard,
-  closeShipyard,
-  openCustomBuild,
-  backToShipyardList,
-  updateCustomBuildStats,
   refreshShipyardListings,
   buyShipyardVessel,
   confirmCustomBuild,
-  openMarketReport,
-  closeMarketReport,
-  openBank,
-  closeBank,
-  openMarketReports,
-  switchLogbookSection,
-  openLogbook,
-  closeLogbook,
-  openSiteManagement,
-  closeSiteManagement,
-  openDevModal,
-  closeDevModal,
   toggleDevTools,
   toggleOnboarding,
   pauseTime,
   resumeTime,
-  updateFeedPurchaseUI,
-  syncFeedPurchase,
-  confirmBuyFeed,
-  setFeedPurchaseMax,
-  toggleSiteList,
-  toggleMobileActions,
-  toggleSiteActions,
-  toggleBankActions,
-  outsideBankActionHandler,
-  selectSite,
-  populateSiteList,
   logVesselHolds,
 };
 
