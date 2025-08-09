@@ -1234,7 +1234,7 @@ function startOffloading(vessel, market){
     }
   });
   const rate = state.OFFLOAD_RATE;
-  const updateEta = ()=>{ vessel.actionEndsAt = Date.now() + (vessel.currentBiomassLoad / rate) * 1000; };
+  const updateEta = ()=>{ vessel.actionEndsAt = Date.now() + (vessel.currentBiomassLoad / rate) * 1000; }; // TODO: derive from holds[0]
   updateEta();
   let last = Date.now();
   vessel.offloadInterval = setInterval(()=>{
@@ -1250,12 +1250,18 @@ function startOffloading(vessel, market){
       if(fish.weight <= remaining){
         remaining -= fish.weight;
         vessel.currentBiomassLoad -= fish.weight;
+        if(vessel.holds && vessel.holds[0]) {
+          vessel.holds[0].biomass -= fish.weight;
+        }
         vessel.offloadRevenue += fish.weight * price;
         if(market.daysSinceSale) market.daysSinceSale[sp] = 0;
         vessel.fishBuffer.shift();
       } else {
         fish.weight -= remaining;
         vessel.currentBiomassLoad -= remaining;
+        if(vessel.holds && vessel.holds[0]) {
+          vessel.holds[0].biomass -= remaining;
+        }
         vessel.offloadRevenue += remaining * price;
         if(market.daysSinceSale) market.daysSinceSale[sp] = 0;
         remaining = 0;
@@ -1266,6 +1272,7 @@ function startOffloading(vessel, market){
     const epsilon = 0.0001;
     if(vessel.currentBiomassLoad <= epsilon || vessel.fishBuffer.length === 0){
       vessel.currentBiomassLoad = 0;
+      if(vessel.holds && vessel.holds[0]) vessel.holds[0].biomass = 0;
       finishOffloading(vessel, market);
     }
   },250);
@@ -1282,6 +1289,10 @@ function finishOffloading(vessel, market, canceled=false){
   if(!canceled){
     vessel.fishBuffer = [];
     vessel.currentBiomassLoad = 0;
+    if(vessel.holds && vessel.holds[0]) {
+      vessel.holds[0].biomass = 0;
+      vessel.holds[0].species = null;
+    }
     vessel.cargoSpecies = null;
     vessel.cargo = {};
     if(market && market.daysSinceSale){
@@ -1297,7 +1308,7 @@ function finishOffloading(vessel, market, canceled=false){
 function sellCargo(idx){
   const vessel = state.vessels[state.currentVesselIndex];
   if(vessel.isHarvesting || vessel.unloading){ closeSellModal(); return openModal('Vessel currently busy.'); }
-  if(vessel.currentBiomassLoad<=0) return openModal('No biomass to sell.');
+  if(vessel.currentBiomassLoad<=0) return openModal('No biomass to sell.'); // TODO: check holds[0].biomass
   const market = markets[idx];
   if(vessel.location === `Traveling to ${market.name}`){
     closeSellModal();

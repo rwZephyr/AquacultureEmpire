@@ -202,15 +202,25 @@ function finishContractDelivery(vessel, contract){
     if(fish.weight <= remaining){
       remaining -= fish.weight;
       vessel.currentBiomassLoad -= fish.weight;
+      if(vessel.holds && vessel.holds[0]) {
+        vessel.holds[0].biomass -= fish.weight;
+      }
       vessel.fishBuffer.splice(i,1);
     } else {
       fish.weight -= remaining;
       vessel.currentBiomassLoad -= remaining;
+      if(vessel.holds && vessel.holds[0]) {
+        vessel.holds[0].biomass -= remaining;
+      }
       remaining = 0;
     }
   }
   if(vessel.currentBiomassLoad <= 0.001){
     vessel.currentBiomassLoad = 0;
+    if(vessel.holds && vessel.holds[0]){
+      vessel.holds[0].biomass = 0;
+      vessel.holds[0].species = null;
+    }
     vessel.cargoSpecies = null;
   }
   const base = speciesData[contract.species]?.marketPrice || 0;
