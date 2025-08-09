@@ -235,15 +235,25 @@
           <label for="harvestPenSelect">Pen:</label>
           <select id="harvestPenSelect"></select>
         </div>
+        <div>
+          <label for="harvestHoldSelect">Hold:</label>
+          <select id="harvestHoldSelect"></select>
+          <span id="harvestHoldInfo"></span>
+        </div>
         <div>Max: <span id="harvestMax">0</span> kg</div>
         <input type="number" id="harvestAmount" min="0" step="0.01">
-        <button onclick="confirmHarvest()">Start Harvest</button>
+        <button id="harvestConfirmBtn" onclick="confirmHarvest()">Start Harvest</button>
         <button onclick="closeHarvestModal()">Cancel</button>
       </div>
     </div>
     <div id="sellModal">
       <div id="sellModalContent">
         <h2>Select Market</h2>
+        <div>
+          <label for="sellHoldSelect">Hold:</label>
+          <select id="sellHoldSelect"></select>
+          <span id="sellHoldInfo"></span>
+        </div>
         <div id="sellOptions"></div>
         <button onclick="closeSellModal()">Cancel</button>
       </div>
