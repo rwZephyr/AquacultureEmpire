@@ -303,6 +303,8 @@
         <button onclick="devRandomizeMarket()">Randomize Market</button>
         <button onclick="devSetMarketModifierPrompt()">Set Market Modifier</button>
         <button onclick="devInstantSellAll()">Instant Sell All Biomass</button>
+        <h3>Settings</h3>
+        <button id="onboardingToggleBtn" onclick="toggleOnboarding()">Onboarding: On</button>
 
         <h3>Utilities</h3>
         <button onclick="devRestartGame()">Restart Game</button>
@@ -444,6 +446,7 @@
       <div id="marketReportContent" class="market-report"></div>
       </div>
     <div id="statusTooltip" class="status-tooltip" role="tooltip"></div>
+    <div id="onboardingChecklist" class="onboarding-card hidden"></div>
     <div id="toastContainer"></div>
     <script type="module" src="script.js"></script>
   <script data-goatcounter="https://rwzephyr.goatcounter.com/count"
