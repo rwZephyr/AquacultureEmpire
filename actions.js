@@ -92,6 +92,12 @@ export function logVesselHolds(vessel){
   });
 }
 
+function sanitizePen(pen){
+  if(!pen) return;
+  pen.fishCount = Math.max(0, Math.floor(pen.fishCount || 0));
+  if(pen.fishCount === 0) pen.averageWeight = 0;
+}
+
 function lockPen(pen, reason){
   pen.locked = true;
   pen.lastLockReason = reason;
@@ -643,6 +649,7 @@ function harvestPen(amount=null, holdIdx=0){
       const remove = Math.floor(vessel.harvestFishBuffer);
       if(remove>0){
         pen.fishCount -= remove;
+        sanitizePen(pen);
         vessel.harvestFishBuffer -= remove;
         for(let i=0;i<remove;i++){
           vessel.fishBuffer.push({ species: pen.species, weight: lockedWeight });
@@ -654,6 +661,7 @@ function harvestPen(amount=null, holdIdx=0){
         vessel.harvestInterval = null;
         vessel.harvestProgress = 0;
         pen.fishCount = Math.max(0, startFishCount - fishNum);
+        sanitizePen(pen);
         const leftover = Math.round(vessel.harvestFishBuffer);
         if(leftover > 0){
           for(let i=0; i<leftover; i++){
@@ -738,6 +746,7 @@ function restockPen(sp, qty){
   pen.species = sp;
   pen.averageWeight = data.startingWeight;
   pen.fishCount = qty;
+  sanitizePen(pen);
   updateDisplay();
   closeRestockModal();
 }
@@ -752,6 +761,7 @@ function devHarvestAll(){
     site.pens.forEach(pen=>{
       pen.fishCount = 0;
       pen.averageWeight = 0;
+      sanitizePen(pen);
     });
   });
   updateDisplay();
@@ -764,6 +774,7 @@ function devRestockAll(){
       if(!data) return;
       pen.fishCount = data.restockCount;
       pen.averageWeight = data.startingWeight;
+      sanitizePen(pen);
     });
   });
   updateDisplay();
@@ -841,6 +852,7 @@ function devInstantSellAll() {
       state.cash += calculateHarvestIncome(pen);
       pen.fishCount = 0;
       pen.averageWeight = 0;
+      sanitizePen(pen);
     });
   });
   updateDisplay();

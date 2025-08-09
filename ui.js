@@ -387,8 +387,10 @@ function renderPenGrid(site){
     card.querySelector('.pen-name').textContent = `Pen ${idx+1}`;
     card.querySelector('.pen-species').textContent = capitalizeFirstLetter(pen.species);
     card.querySelector('.pen-fish').textContent = pen.fishCount;
-    card.querySelector('.pen-avg').textContent = pen.averageWeight.toFixed(2);
-    card.querySelector('.pen-biomass').textContent = (pen.fishCount * pen.averageWeight).toFixed(2);
+    const avg = pen.fishCount > 0 ? pen.averageWeight : 0;
+    const biomass = pen.fishCount > 0 ? pen.fishCount * pen.averageWeight : 0;
+    card.querySelector('.pen-avg').textContent = avg.toFixed(2);
+    card.querySelector('.pen-biomass').textContent = biomass.toFixed(2);
     const feederType = pen.feeder?.type||'None';
     const feederTier = pen.feeder?.tier||0;
     card.querySelector('.pen-feeder').textContent = `${capitalizeFirstLetter(feederType)} (Tier ${feederTier})`;
@@ -433,8 +435,10 @@ function updatePenCards(site){
     card.querySelector('.pen-name').textContent = `Pen ${idx+1}`;
     card.querySelector('.pen-species').textContent = capitalizeFirstLetter(pen.species);
     card.querySelector('.pen-fish').textContent = pen.fishCount;
-    card.querySelector('.pen-avg').textContent = pen.averageWeight.toFixed(2);
-    card.querySelector('.pen-biomass').textContent = (pen.fishCount * pen.averageWeight).toFixed(2);
+    const avg2 = pen.fishCount > 0 ? pen.averageWeight : 0;
+    const biomass2 = pen.fishCount > 0 ? pen.fishCount * pen.averageWeight : 0;
+    card.querySelector('.pen-avg').textContent = avg2.toFixed(2);
+    card.querySelector('.pen-biomass').textContent = biomass2.toFixed(2);
     const feederType = pen.feeder?.type||'None';
     const feederTier = pen.feeder?.tier||0;
     card.querySelector('.pen-feeder').textContent = `${capitalizeFirstLetter(feederType)} (Tier ${feederTier})`;
@@ -975,12 +979,16 @@ function updateHarvestModal(){
   const penIdx = Number(document.getElementById('harvestPenSelect').value);
   state.currentPenIndex = penIdx;
   const pen = site.pens[penIdx];
-  let holdIdx = Number(document.getElementById('harvestHoldSelect').value) || 0;
+  const holdSelectEl = document.getElementById('harvestHoldSelect');
   const holds = vessel.holds && vessel.holds.length > 0 ? vessel.holds : [{ species: vessel.cargoSpecies ?? null, biomass: vessel.currentBiomassLoad ?? 0, capacity: vessel.maxBiomassCapacity ?? 0 }];
-  if(holdIdx < 0 || holdIdx >= holds.length) holdIdx = 0;
+  let holdIdx = 0;
+  if(holds.length > 1){
+    holdIdx = Number(holdSelectEl.value) || 0;
+    if(holdIdx < 0 || holdIdx >= holds.length) holdIdx = 0;
+  }
   const hold = holds[holdIdx];
   const vesselRemaining = hold ? (hold.capacity - hold.biomass) : (vessel.maxBiomassCapacity - vessel.currentBiomassLoad);
-  const penBiomass = pen.fishCount * pen.averageWeight;
+  const penBiomass = pen.fishCount > 0 ? pen.fishCount * pen.averageWeight : 0;
   const maxHarvest = Math.min(penBiomass, vesselRemaining);
   document.getElementById('harvestMax').innerText = maxHarvest.toFixed(2);
   const input = document.getElementById('harvestAmount');
@@ -1000,7 +1008,7 @@ function updateHarvestModal(){
   const confirmBtn = document.getElementById('harvestConfirmBtn');
   if(hold){
     const free = hold.capacity - hold.biomass;
-    infoEl.textContent = `${hold.species ? capitalizeFirstLetter(hold.species) : 'Empty'} (${free.toFixed(2)}kg free)`;
+    infoEl.textContent = `Hold ${holdIdx+1} — ${hold.species ? capitalizeFirstLetter(hold.species) : 'Empty'} — ${free.toFixed(1)} kg free`;
     const mismatch = hold.species && hold.species !== pen.species;
     confirmBtn.disabled = mismatch;
     confirmBtn.title = mismatch ? 'Hold contains a different species' : '';
@@ -1020,7 +1028,7 @@ function openHarvestModal(vIdx){
   const select = document.getElementById('harvestPenSelect');
   select.innerHTML = '';
   site.pens.forEach((pen, idx)=>{
-    const biomass = (pen.fishCount * pen.averageWeight).toFixed(2);
+    const biomass = (pen.fishCount > 0 ? pen.fishCount * pen.averageWeight : 0).toFixed(2);
     const opt = document.createElement('option');
     opt.value = idx;
     opt.textContent = `Pen ${idx+1} - ${capitalizeFirstLetter(pen.species)} (${biomass}kg)`;
@@ -1029,16 +1037,27 @@ function openHarvestModal(vIdx){
   });
   if(select.options.length===0) return openModal('No available pens to harvest.');
   const holdSelect = document.getElementById('harvestHoldSelect');
+  const holdLabel = document.querySelector('label[for="harvestHoldSelect"]');
   holdSelect.innerHTML = '';
   const holds = vessel.holds && vessel.holds.length > 0 ? vessel.holds : [{ species: vessel.cargoSpecies ?? null, biomass: vessel.currentBiomassLoad ?? 0, capacity: vessel.maxBiomassCapacity ?? 0 }];
-  holds.forEach((h, idx)=>{
-    const opt = document.createElement('option');
-    opt.value = idx;
-    opt.textContent = `Hold ${idx}`;
-    holdSelect.appendChild(opt);
-  });
-  holdSelect.onchange = updateHarvestModal;
-  holdSelect.value = '0';
+  if(holds.length > 1){
+    if(holdLabel) holdLabel.style.display = '';
+    holdSelect.style.display = '';
+    holds.forEach((h, idx)=>{
+      const free = h.capacity - h.biomass;
+      const opt = document.createElement('option');
+      opt.value = idx;
+      opt.textContent = `Hold ${idx+1} — ${h.species ? capitalizeFirstLetter(h.species) : 'Empty'} — ${free.toFixed(1)} kg free`;
+      holdSelect.appendChild(opt);
+    });
+    holdSelect.onchange = updateHarvestModal;
+    holdSelect.value = '0';
+  } else {
+    if(holdLabel) holdLabel.style.display = 'none';
+    holdSelect.style.display = 'none';
+    holdSelect.onchange = null;
+    holdSelect.value = '0';
+  }
   select.onchange = updateHarvestModal;
   select.value = select.options[0].value;
   document.getElementById('harvestAmount').oninput = updateHarvestModal;
@@ -1062,22 +1081,34 @@ function openSellModal(){
   if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
     return openModal('Vessel currently busy.');
   const holdSelect = document.getElementById('sellHoldSelect');
+  const holdLabel = document.querySelector('label[for="sellHoldSelect"]');
   holdSelect.innerHTML = '';
   const holds = vessel.holds && vessel.holds.length > 0 ? vessel.holds : [{ species: vessel.cargoSpecies ?? null, biomass: vessel.currentBiomassLoad ?? 0, capacity: vessel.maxBiomassCapacity ?? 0 }];
-  holds.forEach((h, idx)=>{
-    const opt = document.createElement('option');
-    opt.value = idx;
-    opt.textContent = `Hold ${idx}`;
-    holdSelect.appendChild(opt);
-  });
   const updateHoldInfo = ()=>{
-    const idx = Number(holdSelect.value) || 0;
+    const idx = holds.length > 1 ? (Number(holdSelect.value) || 0) : 0;
     const hold = holds[idx];
-    const info = hold ? `${hold.species ? capitalizeFirstLetter(hold.species) : 'Empty'} (${(hold.capacity - hold.biomass).toFixed(2)}kg free)` : 'N/A';
+    const free = hold.capacity - hold.biomass;
+    const info = hold ? `Hold ${idx+1} — ${hold.species ? capitalizeFirstLetter(hold.species) : 'Empty'} — ${free.toFixed(1)} kg free` : 'N/A';
     document.getElementById('sellHoldInfo').textContent = info;
   };
-  holdSelect.onchange = updateHoldInfo;
-  holdSelect.value = '0';
+  if(holds.length > 1){
+    if(holdLabel) holdLabel.style.display = '';
+    holdSelect.style.display = '';
+    holds.forEach((h, idx)=>{
+      const free = h.capacity - h.biomass;
+      const opt = document.createElement('option');
+      opt.value = idx;
+      opt.textContent = `Hold ${idx+1} — ${h.species ? capitalizeFirstLetter(h.species) : 'Empty'} — ${free.toFixed(1)} kg free`;
+      holdSelect.appendChild(opt);
+    });
+    holdSelect.onchange = updateHoldInfo;
+    holdSelect.value = '0';
+  } else {
+    if(holdLabel) holdLabel.style.display = 'none';
+    holdSelect.style.display = 'none';
+    holdSelect.onchange = null;
+    holdSelect.value = '0';
+  }
   updateHoldInfo();
   markets.forEach((m,idx)=>{
     const btn = document.createElement('button');
@@ -1085,7 +1116,7 @@ function openSellModal(){
     const secs = estimateTravelTime(vessel.location, m.location, vessel);
     btn.innerText = `${m.name} - $${price.toFixed(2)} (${secs.toFixed(1)}s)`;
     btn.onclick = ()=>{
-      const hIdx = Number(holdSelect.value) || 0;
+      const hIdx = holds.length > 1 ? (Number(holdSelect.value) || 0) : 0;
       sellCargo(idx, hIdx);
     };
     optionsDiv.appendChild(btn);
