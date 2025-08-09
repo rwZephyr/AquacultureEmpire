@@ -441,4 +441,6 @@ function getSiteHarvestRate(site) {
 
 state.getSiteHarvestRate = getSiteHarvestRate;
 
+export default state;
+
 
