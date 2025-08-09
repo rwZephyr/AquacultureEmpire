@@ -148,11 +148,12 @@ export function checkContractExpirations(){
 }
 
 function getEligibleVessels(contract){
-  return state.vessels.filter(v =>
-    !v.isHarvesting && !v.unloading && !v.deliveringContractId &&
-    v.cargoSpecies === contract.species &&
-    v.currentBiomassLoad >= contract.biomassGoalKg
-  );
+  return state.vessels.filter(v => {
+    const hold = v.holds?.[0];
+    return !v.isHarvesting && !v.unloading && !v.deliveringContractId &&
+      hold?.species === contract.species &&
+      hold.biomass >= contract.biomassGoalKg;
+  });
 }
 
 export function checkVesselContractEligibility(vessel){
@@ -160,7 +161,8 @@ export function checkVesselContractEligibility(vessel){
     if(c.status !== 'active') return;
     if(!c.reminders) c.reminders = {};
     if(c.reminders[vessel.name]) return;
-    if(vessel.cargoSpecies === c.species && vessel.currentBiomassLoad >= c.biomassGoalKg){
+    const hold = vessel.holds?.[0];
+    if(hold?.species === c.species && hold.biomass >= c.biomassGoalKg){
       state.addStatusMessage(`✅ ${vessel.name} can now fulfill a contract for ${capitalizeFirstLetter(c.species)}! Check the Contracts screen.`);
       c.reminders[vessel.name] = true;
     }
@@ -194,35 +196,31 @@ export function closeContractDeliveryModal(){
 }
 
 function finishContractDelivery(vessel, contract){
-  vessel.location = contract.destination;
-  vessel.deliveringContractId = null;
-  let remaining = contract.biomassGoalKg;
-  for(let i=0;i<vessel.fishBuffer.length && remaining>0;){
-    const fish = vessel.fishBuffer[i];
-    if(fish.weight <= remaining){
-      remaining -= fish.weight;
-      vessel.currentBiomassLoad -= fish.weight;
-      if(vessel.holds && vessel.holds[0]) {
-        vessel.holds[0].biomass -= fish.weight;
+    vessel.location = contract.destination;
+    vessel.deliveringContractId = null;
+    const hold = vessel.holds?.[0];
+    let remaining = contract.biomassGoalKg;
+    for(let i=0;i<vessel.fishBuffer.length && remaining>0;){
+      const fish = vessel.fishBuffer[i];
+      if(fish.weight <= remaining){
+        remaining -= fish.weight;
+        if(hold) hold.biomass -= fish.weight;
+        vessel.fishBuffer.splice(i,1);
+      } else {
+        fish.weight -= remaining;
+        if(hold) hold.biomass -= remaining;
+        remaining = 0;
       }
-      vessel.fishBuffer.splice(i,1);
-    } else {
-      fish.weight -= remaining;
-      vessel.currentBiomassLoad -= remaining;
-      if(vessel.holds && vessel.holds[0]) {
-        vessel.holds[0].biomass -= remaining;
-      }
-      remaining = 0;
     }
-  }
-  if(vessel.currentBiomassLoad <= 0.001){
-    vessel.currentBiomassLoad = 0;
-    if(vessel.holds && vessel.holds[0]){
-      vessel.holds[0].biomass = 0;
-      vessel.holds[0].species = null;
+    if(hold && hold.biomass <= 0.001){
+      hold.biomass = 0;
+      hold.species = null;
+      vessel.cargoSpecies = null; // TODO: remove after holds migration
+      vessel.currentBiomassLoad = 0; // TODO: remove after holds migration
+    } else if(hold){
+      vessel.cargoSpecies = hold.species; // TODO: remove after holds migration
+      vessel.currentBiomassLoad = hold.biomass; // TODO: remove after holds migration
     }
-    vessel.cargoSpecies = null;
-  }
   const base = speciesData[contract.species]?.marketPrice || 0;
   const market = state.findMarketByName(contract.destination);
   let payout = contract.biomassGoalKg * base;
@@ -246,8 +244,9 @@ export function deliverContract(id, vIdx){
   const vessel = state.vessels[vIdx];
   if(!vessel || vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
     return state.addStatusMessage('Vessel currently busy.');
-  if(vessel.cargoSpecies !== contract.species || vessel.currentBiomassLoad < contract.biomassGoalKg)
-    return state.addStatusMessage('Vessel lacks required cargo.');
+    const hold = vessel.holds?.[0];
+    if(!hold || hold.species !== contract.species || hold.biomass < contract.biomassGoalKg)
+      return state.addStatusMessage('Vessel lacks required cargo.');
   const market = state.findMarketByName(contract.destination);
   const destLoc = market ? market.location : null;
   const startLoc = state.getLocationByName(vessel.location) || (market ? market.location : {x:0,y:0});
