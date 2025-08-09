@@ -868,21 +868,37 @@ function openModal(msg){
   document.getElementById('modal').classList.add('visible');
 }
 function closeModal(){ document.getElementById('modal').classList.remove('visible'); }
+let restockSpecies = null;
+let restockUnitCost = 0;
+let restockMaxQty = 0;
 function openRestockModal(){
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
   if(pen.locked) return openModal('Pen currently busy.');
-  if(pen.fishCount>0){ return openModal("You must harvest the pen before restocking!"); }
   const optionsDiv = document.getElementById('restockOptions');
   optionsDiv.innerHTML = '';
+  restockSpecies = null;
+  const qtySection = ensureRestockControls();
+  qtySection.style.display = 'none';
   site.licenses.forEach(sp => {
     const data = speciesData[sp];
     const card = document.createElement('div');
     card.className = 'species-card';
     card.onclick = () => {
+      if(pen.fishCount>0 && pen.species !== sp){
+        return openModal("You must harvest the pen before restocking!");
+      }
       optionsDiv.querySelectorAll('.species-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
-      restockPen(sp);
+      restockSpecies = sp;
+      restockUnitCost = data.restockCost / data.restockCount;
+      const maxAffordable = Math.floor(state.cash / restockUnitCost);
+      restockMaxQty = Math.min(maxAffordable, 10000);
+      const input = document.getElementById('restockQtyInput');
+      input.max = restockMaxQty;
+      input.value = Math.min(data.restockCount, restockMaxQty);
+      updateRestockCost();
+      qtySection.style.display = 'block';
     };
 
     const img = document.createElement('img');
@@ -914,6 +930,42 @@ function openRestockModal(){
     optionsDiv.appendChild(card);
   });
   document.getElementById('restockModal').classList.add('visible');
+}
+function ensureRestockControls(){
+  let section = document.getElementById('restockQtySection');
+  if(section) return section;
+  const modalContent = document.getElementById('restockModalContent');
+  section = document.createElement('div');
+  section.id = 'restockQtySection';
+  section.style.display = 'none';
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.id = 'restockQtyInput';
+  input.min = 0;
+  input.addEventListener('input', updateRestockCost);
+  const costDiv = document.createElement('div');
+  costDiv.innerHTML = 'Total Cost: $<span id="restockTotalCost">0</span>';
+  const btn = document.createElement('button');
+  btn.id = 'restockConfirm';
+  btn.textContent = 'Restock';
+  btn.onclick = () => {
+    const qty = Number(document.getElementById('restockQtyInput').value);
+    restockPen(restockSpecies, qty);
+  };
+  section.appendChild(input);
+  section.appendChild(costDiv);
+  section.appendChild(btn);
+  modalContent.insertBefore(section, modalContent.querySelector('.secondary-btn'));
+  return section;
+}
+function updateRestockCost(){
+  const input = document.getElementById('restockQtyInput');
+  const costEl = document.getElementById('restockTotalCost');
+  let val = Number(input.value);
+  if(val > restockMaxQty) val = restockMaxQty;
+  if(val < 0) val = 0;
+  input.value = val;
+  costEl.textContent = (val * restockUnitCost).toFixed(2);
 }
 function closeRestockModal(){ document.getElementById('restockModal').classList.remove('visible'); }
 

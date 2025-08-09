@@ -683,16 +683,25 @@ function cancelVesselHarvest(idx){
   openModal('Harvest cancelled.');
   updateDisplay();
 }
-function restockPen(sp){
+function restockPen(sp, qty){
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
   if(pen.locked) return openModal('Pen currently busy.');
   const data = speciesData[sp];
-  if(state.cash < data.restockCost) return openModal("Not enough cash to restock.");
-  state.cash -= data.restockCost;
+  qty = Math.max(0, Math.floor(qty));
+  const unit = data.restockCost / data.restockCount;
+  const cost = qty * unit;
+  if(qty <= 0) return;
+  if(state.cash < cost) return openModal("Not enough cash to restock.");
+  if(pen.fishCount > 0){
+    if(pen.species !== sp) return;
+    return; // require empty for now
+  }
+  state.cash -= cost;
   pen.species = sp;
-  pen.fishCount = data.restockCount;
   pen.averageWeight = data.startingWeight;
+  pen.fishCount = qty;
+  updateDisplay();
   closeRestockModal();
 }
 // dev menu
