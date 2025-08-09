@@ -160,6 +160,19 @@ function updateMarketPrices(){
 state.setupMarketData = setupMarketData;
 state.updateMarketPrices = updateMarketPrices;
 
+function applyGrowth(pen, species, feedKg){
+  const baseGain = feedKg / speciesData[species].fcr;
+  let gain = baseGain;
+  const max = speciesData[species].maxWeight;
+  if(max && pen.averageWeight > max){
+    const excess = pen.averageWeight - max;
+    const scale = Math.max(0.1, 1 - (excess / max));
+    gain *= scale;
+  }
+  return pen.averageWeight + gain / pen.fishCount;
+}
+
+state.applyGrowth = applyGrowth;
 
 function advanceDay() {
   state.lastMarketUpdateString = getDateString();
@@ -187,6 +200,14 @@ function advanceDay() {
   checkContractExpirations();
   generateDailyContracts();
   checkShipyardRestock();
+
+  state.sites.forEach(site => {
+    site.pens.forEach(pen => {
+      if(pen.locked) return;
+      const newAvg = applyGrowth(pen, pen.species, 0);
+      pen.averageWeight = newAvg;
+    });
+  });
 }
 
 state.advanceDay = advanceDay;
@@ -430,6 +451,7 @@ export {
   checkShipyardRestock,
   pauseTime,
   resumeTime,
+  applyGrowth,
   getSiteHarvestRate,
 };
 
