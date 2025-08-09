@@ -1374,9 +1374,6 @@ const actions = {
   outsideBankActionHandler,
   selectSite,
   populateSiteList,
-  openContractDeliveryModal,
-  closeContractDeliveryModal,
-  deliverContract,
   logVesselHolds,
 };
 

@@ -1,5 +1,4 @@
-// Global state reference
-const state = window.state;
+// Global contracts list uses shared game state
 let contracts = [];
 
 // Capitalize helper replicated here to keep module independent
@@ -342,4 +341,18 @@ function renderContracts(){
     row.appendChild(info);
     container.appendChild(row);
   });
+}
+
+// expose contract helpers globally for existing event handlers
+const contractAPI = {
+  initContracts,
+  renderContracts,
+  openContractDeliveryModal,
+  closeContractDeliveryModal,
+  deliverContract,
+  checkVesselContractEligibility,
+};
+
+for (const key in contractAPI) {
+  window[key] = (...args) => window.bootGuard(() => contractAPI[key](...args));
 }
