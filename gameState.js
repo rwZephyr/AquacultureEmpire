@@ -72,6 +72,20 @@ const state = {
   tips: {
     vesselUnlocked: false,
     penUnlocked: false,
+    tipStockShown: false,
+    tipHarvestShown: false,
+    tipSellShown: false,
+    tipBuyPenShown: false,
+  },
+  onboarding: {
+    enabled: true,
+    steps: {
+      stocked: false,
+      harvested: false,
+      sold: false,
+      boughtPen: false,
+    },
+    dismissed: false,
   },
 
   // --- Banking System ---

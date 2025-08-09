@@ -1873,3 +1873,47 @@ html.modal-open {
 .pulse-once {
   animation: pulse-once 1.5s ease-out;
 }
+
+/* onboarding checklist */
+.onboarding-card {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 8px;
+  font-size: 0.9rem;
+  z-index: 5;
+  max-width: 200px;
+}
+.onboarding-card.hidden { display: none; }
+.onboarding-card ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.onboarding-card li.done {
+  text-decoration: line-through;
+  color: #555;
+}
+.onboarding-card a {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  text-align: right;
+  cursor: pointer;
+}
+@media (max-width: 600px) {
+  .onboarding-card { top: 10px; bottom: auto; }
+}
+
+.onboarding-tooltip {
+  position: absolute;
+  background: #333;
+  color: #fff;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  z-index: 6;
+  pointer-events: none;
+}

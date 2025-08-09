@@ -24,6 +24,7 @@ import state, {
 import { renderContracts } from "./contracts.js";
 import { milestones, checkMilestones } from './milestones.js';
 import { depositToBank, withdrawFromBank, takeLoan, repayLoan } from "./bank.js";
+import { saveGame } from "./actions.js";
 
 const speciesColors = {
   shrimp: '#e74c3c',
@@ -319,6 +320,9 @@ function updateDisplay(){
   updateFeedPurchaseUI();
   updateMarketCharts();
   if(logbookSection === 'contracts') renderContracts();
+  renderOnboardingChecklist();
+  updateOnboardingToggleButton();
+  maybeShowOnboardingTips();
 }
 
 // harvest preview
@@ -384,6 +388,99 @@ function toggleLicenseList(){
 
 function updateLicenseDropdown(){
   populateLicenseDropdown();
+}
+
+function renderOnboardingChecklist(){
+  const box = document.getElementById('onboardingChecklist');
+  if(!box) return;
+  const steps = state.onboarding.steps;
+  const allDone = Object.values(steps).every(v=>v);
+  if(!state.onboarding.enabled || state.onboarding.dismissed || allDone){
+    box.classList.add('hidden');
+    box.innerHTML = '';
+    return;
+  }
+  box.classList.remove('hidden');
+  box.innerHTML = `
+    <ul>
+      <li class="${steps.stocked?'done':''}">${steps.stocked?'\u2713 ':''}Stock a pen</li>
+      <li class="${steps.harvested?'done':''}">${steps.harvested?'\u2713 ':''}Harvest a pen</li>
+      <li class="${steps.sold?'done':''}">${steps.sold?'\u2713 ':''}Sell your catch</li>
+      <li class="${steps.boughtPen?'done':''}">${steps.boughtPen?'\u2713 ':''}Buy another pen</li>
+    </ul>
+    <a id="hideGuideLink" href="#">Hide guide</a>
+  `;
+  const hide = document.getElementById('hideGuideLink');
+  if(hide){
+    hide.onclick = (e)=>{
+      e.preventDefault();
+      state.onboarding.enabled = false;
+      state.onboarding.dismissed = true;
+      saveGame();
+      renderOnboardingChecklist();
+    };
+  }
+}
+
+function updateOnboardingToggleButton(){
+  const btn = document.getElementById('onboardingToggleBtn');
+  if(btn){
+    btn.textContent = `Onboarding: ${state.onboarding.enabled ? 'On' : 'Off'}`;
+  }
+}
+
+function showOnboardingTip(target, message){
+  if(!target) return;
+  const tip = document.createElement('div');
+  tip.className = 'onboarding-tooltip';
+  let text = message;
+  const reasonEl = target.disabled ? (document.getElementById(target.id + 'LockReason') || target.parentElement?.querySelector('.lock-reason')) : null;
+  if(reasonEl && reasonEl.textContent) text += ' ' + reasonEl.textContent;
+  tip.textContent = text;
+  document.body.appendChild(tip);
+  const rect = target.getBoundingClientRect();
+  tip.style.top = `${rect.top - tip.offsetHeight - 8 + window.scrollY}px`;
+  tip.style.left = `${rect.left + window.scrollX}px`;
+  setTimeout(()=> tip.remove(), 4000);
+}
+
+function maybeShowOnboardingTips(){
+  if(!state.onboarding.enabled) return;
+  if(!state.tips.tipStockShown){
+    const btn = document.querySelector('.restock-btn');
+    if(btn){
+      showOnboardingTip(btn, 'Start by stocking a pen.');
+      state.tips.tipStockShown = true;
+      saveGame();
+    }
+    return;
+  }
+  if(state.onboarding.steps.stocked && !state.onboarding.steps.harvested && !state.tips.tipHarvestShown){
+    const btn = document.querySelector('.harvest-btn');
+    if(btn && btn.style.display !== 'none'){
+      showOnboardingTip(btn, 'Harvest to load your vessel.');
+      state.tips.tipHarvestShown = true;
+      saveGame();
+    }
+    return;
+  }
+  if(state.onboarding.steps.harvested && !state.onboarding.steps.sold && !state.tips.tipSellShown){
+    const btn = document.querySelector('.sell-btn');
+    if(btn){
+      showOnboardingTip(btn, 'Sell at market to make cash.');
+      state.tips.tipSellShown = true;
+      saveGame();
+    }
+    return;
+  }
+  if(state.onboarding.steps.sold && !state.onboarding.steps.boughtPen && !state.tips.tipBuyPenShown){
+    const btn = document.getElementById('buyPenBtn');
+    if(btn){
+      showOnboardingTip(btn, 'Now buy another pen to expand.');
+      state.tips.tipBuyPenShown = true;
+      saveGame();
+    }
+  }
 }
 
 function updateSiteUpgrades(){
@@ -1398,6 +1495,7 @@ function finishOffloading(vessel, market, canceled=false){
   state.cash += earned;
   if(earned > 0){
     state.milestones.firstSale = true;
+    state.onboarding.steps.sold = true;
     checkMilestones();
   }
   vessel.offloadRevenue = 0;
@@ -1679,6 +1777,7 @@ function closeSiteManagement(){
 
 function openDevModal(){
   document.getElementById('devModal').classList.add('visible');
+  updateOnboardingToggleButton();
 }
 
 function closeDevModal(){

@@ -198,6 +198,7 @@ function buyNewPen(bargeIdx = state.currentBargeIndex){
   state.cash -= state.penPurchaseCost;
   site.pens.push({ species:"shrimp", fishCount:0, averageWeight:0, bargeIndex: Number(bargeIdx) });
   state.penPurchaseCost *= 1.5;
+  state.onboarding.steps.boughtPen = true;
   updateDisplay();
 }
 
@@ -431,6 +432,17 @@ function toggleDevTools(){
   const modal = document.getElementById('devModal');
   if(modal.classList.contains('visible')) uiCloseDevModal();
   else uiOpenDevModal();
+}
+
+function toggleOnboarding(){
+  state.onboarding.enabled = !state.onboarding.enabled;
+  if(!state.onboarding.enabled){
+    state.onboarding.dismissed = true;
+  } else {
+    state.onboarding.dismissed = false;
+  }
+  updateDisplay();
+  saveGame();
 }
 function openCustomBuild(){
   uiOpenCustomBuild();
@@ -675,6 +687,7 @@ function harvestPen(amount=null, holdIdx=0){
         vessel.isHarvesting = false;
         vessel.actionEndsAt = 0;
         state.harvestsCompleted++;
+        state.onboarding.steps.harvested = true;
         openModal(`Harvested ${biomass.toFixed(2)} kg loaded onto ${vessel.name}.`);
         checkVesselContractEligibility(vessel);
       }
@@ -750,6 +763,7 @@ function restockPen(sp, qty){
   updateDisplay();
   closeRestockModal();
   state.milestones.firstStock = true;
+  state.onboarding.steps.stocked = true;
   checkMilestones();
 }
 // dev menu
@@ -1123,6 +1137,7 @@ function saveGame() {
     unlockedContractTiers: state.unlockedContractTiers,
     milestones: state.milestones,
     bank: state.bank,
+    onboarding: state.onboarding,
     tips: state.tips,
     marketStates: markets.map(m => ({
       name: m.name,
@@ -1166,7 +1181,13 @@ function loadGame() {
       state.contractsCompletedByTier = obj.contractsCompletedByTier ?? {};
       state.unlockedContractTiers = obj.unlockedContractTiers ?? [0];
       state.milestones = obj.milestones ?? {};
-      state.tips = Object.assign({ vesselUnlocked:false, penUnlocked:false }, obj.tips);
+      state.tips = Object.assign({ vesselUnlocked:false, penUnlocked:false, tipStockShown:false, tipHarvestShown:false, tipSellShown:false, tipBuyPenShown:false }, obj.tips);
+      state.onboarding = Object.assign({ enabled:true, dismissed:false, steps:{ stocked:false, harvested:false, sold:false, boughtPen:false } }, obj.onboarding);
+      if(!state.onboarding.steps){
+        state.onboarding.steps = { stocked:false, harvested:false, sold:false, boughtPen:false };
+      } else {
+        state.onboarding.steps = Object.assign({ stocked:false, harvested:false, sold:false, boughtPen:false }, state.onboarding.steps);
+      }
       if(obj.bank){
         state.bank.deposit = obj.bank.deposit ?? state.bank.deposit;
         state.bank.depositInterestRate = obj.bank.depositInterestRate ?? state.bank.depositInterestRate;
@@ -1383,6 +1404,7 @@ export {
   openDevModal,
   closeDevModal,
   toggleDevTools,
+  toggleOnboarding,
   getTimeState,
   pauseTime,
   resumeTime,
