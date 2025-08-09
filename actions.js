@@ -13,16 +13,25 @@ function onBoot(fn){
     }
   }, 50);
 }
+window.onBoot = onBoot;
 
 function bootGuard(fn){
-  return function(...args){
-    if(!window.state){
-      console.warn('Action before boot');
-      return;
-    }
-    return fn(...args);
-  };
+  if(!window.state){
+    console.warn('bootGuard: state not ready');
+    return;
+  }
+  try {
+    fn();
+  } catch (e) {
+    console.error(e);
+  }
 }
+window.bootGuard = bootGuard;
+
+function getTimeState(){
+  return { now: Date.now(), speed: state?.timeScale ?? 1 };
+}
+window.getTimeState = getTimeState;
 
 function syncLegacyVesselFields(vessel){
   const h = vessel.holds?.[0];
@@ -1231,9 +1240,7 @@ function loadGame() {
     console.error('Load failed', e);
   }
   setupMarketData();
-  initContracts(state);
   state.generateShipyardInventory();
-  initMilestones();
 }
 
 function resetGame() {
@@ -1354,7 +1361,6 @@ const actions = {
   closeDevModal,
   toggleDevTools,
   toggleOnboarding,
-  getTimeState,
   pauseTime,
   resumeTime,
   updateFeedPurchaseUI,
@@ -1374,14 +1380,13 @@ const actions = {
   logVesselHolds,
 };
 
-for (const key in actions) {
-  actions[key] = bootGuard(actions[key]);
+for (const key in actions){
+  window[key] = (...args) => window.bootGuard(()=>actions[key](...args));
 }
-
-Object.assign(window, actions);
 
 onBoot(()=>{
   loadGame();
+  initContracts(state);
   initMilestones();
   setInterval(saveGame, state.AUTO_SAVE_INTERVAL_MS);
   setInterval(checkMilestones, 1000);

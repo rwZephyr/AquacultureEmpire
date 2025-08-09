@@ -2059,7 +2059,6 @@ const ui = {
   renderMap,
   setupMapInteractions,
   setupStatusTooltips,
-  openModal,
   closeModal,
   openRestockModal,
   closeRestockModal,
@@ -2115,10 +2114,8 @@ const ui = {
 };
 
 for (const key in ui){
-  ui[key] = bootGuard(ui[key]);
+  window[key] = (...args) => window.bootGuard(()=>ui[key](...args));
 }
-
-Object.assign(window, ui);
 
 onBoot(()=>{
   adjustHeaderPadding();
