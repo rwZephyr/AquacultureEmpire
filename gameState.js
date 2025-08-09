@@ -208,6 +208,21 @@ function advanceDay() {
       pen.averageWeight = newAvg;
     });
   });
+
+  state.vessels.forEach(v => {
+    if(Array.isArray(v.holds)){
+      v.holds.forEach(h => {
+        if(!h.species) return;
+        h.biomass = Math.min(h.biomass, h.capacity);
+      });
+      const h0 = v.holds[0];
+      if(h0){
+        v.currentBiomassLoad = h0.biomass; // TODO: remove after holds migration
+        v.cargoSpecies = h0.species; // TODO: remove after holds migration
+        v.maxBiomassCapacity = h0.capacity; // TODO: remove after holds migration
+      }
+    }
+  });
 }
 
 state.advanceDay = advanceDay;
@@ -291,11 +306,11 @@ state.sites = [
 ];
 
 state.vessels = [
-  new Vessel({
-    name: 'Hauler 1',
-    maxBiomassCapacity: vesselTiers[0].maxBiomassCapacity,
-    currentBiomassLoad: 0,
-    cargoSpecies: null,
+    new Vessel({
+      name: 'Hauler 1',
+      maxBiomassCapacity: vesselTiers[0].maxBiomassCapacity, // TODO: remove after holds migration
+      currentBiomassLoad: 0, // TODO: remove after holds migration
+      cargoSpecies: null, // TODO: remove after holds migration
     speed: vesselTiers[0].speed,
     location: 'Dock',
     upgradeSlots: vesselClasses.skiff.slots,
@@ -404,8 +419,8 @@ function estimateTravelTime(fromName, destLoc, vessel){
 function estimateSellPrice(vessel, market){
   let total = 0;
   if(vessel.fishBuffer){
-    vessel.fishBuffer.forEach(fish=>{
-      const sp = fish.species || vessel.cargoSpecies;
+      vessel.fishBuffer.forEach(fish=>{
+        const sp = fish.species || vessel.cargoSpecies; // TODO: remove after holds migration
       let price = fish.salePrice;
       if(price === undefined){
         const marketPrice = market.prices?.[sp];

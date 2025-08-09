@@ -545,12 +545,12 @@ function renderVesselGrid(){
     if(vessel.unloading){
       speciesEl.textContent = `Revenue $${vessel.offloadRevenue.toFixed(2)}`;
     } else {
-      speciesEl.textContent = vessel.isHarvesting && vessel.cargoSpecies ? `Harvesting ${capitalizeFirstLetter(vessel.cargoSpecies)}` : '';
+        speciesEl.textContent = vessel.isHarvesting && vessel.cargoSpecies ? `Harvesting ${capitalizeFirstLetter(vessel.cargoSpecies)}` : ''; // TODO: remove after holds migration
     }
-    const loadPercent = vessel.maxBiomassCapacity ? (vessel.currentBiomassLoad / vessel.maxBiomassCapacity)*100 : 0;
-    card.querySelector('.vessel-progress').style.width = loadPercent + '%';
-    card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1);
-    card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity;
+      const loadPercent = vessel.maxBiomassCapacity ? (vessel.currentBiomassLoad / vessel.maxBiomassCapacity)*100 : 0; // TODO: derive from holds[0]
+      card.querySelector('.vessel-progress').style.width = loadPercent + '%';
+      card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1); // TODO: remove after holds migration
+      card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity; // TODO: remove after holds migration
     card.querySelector('.load-percent').textContent = loadPercent.toFixed(0);
     const infoEl = card.querySelector('.fishbuffer-info');
     const infoStr = getFishBufferInfo(vessel.fishBuffer);
@@ -628,12 +628,12 @@ function updateVesselCards(){
     if(vessel.unloading){
       speciesEl.textContent = `Revenue $${vessel.offloadRevenue.toFixed(2)}`;
     } else {
-      speciesEl.textContent = vessel.isHarvesting && vessel.cargoSpecies ? `Harvesting ${capitalizeFirstLetter(vessel.cargoSpecies)}` : '';
+        speciesEl.textContent = vessel.isHarvesting && vessel.cargoSpecies ? `Harvesting ${capitalizeFirstLetter(vessel.cargoSpecies)}` : ''; // TODO: remove after holds migration
     }
-    const loadPercent = vessel.maxBiomassCapacity ? (vessel.currentBiomassLoad / vessel.maxBiomassCapacity)*100 : 0;
-    card.querySelector('.vessel-progress').style.width = loadPercent + '%';
-    card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1);
-    card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity;
+      const loadPercent = vessel.maxBiomassCapacity ? (vessel.currentBiomassLoad / vessel.maxBiomassCapacity)*100 : 0; // TODO: derive from holds[0]
+      card.querySelector('.vessel-progress').style.width = loadPercent + '%';
+      card.querySelector('.vessel-load').textContent = vessel.currentBiomassLoad.toFixed(1); // TODO: remove after holds migration
+      card.querySelector('.vessel-capacity').textContent = vessel.maxBiomassCapacity; // TODO: remove after holds migration
     const lp = card.querySelector('.load-percent');
     if(lp) lp.textContent = loadPercent.toFixed(0);
     const infoEl2 = card.querySelector('.fishbuffer-info');
@@ -975,7 +975,7 @@ function updateHarvestModal(){
   const penIdx = Number(document.getElementById('harvestPenSelect').value);
   state.currentPenIndex = penIdx;
   const pen = site.pens[penIdx];
-  const vesselRemaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
+    const vesselRemaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad; // TODO: derive from holds[0]
   const penBiomass = pen.fishCount * pen.averageWeight;
   const maxHarvest = Math.min(penBiomass, vesselRemaining);
   document.getElementById('harvestMax').innerText = maxHarvest.toFixed(2);
@@ -1220,9 +1220,11 @@ function startOffloading(vessel, market){
   vessel.unloading = true;
   vessel.offloadRevenue = 0;
   vessel.offloadMarket = market.name;
+  const holdIndex = 0;
+  const hold = vessel.holds?.[holdIndex];
   vessel.fishBuffer.forEach(fish => {
     if(fish.salePrice === undefined){
-      const sp = fish.species || vessel.cargoSpecies;
+      const sp = fish.species || hold?.species;
       const mp = market.prices?.[sp];
       if(mp !== undefined){
         fish.salePrice = mp;
@@ -1234,7 +1236,7 @@ function startOffloading(vessel, market){
     }
   });
   const rate = state.OFFLOAD_RATE;
-  const updateEta = ()=>{ vessel.actionEndsAt = Date.now() + (vessel.currentBiomassLoad / rate) * 1000; }; // TODO: derive from holds[0]
+  const updateEta = ()=>{ vessel.actionEndsAt = Date.now() + (hold.biomass / rate) * 1000; };
   updateEta();
   let last = Date.now();
   vessel.offloadInterval = setInterval(()=>{
@@ -1243,36 +1245,31 @@ function startOffloading(vessel, market){
     let dt = (now - last)/1000;
     last = now;
     let remaining = rate * dt;
-    while(remaining > 0 && vessel.currentBiomassLoad > 0 && vessel.fishBuffer.length > 0){
+    while(remaining > 0 && hold.biomass > 0 && vessel.fishBuffer.length > 0){
       const fish = vessel.fishBuffer[0];
-      const sp = fish.species || vessel.cargoSpecies;
+      const sp = fish.species || hold.species;
       const price = fish.salePrice || 0;
       if(fish.weight <= remaining){
         remaining -= fish.weight;
-        vessel.currentBiomassLoad -= fish.weight;
-        if(vessel.holds && vessel.holds[0]) {
-          vessel.holds[0].biomass -= fish.weight;
-        }
+        hold.biomass -= fish.weight;
         vessel.offloadRevenue += fish.weight * price;
         if(market.daysSinceSale) market.daysSinceSale[sp] = 0;
         vessel.fishBuffer.shift();
       } else {
         fish.weight -= remaining;
-        vessel.currentBiomassLoad -= remaining;
-        if(vessel.holds && vessel.holds[0]) {
-          vessel.holds[0].biomass -= remaining;
-        }
+        hold.biomass -= remaining;
         vessel.offloadRevenue += remaining * price;
         if(market.daysSinceSale) market.daysSinceSale[sp] = 0;
         remaining = 0;
       }
     }
+    vessel.currentBiomassLoad = hold.biomass; // TODO: remove after holds migration
+    vessel.cargoSpecies = hold.species; // TODO: remove after holds migration
     updateEta();
     updateDisplay();
     const epsilon = 0.0001;
-    if(vessel.currentBiomassLoad <= epsilon || vessel.fishBuffer.length === 0){
-      vessel.currentBiomassLoad = 0;
-      if(vessel.holds && vessel.holds[0]) vessel.holds[0].biomass = 0;
+    if(hold.biomass <= epsilon || vessel.fishBuffer.length === 0){
+      hold.biomass = 0;
       finishOffloading(vessel, market);
     }
   },250);
@@ -1286,14 +1283,15 @@ function finishOffloading(vessel, market, canceled=false){
   state.cash += earned;
   vessel.offloadRevenue = 0;
   vessel.offloadMarket = null;
+  const hold = vessel.holds?.[0];
   if(!canceled){
     vessel.fishBuffer = [];
-    vessel.currentBiomassLoad = 0;
-    if(vessel.holds && vessel.holds[0]) {
-      vessel.holds[0].biomass = 0;
-      vessel.holds[0].species = null;
+    if(hold){
+      hold.biomass = 0;
+      hold.species = null;
     }
-    vessel.cargoSpecies = null;
+    vessel.currentBiomassLoad = 0; // TODO: remove after holds migration
+    vessel.cargoSpecies = null; // TODO: remove after holds migration
     vessel.cargo = {};
     if(market && market.daysSinceSale){
       // daysSinceSale already updated during offload
@@ -1307,8 +1305,9 @@ function finishOffloading(vessel, market, canceled=false){
 
 function sellCargo(idx){
   const vessel = state.vessels[state.currentVesselIndex];
+  const hold = vessel.holds?.[0];
   if(vessel.isHarvesting || vessel.unloading){ closeSellModal(); return openModal('Vessel currently busy.'); }
-  if(vessel.currentBiomassLoad<=0) return openModal('No biomass to sell.'); // TODO: check holds[0].biomass
+  if(!hold || hold.biomass<=0) return openModal('No biomass to sell.');
   const market = markets[idx];
   if(vessel.location === `Traveling to ${market.name}`){
     closeSellModal();

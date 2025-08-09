@@ -69,10 +69,10 @@ export class Site {
 export class Vessel {
   constructor({
     name,
-    maxBiomassCapacity = 1000,
-    currentBiomassLoad = 0,
-    cargo = {},
-    cargoSpecies = null,
+      maxBiomassCapacity = 1000, // TODO: remove after holds migration
+      currentBiomassLoad = 0, // TODO: remove after holds migration
+      cargo = {},
+      cargoSpecies = null, // TODO: remove after holds migration
     holds = null,
     speed = 10,
     location = '',
@@ -83,11 +83,11 @@ export class Vessel {
     actionEndsAt = 0
   } = {}) {
     this.name = name;
-    this.maxBiomassCapacity = maxBiomassCapacity;
-    this.currentBiomassLoad = currentBiomassLoad;
+      this.maxBiomassCapacity = maxBiomassCapacity; // TODO: remove after holds migration
+      this.currentBiomassLoad = currentBiomassLoad; // TODO: remove after holds migration
     // Deprecated: cargo is maintained for legacy saves but no longer used
     this.cargo = cargo;
-    this.cargoSpecies = cargoSpecies;
+      this.cargoSpecies = cargoSpecies; // TODO: remove after holds migration
     this.speed = speed;
     this.location = location;
     this.upgradeSlots = upgradeSlots;
@@ -101,13 +101,13 @@ export class Vessel {
       this.holds = holds.map(h => ({
         species: h?.species ?? null,
         biomass: h?.biomass ?? 0,
-        capacity: h?.capacity ?? maxBiomassCapacity,
+          capacity: h?.capacity ?? maxBiomassCapacity, // TODO: remove after holds migration
       }));
     } else {
       this.holds = [{
-        species: cargoSpecies,
-        biomass: currentBiomassLoad,
-        capacity: maxBiomassCapacity,
+          species: cargoSpecies, // TODO: remove after holds migration
+          biomass: currentBiomassLoad, // TODO: remove after holds migration
+          capacity: maxBiomassCapacity, // TODO: remove after holds migration
       }];
     }
 

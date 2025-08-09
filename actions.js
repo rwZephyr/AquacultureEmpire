@@ -74,6 +74,24 @@ import {
   switchLogbookSection
 } from "./ui.js";
 
+function syncLegacyVesselFields(vessel){
+  const h = vessel.holds?.[0];
+  if(!h) return;
+  vessel.currentBiomassLoad = h.biomass; // TODO: remove scalar after holds migration
+  vessel.cargoSpecies = h.species; // TODO: remove scalar after holds migration
+  vessel.maxBiomassCapacity = h.capacity; // TODO: remove scalar after holds migration
+}
+
+export function logVesselHolds(vessel){
+  if(!vessel || !Array.isArray(vessel.holds)){
+    console.log('No holds to log');
+    return;
+  }
+  vessel.holds.forEach((h, i)=>{
+    console.log(`Hold ${i}: ${h.biomass}/${h.capacity}kg ${h.species||'empty'}`);
+  });
+}
+
 function lockPen(pen, reason){
   pen.locked = true;
   pen.lastLockReason = reason;
@@ -295,10 +313,10 @@ function upgradeVessel(){
   if(state.cash < next.cost) return openModal("Not enough cash to upgrade vessel.");
   state.cash -= next.cost;
   vessel.tier++;
-  vessel.maxBiomassCapacity = Math.max(vessel.maxBiomassCapacity, next.maxBiomassCapacity);
-  if (vessel.holds && vessel.holds[0]) {
-    vessel.holds[0].capacity = vessel.maxBiomassCapacity;
-  }
+    vessel.maxBiomassCapacity = Math.max(vessel.maxBiomassCapacity, next.maxBiomassCapacity); // TODO: remove after holds migration
+    if (vessel.holds && vessel.holds[0]) {
+      vessel.holds[0].capacity = vessel.maxBiomassCapacity; // TODO: remove after holds migration
+    }
   vessel.speed = next.speed;
   openModal(`Vessel upgraded to ${next.name} tier!`);
   updateDisplay();
@@ -307,11 +325,11 @@ function upgradeVessel(){
 function buyNewVessel(){
   if(state.cash < NEW_VESSEL_COST) return openModal("Not enough cash to buy a new vessel!");
   state.cash -= NEW_VESSEL_COST;
-  state.vessels.push(new Vessel({
-    name: `Vessel ${state.vessels.length + 1}`,
-    maxBiomassCapacity: vesselTiers[0].maxBiomassCapacity,
-    currentBiomassLoad: 0,
-    cargoSpecies: null,
+    state.vessels.push(new Vessel({
+      name: `Vessel ${state.vessels.length + 1}`,
+      maxBiomassCapacity: vesselTiers[0].maxBiomassCapacity, // TODO: remove after holds migration
+      currentBiomassLoad: 0, // TODO: remove after holds migration
+      cargoSpecies: null, // TODO: remove after holds migration
     speed: vesselTiers[0].speed,
     location: 'Dock',
     tier: 0,
@@ -430,11 +448,11 @@ function buyShipyardVessel(idx){
   if(!item) return;
   if(state.cash < item.cost) return openModal('Not enough cash to buy this vessel.');
   state.cash -= item.cost;
-  const vessel = new Vessel({
-    name: item.name,
-    maxBiomassCapacity: item.cargoCapacity,
-    currentBiomassLoad: 0,
-    cargoSpecies: null,
+    const vessel = new Vessel({
+      name: item.name,
+      maxBiomassCapacity: item.cargoCapacity, // TODO: remove after holds migration
+      currentBiomassLoad: 0, // TODO: remove after holds migration
+      cargoSpecies: null, // TODO: remove after holds migration
     speed: item.speed,
     location: 'Dock',
     tier: 0,
@@ -474,11 +492,11 @@ function confirmCustomBuild(){
   const cost = Math.round(base.cost * CUSTOM_BUILD_MARKUP);
   if(state.cash < cost) return openModal('Not enough cash to build this vessel.');
   state.cash -= cost;
-  const vessel = new Vessel({
-    name: name,
-    maxBiomassCapacity: base.baseCapacity,
-    currentBiomassLoad: 0,
-    cargoSpecies: null,
+    const vessel = new Vessel({
+      name: name,
+      maxBiomassCapacity: base.baseCapacity, // TODO: remove after holds migration
+      currentBiomassLoad: 0, // TODO: remove after holds migration
+      cargoSpecies: null, // TODO: remove after holds migration
     speed: base.baseSpeed,
     location: 'Dock',
     tier: 0,
@@ -554,17 +572,19 @@ function feedFish(){
   pen.averageWeight += gain/pen.fishCount;
 }
 function harvestPen(amount=null){
-  // TODO: use holds[0] as source of truth for biomass/species
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
   const vessel = state.vessels[state.currentVesselIndex];
+  const holdIndex = 0;
+  const hold = vessel.holds?.[holdIndex];
+  if(!hold) return;
   if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
     return openModal('Vessel currently busy.');
   if(pen.fishCount===0) return;
-  if(vessel.currentBiomassLoad>0 && vessel.cargoSpecies && vessel.cargoSpecies !== pen.species){
+  if(hold.biomass>0 && hold.species && hold.species !== pen.species){
     return openModal('Vessel already contains a different species.');
   }
-  const vesselRemaining = vessel.maxBiomassCapacity - vessel.currentBiomassLoad;
+  const vesselRemaining = hold.capacity - hold.biomass;
   const totalBiomass = pen.fishCount * pen.averageWeight;
   const maxHarvest = Math.min(totalBiomass, vesselRemaining);
   if(maxHarvest <= 0) return openModal("Vessel capacity full.");
@@ -579,7 +599,7 @@ function harvestPen(amount=null){
   const performHarvest = ()=>{
     lockPen(pen, 'harvest:start');
     vessel.harvestingPenIndex = state.currentPenIndex;
-    if(!vessel.cargoSpecies) vessel.cargoSpecies = pen.species;
+    if(!hold.species) hold.species = pen.species;
     if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
     vessel.harvestProgress = 0;
     vessel.harvestFishBuffer = 0;
@@ -601,14 +621,9 @@ function harvestPen(amount=null){
       if(vessel.harvestProgress + delta > biomass) delta = biomass - vessel.harvestProgress;
       if(delta<=0) return;
       vessel.harvestProgress += delta;
-      vessel.currentBiomassLoad += delta;
-      if(vessel.holds && vessel.holds[0]) {
-        vessel.holds[0].biomass += delta;
-      }
-      if(!vessel.cargoSpecies) vessel.cargoSpecies = pen.species;
-      if(vessel.holds && vessel.holds[0] && !vessel.holds[0].species) {
-        vessel.holds[0].species = pen.species;
-      }
+      hold.biomass = Math.min(hold.biomass + delta, hold.capacity);
+      if(!hold.species) hold.species = pen.species;
+      syncLegacyVesselFields(vessel);
       if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
       vessel.cargo[pen.species] += delta;
       vessel.harvestFishBuffer += delta / pen.averageWeight;
@@ -625,7 +640,6 @@ function harvestPen(amount=null){
         clearInterval(vessel.harvestInterval);
         vessel.harvestInterval = null;
         vessel.harvestProgress = 0;
-        // ensure final fish count accounts for rounding
         pen.fishCount = Math.max(0, startFishCount - fishNum);
         const leftover = Math.round(vessel.harvestFishBuffer);
         if(leftover > 0){
@@ -1039,6 +1053,21 @@ function simulateOfflineProgress(ms){
         }
       });
     });
+
+    state.vessels.forEach(v => {
+      if(Array.isArray(v.holds)){
+        v.holds.forEach(h => {
+          if(!h.species) return;
+          h.biomass = Math.min(h.biomass, h.capacity);
+        });
+        const h0 = v.holds[0];
+        if(h0){
+          v.currentBiomassLoad = h0.biomass; // TODO: remove after holds migration
+          v.cargoSpecies = h0.species; // TODO: remove after holds migration
+          v.maxBiomassCapacity = h0.capacity; // TODO: remove after holds migration
+        }
+      }
+    });
   }
 
   const daysPassed = Math.floor(totalSeconds / daySeconds);
@@ -1120,22 +1149,22 @@ function loadGame() {
       state.vessels = obj.vessels ?? state.vessels;
       state.vessels.forEach(v => {
         if(!v.cargo) v.cargo = {};
-        if(v.cargoSpecies === undefined) v.cargoSpecies = Object.keys(v.cargo)[0] || null;
+          if(v.cargoSpecies === undefined) v.cargoSpecies = Object.keys(v.cargo)[0] || null; // TODO: remove after holds migration
         if(v.isHarvesting === undefined) v.isHarvesting = false;
         if(v.actionEndsAt === undefined) v.actionEndsAt = 0;
         if(v.upgradeSlots === undefined) v.upgradeSlots = vesselClasses.skiff.slots;
         if(!v.upgrades) v.upgrades = [];
         if(!Array.isArray(v.holds)) {
           v.holds = [{
-            species: v.cargoSpecies ?? null,
-            biomass: v.currentBiomassLoad ?? 0,
-            capacity: v.maxBiomassCapacity ?? 0,
+              species: v.cargoSpecies ?? null, // TODO: remove after holds migration
+              biomass: v.currentBiomassLoad ?? 0, // TODO: remove after holds migration
+              capacity: v.maxBiomassCapacity ?? 0, // TODO: remove after holds migration
           }];
         } else {
           v.holds = v.holds.map(h => ({
             species: h?.species ?? null,
             biomass: h?.biomass ?? 0,
-            capacity: h?.capacity ?? v.maxBiomassCapacity ?? 0,
+              capacity: h?.capacity ?? v.maxBiomassCapacity ?? 0, // TODO: remove after holds migration
           }));
         }
         Object.defineProperty(v, 'harvestInterval', { value: null, writable: true, enumerable: false });
