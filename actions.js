@@ -296,6 +296,9 @@ function upgradeVessel(){
   state.cash -= next.cost;
   vessel.tier++;
   vessel.maxBiomassCapacity = Math.max(vessel.maxBiomassCapacity, next.maxBiomassCapacity);
+  if (vessel.holds && vessel.holds[0]) {
+    vessel.holds[0].capacity = vessel.maxBiomassCapacity;
+  }
   vessel.speed = next.speed;
   openModal(`Vessel upgraded to ${next.name} tier!`);
   updateDisplay();
@@ -551,6 +554,7 @@ function feedFish(){
   pen.averageWeight += gain/pen.fishCount;
 }
 function harvestPen(amount=null){
+  // TODO: use holds[0] as source of truth for biomass/species
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
   const vessel = state.vessels[state.currentVesselIndex];
@@ -598,7 +602,13 @@ function harvestPen(amount=null){
       if(delta<=0) return;
       vessel.harvestProgress += delta;
       vessel.currentBiomassLoad += delta;
+      if(vessel.holds && vessel.holds[0]) {
+        vessel.holds[0].biomass += delta;
+      }
       if(!vessel.cargoSpecies) vessel.cargoSpecies = pen.species;
+      if(vessel.holds && vessel.holds[0] && !vessel.holds[0].species) {
+        vessel.holds[0].species = pen.species;
+      }
       if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
       vessel.cargo[pen.species] += delta;
       vessel.harvestFishBuffer += delta / pen.averageWeight;
@@ -1115,6 +1125,19 @@ function loadGame() {
         if(v.actionEndsAt === undefined) v.actionEndsAt = 0;
         if(v.upgradeSlots === undefined) v.upgradeSlots = vesselClasses.skiff.slots;
         if(!v.upgrades) v.upgrades = [];
+        if(!Array.isArray(v.holds)) {
+          v.holds = [{
+            species: v.cargoSpecies ?? null,
+            biomass: v.currentBiomassLoad ?? 0,
+            capacity: v.maxBiomassCapacity ?? 0,
+          }];
+        } else {
+          v.holds = v.holds.map(h => ({
+            species: h?.species ?? null,
+            biomass: h?.biomass ?? 0,
+            capacity: h?.capacity ?? v.maxBiomassCapacity ?? 0,
+          }));
+        }
         Object.defineProperty(v, 'harvestInterval', { value: null, writable: true, enumerable: false });
         Object.defineProperty(v, 'harvestTimeout', { value: null, writable: true, enumerable: false });
         Object.defineProperty(v, 'harvestProgress', { value: 0, writable: true, enumerable: false });

@@ -73,6 +73,7 @@ export class Vessel {
     currentBiomassLoad = 0,
     cargo = {},
     cargoSpecies = null,
+    holds = null,
     speed = 10,
     location = '',
     upgradeSlots = 2,
@@ -94,6 +95,21 @@ export class Vessel {
     this.tier = tier;
     this.isHarvesting = isHarvesting;
     this.actionEndsAt = actionEndsAt;
+
+    // future: support multiple holds; hold[0] mirrors legacy fields
+    if (Array.isArray(holds) && holds.length) {
+      this.holds = holds.map(h => ({
+        species: h?.species ?? null,
+        biomass: h?.biomass ?? 0,
+        capacity: h?.capacity ?? maxBiomassCapacity,
+      }));
+    } else {
+      this.holds = [{
+        species: cargoSpecies,
+        biomass: currentBiomassLoad,
+        capacity: maxBiomassCapacity,
+      }];
+    }
 
     this.unloading = false;
     this.offloadRevenue = 0;
