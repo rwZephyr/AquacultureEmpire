@@ -1,28 +1,4 @@
-import {
-  siloUpgrades,
-  blowerUpgrades,
-  housingUpgrades,
-  DEFAULT_FEEDER_LIMIT,
-  DEFAULT_MAX_FEEDER_TIER,
-  NEW_BARGE_COST,
-  NEW_VESSEL_COST,
-  feedStorageUpgrades,
-  STAFF_HIRE_COST,
-  staffRoles,
-  staffHousingUpgrades,
-  speciesData,
-  feederUpgrades,
-  siteNamePrefixes,
-  siteNameSuffixes,
-  vesselNamePrefixes,
-  vesselNameSuffixes,
-  vesselClasses,
-  vesselUnlockDays,
-  vesselTiers,
-  markets,
-} from './data.js';
-import { Site, Barge, Pen, Vessel } from './models.js';
-import { initContracts, checkContractExpirations, generateDailyContracts } from "./contracts.js";
+ 
 
 // Core Game State wrapped in a mutable object so other modules can update it
 const state = {
@@ -100,6 +76,8 @@ const state = {
 
 // initialize contracts module with state reference
 initContracts(state);
+// expose state globally for boot readiness
+window.state = state;
 
 // Expose read-only accessors for external logic
 Object.defineProperties(window, {
@@ -462,30 +440,5 @@ function getSiteHarvestRate(site) {
 }
 
 state.getSiteHarvestRate = getSiteHarvestRate;
-
-export default state;
-export {
-  capitalizeFirstLetter,
-  generateRandomSiteName,
-  generateRandomVesselName,
-  generateShipyardInventory,
-  findSiteByName,
-  findMarketByName,
-  getLocationByName,
-  estimateTravelTime,
-  estimateSellPrice,
-  getTimeState,
-  getDateString,
-  setupMarketData,
-  updateMarketPrices,
-  advanceDay,
-  advanceDays,
-  addStatusMessage,
-  checkShipyardRestock,
-  pauseTime,
-  resumeTime,
-  applyGrowth,
-  getSiteHarvestRate,
-};
 
 

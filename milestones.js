@@ -1,5 +1,3 @@
-import state from './gameState.js';
-import { openModal } from './ui.js';
 
 // List of milestone definitions
 const milestones = [
@@ -107,5 +105,3 @@ function checkMilestones(){
     }
   });
 }
-
-export { milestones, initMilestones, checkMilestones };

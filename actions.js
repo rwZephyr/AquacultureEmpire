@@ -1,78 +1,28 @@
-import {
-  NEW_BARGE_COST,
-  NEW_VESSEL_COST,
-  feedStorageUpgrades,
-  siloUpgrades,
-  blowerUpgrades,
-  housingUpgrades,
-  DEFAULT_FEEDER_LIMIT,
-  DEFAULT_MAX_FEEDER_TIER,
-  STAFF_HIRE_COST,
-  staffRoles,
-  staffHousingUpgrades,
-  speciesData,
-  feederUpgrades,
-  vesselTiers,
-  markets,
-  vesselClasses,
-  vesselUnlockDays,
-  VESSEL_RENAME_FEE,
-  CUSTOM_BUILD_MARKUP
-} from "./data.js";
-import { Site, Barge, Pen, Vessel } from "./models.js";
-import state, { getTimeState, addStatusMessage, advanceDays, setupMarketData, updateMarketPrices } from "./gameState.js";
-import { initMilestones, checkMilestones } from './milestones.js';
-import { initContracts, openContractDeliveryModal, closeContractDeliveryModal, deliverContract, checkVesselContractEligibility } from './contracts.js';
-
 const OFFLINE_STEP_SECONDS = 60; // simulation granularity for offline progress
-import {
-  updateDisplay,
-  openModal,
-  closeModal,
-  setupMapInteractions,
-  openRestockModal,
-  closeRestockModal,
-  closeHarvestModal,
-  confirmHarvest,
-  openSellModal,
-  closeSellModal,
-  sellCargo,
-  startOffloading,
-  finishOffloading,
-  openBargeUpgradeModal as uiOpenBargeUpgradeModal,
-  closeBargeUpgradeModal as uiCloseBargeUpgradeModal,
-  openMarketReport,
-  closeMarketReport,
-  openBank,
-  closeBank,
-  openMarketReports,
-  openShipyard as uiOpenShipyard,
-  closeShipyard as uiCloseShipyard,
-  openCustomBuild as uiOpenCustomBuild,
-  backToShipyardList as uiBackToShipyardList,
-  updateCustomBuildStats as uiUpdateCustomBuildStats,
-  updateFeedPurchaseUI,
-  syncFeedPurchase,
-  confirmBuyFeed,
-  setFeedPurchaseMax,
-  toggleSiteList,
-  toggleMobileActions,
-  toggleSiteActions,
-  toggleBankActions,
-  outsideBankActionHandler,
-  selectSite,
-  populateSiteList,
-  openLogbook,
-  closeLogbook,
-  openSiteManagement as uiOpenSiteManagement,
-  closeSiteManagement as uiCloseSiteManagement,
-  updateSiteUpgrades,
-  updateLicenseDropdown,
-  updateSiteLicenses,
-  openDevModal as uiOpenDevModal,
-  closeDevModal as uiCloseDevModal,
-  switchLogbookSection
-} from "./ui.js";
+
+function onBoot(fn){
+  if (document.readyState === 'complete' || document.readyState === 'interactive'){
+    if (window.state) return fn();
+  }
+  const start = Date.now();
+  const id = setInterval(()=>{
+    if ((document.readyState === 'complete' || document.readyState === 'interactive') && window.state){
+      clearInterval(id); fn();
+    } else if (Date.now() - start > 4000){
+      clearInterval(id); console.error('Boot timeout: state not ready');
+    }
+  }, 50);
+}
+
+function bootGuard(fn){
+  return function(...args){
+    if(!window.state){
+      console.warn('Action before boot');
+      return;
+    }
+    return fn(...args);
+  };
+}
 
 function syncLegacyVesselFields(vessel){
   const h = vessel.holds?.[0];
@@ -82,7 +32,7 @@ function syncLegacyVesselFields(vessel){
   vessel.maxBiomassCapacity = h.capacity; // TODO: remove scalar after holds migration
 }
 
-export function logVesselHolds(vessel){
+function logVesselHolds(vessel){
   if(!vessel || !Array.isArray(vessel.holds)){
     console.log('No holds to log');
     return;
@@ -960,7 +910,7 @@ function getStaffFeedRate(site){
 
 // --- AUTO-FEED ALL SITES & PENS EVERY SECOND ---
 // Locked pens are skipped during auto-feeding
-setInterval(()=>{
+function autoFeedTick(){
   if(state.timePaused) return;
   state.sites.forEach(site=>{
     const staffRate = getStaffFeedRate(site);
@@ -995,7 +945,7 @@ setInterval(()=>{
     });
   });
   updateDisplay();
-},1000);
+}
 
 // --- AUTO FEED MANAGER ---
 function checkFeedManagers(){
@@ -1017,7 +967,6 @@ function checkFeedManagers(){
   });
   updateDisplay();
 }
-setInterval(checkFeedManagers, 5000);
 
 // simplified feed manager logic for offline simulation
 function simulateFeedManagers(){
@@ -1118,11 +1067,11 @@ function simulateOfflineProgress(ms){
 }
 
 // --- GAME TIME LOOP ---
-setInterval(()=>{
+function gameTimeTick(){
   if(!state.timePaused){
     state.advanceDay();
   }
-}, state.DAY_DURATION_MS);
+}
 
 // --- SAVE SYSTEM ---
 function saveGame() {
@@ -1313,7 +1262,7 @@ function nextVessel(){ if(state.currentVesselIndex<state.vessels.length-1) state
 
 
 
-export {
+const actions = {
   buyFeed,
   buyFeedStorageUpgrade,
   purchaseLicense,
@@ -1421,5 +1370,22 @@ export {
   populateSiteList,
   openContractDeliveryModal,
   closeContractDeliveryModal,
-  deliverContract
+  deliverContract,
+  logVesselHolds,
 };
+
+for (const key in actions) {
+  actions[key] = bootGuard(actions[key]);
+}
+
+Object.assign(window, actions);
+
+onBoot(()=>{
+  loadGame();
+  initMilestones();
+  setInterval(saveGame, state.AUTO_SAVE_INTERVAL_MS);
+  setInterval(checkMilestones, 1000);
+  setInterval(autoFeedTick, 1000);
+  setInterval(checkFeedManagers, 5000);
+  setInterval(gameTimeTick, state.DAY_DURATION_MS);
+});

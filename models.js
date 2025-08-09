@@ -1,6 +1,5 @@
-import { siloUpgrades, blowerUpgrades, housingUpgrades, DEFAULT_FEEDER_LIMIT, DEFAULT_MAX_FEEDER_TIER } from './data.js';
 
-export class Barge {
+class Barge {
   constructor({
     feed = 100,
     feedCapacity = siloUpgrades[0].feedCapacity,
@@ -30,7 +29,7 @@ export class Barge {
   }
 }
 
-export class Pen {
+class Pen {
   constructor({
     species = 'shrimp',
     fishCount = 0,
@@ -48,7 +47,7 @@ export class Pen {
   }
 }
 
-export class Site {
+class Site {
   constructor({
     name,
     location = { x: 0, y: 0 },
@@ -66,7 +65,7 @@ export class Site {
   }
 }
 
-export class Vessel {
+class Vessel {
   constructor({
     name,
       maxBiomassCapacity = 1000, // TODO: remove after holds migration
