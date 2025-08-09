@@ -42,7 +42,7 @@
           <img id="mobileActionToggle" src="assets/general-icons/browser.png" alt="Tools" class="icon-button" onclick="toggleMobileActions()" />
           <div id="mobileActionGroup" class="hidden">
             <button onclick="openMarketReport()">Market</button>
-            <button onclick="openShipyard()">Shipyard</button>
+            <button id="shipyardBtn" onclick="openShipyard()">Shipyard</button><span id="shipyardLockReason" class="lock-reason"></span>
             <button onclick="openLogbook()" title="Open Logbook">Logbook</button>
             <button onclick="toggleDevTools()">⚙️</button>
           </div>
@@ -158,8 +158,9 @@
       <div id="newPenControls" class="newPenControls">
         <label for="newPenBargeSelect">Add Pen to Barge:</label>
         <select id="newPenBargeSelect" onchange="updateSelectedBargeDisplay()"></select>
-        <button onclick="buyNewPen(document.getElementById('newPenBargeSelect').value)">+ Pen</button>
+        <button id="buyPenBtn" onclick="buyNewPen(document.getElementById('newPenBargeSelect').value)">+ Pen</button>
         <span id="selectedBargeDisplay"></span>
+        <div id="penLockReason" class="lock-reason"></div>
       </div>
         <div id="penGridContainer" class="grid">
         </div>

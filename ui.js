@@ -22,7 +22,7 @@ import state, {
   getSiteHarvestRate,
 } from "./gameState.js";
 import { renderContracts } from "./contracts.js";
-import { milestones } from './milestones.js';
+import { milestones, checkMilestones } from './milestones.js';
 import { depositToBank, withdrawFromBank, takeLoan, repayLoan } from "./bank.js";
 
 const speciesColors = {
@@ -189,6 +189,22 @@ function updateDisplay(){
       playBtn.style.display = 'none';
       pauseBtn.style.display = 'inline';
     }
+  }
+
+  // milestone-gated actions
+  const shipyardBtn = document.getElementById('shipyardBtn');
+  const shipyardReason = document.getElementById('shipyardLockReason');
+  const shipyardUnlocked = state.milestones.firstStock;
+  if(shipyardBtn){
+    shipyardBtn.disabled = !shipyardUnlocked;
+    if(shipyardReason) shipyardReason.textContent = shipyardUnlocked ? '' : 'Unlocks after stocking your first pen.';
+  }
+  const penBtn = document.getElementById('buyPenBtn');
+  const penReason = document.getElementById('penLockReason');
+  const penUnlocked = state.milestones.firstHarvest && state.milestones.firstSale;
+  if(penBtn){
+    penBtn.disabled = !penUnlocked;
+    if(penReason) penReason.textContent = penUnlocked ? '' : 'Unlocks after your first harvest & sale.';
   }
 
   // barge card & feed overview
@@ -1364,6 +1380,10 @@ function finishOffloading(vessel, market, canceled=false){
   vessel.actionEndsAt = 0;
   let earned = vessel.offloadRevenue || 0;
   state.cash += earned;
+  if(earned > 0){
+    state.milestones.firstSale = true;
+    checkMilestones();
+  }
   vessel.offloadRevenue = 0;
   vessel.offloadMarket = null;
   const hIdx = vessel.offloadHoldIndex ?? 0;

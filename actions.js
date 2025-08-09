@@ -21,7 +21,7 @@ import {
 } from "./data.js";
 import { Site, Barge, Pen, Vessel } from "./models.js";
 import state, { getTimeState, addStatusMessage, advanceDays, setupMarketData, updateMarketPrices } from "./gameState.js";
-import { initMilestones } from './milestones.js';
+import { initMilestones, checkMilestones } from './milestones.js';
 import { initContracts, openContractDeliveryModal, closeContractDeliveryModal, deliverContract, checkVesselContractEligibility } from './contracts.js';
 
 const OFFLINE_STEP_SECONDS = 60; // simulation granularity for offline progress
@@ -749,6 +749,8 @@ function restockPen(sp, qty){
   sanitizePen(pen);
   updateDisplay();
   closeRestockModal();
+  state.milestones.firstStock = true;
+  checkMilestones();
 }
 // dev menu
 function addDevCash() {

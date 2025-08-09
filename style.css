@@ -1840,3 +1840,9 @@ html.modal-open {
   font-style: italic;
   color: var(--text-muted);
 }
+
+.lock-reason {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
