@@ -1,5 +1,5 @@
-// Local state reference initialized via initContracts to avoid circular imports
-let state;
+// Global state reference
+const state = window.state;
 let contracts = [];
 
 // Capitalize helper replicated here to keep module independent
@@ -8,8 +8,7 @@ function capitalizeFirstLetter(str){
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function initContracts(gameState){
-  state = gameState;
+function initContracts(){
   if(!state.contracts) state.contracts = [];
   if(!state.contractsCompletedByTier) state.contractsCompletedByTier = {};
   if(!state.unlockedContractTiers) state.unlockedContractTiers = [0];
