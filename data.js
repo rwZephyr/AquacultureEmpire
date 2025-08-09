@@ -1,57 +1,57 @@
-export const bargeTiers = [
+const bargeTiers = [
   { name: 'Small',  feedCapacity: 200, feederLimit: 2, maxFeederTier: 1, cost: 0 },
   { name: 'Medium', feedCapacity: 500, feederLimit: 4, maxFeederTier: 2, cost: 5000 },
   { name: 'Large',  feedCapacity: 1000, feederLimit: 8, maxFeederTier: 3, cost: 15000 }
 ];
 
-export const DEFAULT_FEEDER_LIMIT = bargeTiers[0].feederLimit;
-export const DEFAULT_MAX_FEEDER_TIER = bargeTiers[0].maxFeederTier;
+const DEFAULT_FEEDER_LIMIT = bargeTiers[0].feederLimit;
+const DEFAULT_MAX_FEEDER_TIER = bargeTiers[0].maxFeederTier;
 
-export const NEW_BARGE_COST = 8000;
+const NEW_BARGE_COST = 8000;
 
-export const siloUpgrades = [
+const siloUpgrades = [
   { level: 0, feedCapacity: 200,  cost: 0 },
   { level: 1, feedCapacity: 500,  cost: 2500 },
   { level: 2, feedCapacity: 1000, cost: 7500 },
   { level: 3, feedCapacity: 2000, cost: 15000 }
 ];
 
-export const blowerUpgrades = [
+const blowerUpgrades = [
   { level: 0, rate: 1, cost: 0 },
   { level: 1, rate: 2, cost: 3000 },
   { level: 2, rate: 3, cost: 8000 },
   { level: 3, rate: 4, cost: 16000 }
 ];
 
-export const housingUpgrades = [
+const housingUpgrades = [
   { level: 0, staffCapacity: 2, cost: 0 },
   { level: 1, staffCapacity: 4, cost: 4000 },
   { level: 2, staffCapacity: 6, cost: 9000 },
   { level: 3, staffCapacity: 8, cost: 18000 }
 ];
 
-export const feedStorageUpgrades = [
+const feedStorageUpgrades = [
   { capacity: 250, cost: 100 }, { capacity: 500, cost: 250 },
   { capacity: 1000, cost: 500 }, { capacity: 2000, cost: 1000 },
   { capacity: 5000, cost: 2500 }, { capacity: 10000, cost: 6000 },
   { capacity: 20000, cost: 12000 }, { capacity: 30000, cost: 20000 }
 ];
 
-export const STAFF_HIRE_COST = 500;
+const STAFF_HIRE_COST = 500;
 
-export const staffRoles = {
+const staffRoles = {
   feeder:    { cost: 500,  description: 'Boosts auto feed rate' },
   harvester: { cost: 800,  description: 'Increases harvest capacity' },
   feedManager:{ cost: 1000, description: 'Automatically buys feed' }
 };
 
-export const staffHousingUpgrades = [
+const staffHousingUpgrades = [
   { extraCapacity: 2, cost: 1000 },
   { extraCapacity: 2, cost: 2000 },
   { extraCapacity: 4, cost: 4000 }
 ];
 
-export const speciesData = {
+const speciesData = {
   shrimp: {
     marketPrice: 8,
     fcr: 1.25,
@@ -131,19 +131,19 @@ export const speciesData = {
   }
 };
 
-export const feederUpgrades = [
+const feederUpgrades = [
   { type: 'floating',   rate: 1, cost: 500  },
   { type: 'spreader',   rate: 2, cost: 1200 },
   { type: 'underwater', rate: 3, cost: 2500 }
 ];
 
-export const vesselTiers = [
+const vesselTiers = [
   { name: 'Small',  maxBiomassCapacity: 1000, speed: 10, cost: 0 },
   { name: 'Medium', maxBiomassCapacity: 2500, speed: 8,  cost: 10000 },
   { name: 'Large',  maxBiomassCapacity: 5000, speed: 6,  cost: 30000 }
 ];
 
-export const vesselClasses = {
+const vesselClasses = {
   skiff: {
     name: 'Skiff',
     baseCapacity: 800,
@@ -174,32 +174,32 @@ export const vesselClasses = {
   }
 };
 
-export const vesselUnlockDays = {
+const vesselUnlockDays = {
   lobsterBoat: 30,
   retiredTrawler: 60,
   wellboat: 120
 };
 
-export const vesselNamePrefixes = [
+const vesselNamePrefixes = [
   'Sea', 'Wave', 'Storm', 'Lucky', 'Salty', 'Swift', 'Coral', 'Northern', 'Coastal', 'Rapid', 'Brazen', 'Lady', 'Sir' 
 ];
-export const vesselNameSuffixes = [
+const vesselNameSuffixes = [
   'Runner', 'Queen', 'Voyager', 'Dream', 'Star', 'Dawn', 'Breeze', 'Spirit', 'Nightmare', 'Squall', 'Cloud', 'Tidus','Flotsam'
 ];
 
-export const NEW_VESSEL_COST = 12000;
+const NEW_VESSEL_COST = 12000;
 
 // Fee charged when renaming a vessel after purchase
-export const VESSEL_RENAME_FEE = 500;
+const VESSEL_RENAME_FEE = 500;
 
-export const CUSTOM_BUILD_MARKUP = 1.25;
+const CUSTOM_BUILD_MARKUP = 1.25;
 
-export const siteNamePrefixes = [
+const siteNamePrefixes = [
   'Driftwood','Stormreach','Gullrock','Cedar','Misty','Haven','Breakwater','Whispering','Duskwater','Salmonstone','SeaLion'
 ];
-export const siteNameSuffixes = ['Sound','Inlet','Bay','Island','Channel','Passage','Lagoon','Rock'];
+const siteNameSuffixes = ['Sound','Inlet','Bay','Island','Channel','Passage','Lagoon','Rock'];
 
-export const markets = [
+const markets = [
   {
     name: 'Capital Wharf',
     location: { x: 10, y: 80 },
@@ -228,7 +228,7 @@ export const markets = [
   }
 ];
 
-export const contractBuyers = [
+const contractBuyers = [
   { name: 'Local Co-op', tiers: [0] },
   { name: 'Atlantic Exports', tiers: [1] },
   { name: 'NorFed Genetics', tiers: [2] }

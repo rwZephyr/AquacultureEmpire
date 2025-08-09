@@ -1,6 +1,4 @@
 // Local state reference initialized via initContracts to avoid circular imports
-import { updateDisplay } from './ui.js';
-import { speciesData, markets, contractBuyers } from './data.js';
 let state;
 let contracts = [];
 
@@ -10,7 +8,7 @@ function capitalizeFirstLetter(str){
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function initContracts(gameState){
+function initContracts(gameState){
   state = gameState;
   if(!state.contracts) state.contracts = [];
   if(!state.contractsCompletedByTier) state.contractsCompletedByTier = {};
@@ -37,12 +35,12 @@ export function initContracts(gameState){
   }
 }
 
-export const contractFlavors = {
+const contractFlavors = {
   basicDelivery: "Ship {species} to {destination} on time.",
   bigOrder: "A bulk request for {species} has come in from {destination}.",
 };
 
-export const contractTiers = [
+const contractTiers = [
   {
     tier: 0,
     biomassRange: [50, 300],
@@ -88,7 +86,7 @@ function rollContractTier(){
   return unlocked[0];
 }
 
-export function generateDailyContracts(count=2){
+function generateDailyContracts(count=2){
   for(let i=0;i<count;i++){
     const tierIdx = rollContractTier();
     const meta = contractTiers.find(t=>t.tier===tierIdx);
@@ -131,14 +129,14 @@ function checkContractTierUnlocks(){
   });
 }
 
-export function getContractFlavor(contract){
+function getContractFlavor(contract){
   let text = contractFlavors[contract.flavorKey] || '';
   return text
     .replace('{species}', capitalizeFirstLetter(contract.species))
     .replace('{destination}', contract.destination);
 }
 
-export function checkContractExpirations(){
+function checkContractExpirations(){
   contracts.forEach(c => {
     if(c.status === 'active' && state.totalDaysElapsed > c.startDay + c.durationDays){
       c.status = 'expired';
@@ -156,7 +154,7 @@ function getEligibleVessels(contract){
   });
 }
 
-export function checkVesselContractEligibility(vessel){
+function checkVesselContractEligibility(vessel){
   contracts.forEach(c => {
     if(c.status !== 'active') return;
     if(!c.reminders) c.reminders = {};
@@ -169,7 +167,7 @@ export function checkVesselContractEligibility(vessel){
   });
 }
 
-export function openContractDeliveryModal(id){
+function openContractDeliveryModal(id){
   const contract = contracts.find(c=>c.id===id);
   if(!contract) return;
   const optionsDiv = document.getElementById('contractDeliveryOptions');
@@ -190,7 +188,7 @@ export function openContractDeliveryModal(id){
   document.getElementById('contractDeliveryModal').classList.add('visible');
 }
 
-export function closeContractDeliveryModal(){
+function closeContractDeliveryModal(){
   const modal = document.getElementById('contractDeliveryModal');
   if(modal) modal.classList.remove('visible');
 }
@@ -238,7 +236,7 @@ function finishContractDelivery(vessel, contract){
   if(typeof updateDisplay === 'function') updateDisplay();
 }
 
-export function deliverContract(id, vIdx){
+function deliverContract(id, vIdx){
   const contract = contracts.find(c=>c.id===id);
   if(!contract || contract.status !== 'active') return state.addStatusMessage('Contract unavailable.');
   const vessel = state.vessels[vIdx];
@@ -272,7 +270,7 @@ export function deliverContract(id, vIdx){
   },250);
 }
 
-export function renderContracts(){
+function renderContracts(){
   const container = document.getElementById('contractsPlaceholder');
   if(!container) return;
   container.innerHTML = '';
@@ -346,5 +344,3 @@ export function renderContracts(){
     container.appendChild(row);
   });
 }
-
-export { contracts };

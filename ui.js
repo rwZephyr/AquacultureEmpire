@@ -1,30 +1,4 @@
-import {
-  NEW_BARGE_COST,
-  NEW_VESSEL_COST,
-  feedStorageUpgrades,
-  staffHousingUpgrades,
-  speciesData,
-  feederUpgrades,
-  vesselTiers,
-  markets,
-  vesselClasses,
-  vesselUnlockDays,
-  CUSTOM_BUILD_MARKUP,
-  siloUpgrades,
-  blowerUpgrades,
-  housingUpgrades,
-} from "./data.js";
-import state, {
-  capitalizeFirstLetter,
-  getDateString,
-  estimateSellPrice,
-  estimateTravelTime,
-  getSiteHarvestRate,
-} from "./gameState.js";
-import { renderContracts } from "./contracts.js";
-import { milestones, checkMilestones } from './milestones.js';
-import { depositToBank, withdrawFromBank, takeLoan, repayLoan } from "./bank.js";
-import { saveGame } from "./actions.js";
+
 
 const speciesColors = {
   shrimp: '#e74c3c',
@@ -42,6 +16,15 @@ const vesselIcons = {
   retiredTrawler: 'assets/vessel-icons/oldwellboat.png',
   wellboat: 'assets/vessel-icons/modernwellboat.png'
 };
+
+function adjustHeaderPadding(){
+  const header = document.getElementById('topHeader');
+  if(header){
+    const height = header.offsetHeight;
+    document.documentElement.style.setProperty('--header-height', height + 'px');
+  }
+}
+window.addEventListener('resize', adjustHeaderPadding);
 
 // close site dropdown when clicking outside
 document.addEventListener('click', evt => {
@@ -2066,7 +2049,7 @@ function toggleStatusPanel(key){
 }
 
 // --- PURCHASES & ACTIONS ---
-export {
+const ui = {
   updateDisplay,
   updateLicenseDropdown,
   updateSiteLicenses,
@@ -2127,5 +2110,21 @@ export {
   selectSite,
   populateSiteList,
   toggleLicenseList,
-  toggleStatusPanel
+  toggleStatusPanel,
 };
+
+for (const key in ui){
+  ui[key] = bootGuard(ui[key]);
+}
+
+Object.assign(window, ui);
+
+onBoot(()=>{
+  adjustHeaderPadding();
+  updateDisplay();
+  setupStatusTooltips();
+  setupMapInteractions();
+});
+
+window.addEventListener('pagehide', saveGame);
+window.addEventListener('beforeunload', saveGame);
