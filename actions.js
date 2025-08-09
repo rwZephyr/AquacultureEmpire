@@ -80,9 +80,9 @@ function buyFeed(amount=20){
   const barge = site.barges[state.currentBargeIndex];
   amount = Math.max(0, amount);
   const cost = amount * state.FEED_COST_PER_KG;
-  if(state.cash < cost) return openModal("Not enough cash to buy feed.");
+  if(state.cash < cost) return (window.openModal || alert)("Not enough cash to buy feed.");
   if(barge.feed + amount > barge.feedCapacity)
-    return openModal("Not enough feed storage space!");
+    return (window.openModal || alert)("Not enough feed storage space!");
   state.cash -= cost;
   barge.feed += amount;
   updateDisplay();
@@ -91,39 +91,39 @@ function buyFeed(amount=20){
 function buyFeedStorageUpgrade(){
   const site = state.sites[state.currentSiteIndex];
   const barge = site.barges[state.currentBargeIndex];
-  if(barge.storageUpgradeLevel>=feedStorageUpgrades.length) return openModal("Max feed storage reached!");
+  if(barge.storageUpgradeLevel>=feedStorageUpgrades.length) return (window.openModal || alert)("Max feed storage reached!");
   const up = feedStorageUpgrades[barge.storageUpgradeLevel];
-  if(state.cash<up.cost) return openModal("Not enough cash to upgrade feed storage!");
+  if(state.cash<up.cost) return (window.openModal || alert)("Not enough cash to upgrade feed storage!");
   state.cash-=up.cost; barge.feedCapacity=up.capacity;
   barge.storageUpgradeLevel++; updateDisplay();
 }
 function purchaseLicense(sp){
   const site = state.sites[state.currentSiteIndex];
   const cost = speciesData[sp]?.licenseCost || 0;
-  if(site.licenses.includes(sp)) return openModal('Already licensed');
-  if(state.cash < cost) return openModal('Insufficient funds');
+  if(site.licenses.includes(sp)) return (window.openModal || alert)('Already licensed');
+  if(state.cash < cost) return (window.openModal || alert)('Insufficient funds');
   state.cash -= cost;
   site.licenses.push(sp);
   updateDisplay();
   updateSiteLicenses();
   updateLicenseDropdown();
-  openModal('License purchased successfully');
+  (window.openModal || alert)('License purchased successfully');
 }
 
 function purchaseSiteUpgrade(key){
   const site = state.sites[state.currentSiteIndex];
   if(!site.upgrades) site.upgrades = [];
-  if(site.upgrades.includes(key)) return openModal('Upgrade already purchased');
+  if(site.upgrades.includes(key)) return (window.openModal || alert)('Upgrade already purchased');
   const cost = 25000;
-  if(state.cash < cost) return openModal('Insufficient funds');
+  if(state.cash < cost) return (window.openModal || alert)('Insufficient funds');
   state.cash -= cost;
   site.upgrades.push(key);
   updateDisplay();
   updateSiteUpgrades();
-  openModal('Upgrade purchased successfully');
+  (window.openModal || alert)('Upgrade purchased successfully');
 }
 function buyNewSite(){
-  if(state.cash<20000) return openModal("Not enough cash to buy a new site!");
+  if(state.cash<20000) return (window.openModal || alert)("Not enough cash to buy a new site!");
   state.cash-=20000;
   state.sites.push(new Site({
     name: state.generateRandomSiteName(),
@@ -148,12 +148,12 @@ function buyNewSite(){
     pens:[new Pen({ species:"shrimp", fishCount:500, averageWeight:0.01, bargeIndex:0 })]
   }));
   updateDisplay();
-  openModal("New site purchased!");
+  (window.openModal || alert)("New site purchased!");
 }
 function buyNewPen(bargeIdx = state.currentBargeIndex){
   const site = state.sites[state.currentSiteIndex];
-  if(state.cash < state.penPurchaseCost) return openModal("Not enough cash to buy a new pen!");
-  if(bargeIdx < 0 || bargeIdx >= site.barges.length) return openModal("Invalid barge selected.");
+  if(state.cash < state.penPurchaseCost) return (window.openModal || alert)("Not enough cash to buy a new pen!");
+  if(bargeIdx < 0 || bargeIdx >= site.barges.length) return (window.openModal || alert)("Invalid barge selected.");
   state.cash -= state.penPurchaseCost;
   site.pens.push({ species:"shrimp", fishCount:0, averageWeight:0, bargeIndex: Number(bargeIdx) });
   state.penPurchaseCost *= 1.5;
@@ -163,7 +163,7 @@ function buyNewPen(bargeIdx = state.currentBargeIndex){
 
 function buyNewBarge(){
   const site = state.sites[state.currentSiteIndex];
-  if(state.cash < NEW_BARGE_COST) return openModal("Not enough cash to buy a new barge!");
+  if(state.cash < NEW_BARGE_COST) return (window.openModal || alert)("Not enough cash to buy a new barge!");
   state.cash -= NEW_BARGE_COST;
   site.barges.push({
     feed:100,
@@ -181,14 +181,14 @@ function buyNewBarge(){
   });
   state.currentBargeIndex = site.barges.length-1;
   updateDisplay();
-  openModal("New barge purchased!");
+  (window.openModal || alert)("New barge purchased!");
 }
 function hireStaff(){
   const site = state.sites[state.currentSiteIndex];
   const capacity = site.barges.reduce((t,b)=>t+b.staffCapacity,0);
   if(site.staff.length >= capacity)
-    return openModal("No staff housing available.");
-  if(state.cash < STAFF_HIRE_COST) return openModal("Not enough cash to hire staff.");
+    return (window.openModal || alert)("No staff housing available.");
+  if(state.cash < STAFF_HIRE_COST) return (window.openModal || alert)("Not enough cash to hire staff.");
   state.cash -= STAFF_HIRE_COST;
   site.staff.push({ role: null });
   updateDisplay();
@@ -196,14 +196,14 @@ function hireStaff(){
 function fireStaff(role=null){
   const site = state.sites[state.currentSiteIndex];
   const idx = site.staff.findIndex(s => role ? s.role===role : !s.role);
-  if(idx === -1) return openModal("No staff member available to fire.");
+  if(idx === -1) return (window.openModal || alert)("No staff member available to fire.");
   site.staff.splice(idx,1);
   updateDisplay();
 }
 function assignStaff(role){
   const site = state.sites[state.currentSiteIndex];
   const member = site.staff.find(s=>!s.role);
-  if(!member) return openModal("No unassigned staff available.");
+  if(!member) return (window.openModal || alert)("No unassigned staff available.");
   if(!staffRoles[role]) return;
   member.role = role;
   updateDisplay();
@@ -211,7 +211,7 @@ function assignStaff(role){
 function unassignStaff(role){
   const site = state.sites[state.currentSiteIndex];
   const member = site.staff.find(s=>s.role===role);
-  if(!member) return openModal(`No staff assigned as ${role}.`);
+  if(!member) return (window.openModal || alert)(`No staff assigned as ${role}.`);
   member.role = null;
   updateDisplay();
 }
@@ -220,9 +220,9 @@ function upgradeSilo(barge = state.sites[state.currentSiteIndex].barges[state.cu
   if(!barge) return;
   const level = barge.siloUpgradeLevel || 0;
   if(level >= siloUpgrades.length - 1)
-    return openModal('Silo already at max level.');
+    return (window.openModal || alert)('Silo already at max level.');
   const next = siloUpgrades[level + 1];
-  if(state.cash < next.cost) return openModal('Not enough cash to upgrade silo.');
+  if(state.cash < next.cost) return (window.openModal || alert)('Not enough cash to upgrade silo.');
   state.cash -= next.cost;
   barge.siloUpgradeLevel = level + 1;
   barge.feedCapacity = next.feedCapacity;
@@ -233,9 +233,9 @@ function upgradeBlower(barge = state.sites[state.currentSiteIndex].barges[state.
   if(!barge) return;
   const level = barge.blowerUpgradeLevel || 0;
   if(level >= blowerUpgrades.length - 1)
-    return openModal('Blower already at max level.');
+    return (window.openModal || alert)('Blower already at max level.');
   const next = blowerUpgrades[level + 1];
-  if(state.cash < next.cost) return openModal('Not enough cash to upgrade blower.');
+  if(state.cash < next.cost) return (window.openModal || alert)('Not enough cash to upgrade blower.');
   state.cash -= next.cost;
   barge.blowerUpgradeLevel = level + 1;
   barge.feedRateMultiplier = next.rate;
@@ -246,9 +246,9 @@ function upgradeHousing(barge = state.sites[state.currentSiteIndex].barges[state
   if(!barge) return;
   const level = barge.housingUpgradeLevel || 0;
   if(level >= housingUpgrades.length - 1)
-    return openModal('Housing already at max level.');
+    return (window.openModal || alert)('Housing already at max level.');
   const next = housingUpgrades[level + 1];
-  if(state.cash < next.cost) return openModal('Not enough cash to upgrade housing.');
+  if(state.cash < next.cost) return (window.openModal || alert)('Not enough cash to upgrade housing.');
   state.cash -= next.cost;
   barge.housingUpgradeLevel = level + 1;
   barge.staffCapacity = next.staffCapacity;
@@ -258,9 +258,9 @@ function upgradeStaffHousing(){
   const site = state.sites[state.currentSiteIndex];
   const barge = site.barges[state.currentBargeIndex];
   if(barge.housingUpgradeLevel >= staffHousingUpgrades.length)
-    return openModal("Staff housing fully upgraded!");
+    return (window.openModal || alert)("Staff housing fully upgraded!");
   const up = staffHousingUpgrades[barge.housingUpgradeLevel];
-  if(state.cash < up.cost) return openModal("Not enough cash to upgrade housing.");
+  if(state.cash < up.cost) return (window.openModal || alert)("Not enough cash to upgrade housing.");
   state.cash -= up.cost;
   barge.staffCapacity += up.extraCapacity;
   barge.housingUpgradeLevel++;
@@ -271,12 +271,12 @@ function upgradeStaffHousing(){
 function upgradeVessel(){
   const vessel = state.vessels[state.currentVesselIndex];
   if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
-    return openModal('Vessel currently busy.');
+    return (window.openModal || alert)('Vessel currently busy.');
   const currentTier = vessel.tier;
   if(currentTier >= vesselTiers.length - 1)
-    return openModal("Vessel already at max tier.");
+    return (window.openModal || alert)("Vessel already at max tier.");
   const next = vesselTiers[currentTier + 1];
-  if(state.cash < next.cost) return openModal("Not enough cash to upgrade vessel.");
+  if(state.cash < next.cost) return (window.openModal || alert)("Not enough cash to upgrade vessel.");
   state.cash -= next.cost;
   vessel.tier++;
     vessel.maxBiomassCapacity = Math.max(vessel.maxBiomassCapacity, next.maxBiomassCapacity); // TODO: remove after holds migration
@@ -284,12 +284,12 @@ function upgradeVessel(){
       vessel.holds[0].capacity = vessel.maxBiomassCapacity; // TODO: remove after holds migration
     }
   vessel.speed = next.speed;
-  openModal(`Vessel upgraded to ${next.name} tier!`);
+  (window.openModal || alert)(`Vessel upgraded to ${next.name} tier!`);
   updateDisplay();
 }
 
 function buyNewVessel(){
-  if(state.cash < NEW_VESSEL_COST) return openModal("Not enough cash to buy a new vessel!");
+  if(state.cash < NEW_VESSEL_COST) return (window.openModal || alert)("Not enough cash to buy a new vessel!");
   state.cash -= NEW_VESSEL_COST;
     state.vessels.push(new Vessel({
       name: `Vessel ${state.vessels.length + 1}`,
@@ -305,14 +305,14 @@ function buyNewVessel(){
   }));
   state.currentVesselIndex = state.vessels.length - 1;
   updateDisplay();
-  openModal('New vessel purchased!');
+  (window.openModal || alert)('New vessel purchased!');
 }
 
 function renameVessel(){
   const vessel = state.vessels[state.currentVesselIndex];
   if(!vessel) return;
   if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
-    return openModal('Vessel currently busy.');
+    return (window.openModal || alert)('Vessel currently busy.');
   const input = document.getElementById('renameInput');
   if(input){
     input.value = vessel.name;
@@ -328,22 +328,22 @@ function confirmRename(){
   const vessel = state.vessels[state.currentVesselIndex];
   if(!vessel) return closeRenameModal();
   if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
-    return openModal('Vessel currently busy.');
+    return (window.openModal || alert)('Vessel currently busy.');
   const input = document.getElementById('renameInput');
   const newName = input.value.trim();
   if(!newName) return closeRenameModal();
-  if(state.cash < VESSEL_RENAME_FEE) return openModal('Insufficient funds');
+  if(state.cash < VESSEL_RENAME_FEE) return (window.openModal || alert)('Insufficient funds');
   state.cash -= VESSEL_RENAME_FEE;
   vessel.name = newName;
   closeRenameModal();
   updateDisplay();
-  openModal(`A Vessel Registry Update Fee of $${VESSEL_RENAME_FEE} has been applied for renaming.`);
+  (window.openModal || alert)(`A Vessel Registry Update Fee of $${VESSEL_RENAME_FEE} has been applied for renaming.`);
 }
 
 function openMoveVesselModal(){
   const vessel = state.vessels[state.currentVesselIndex];
   if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
-    return openModal('Vessel currently busy.');
+    return (window.openModal || alert)('Vessel currently busy.');
   const optionsDiv = document.getElementById('moveOptions');
   optionsDiv.innerHTML = '';
   state.sites.forEach((s, idx)=>{
@@ -423,7 +423,7 @@ function refreshShipyardListings(){
 function buyShipyardVessel(idx){
   const item = state.shipyardInventory[idx];
   if(!item) return;
-  if(state.cash < item.cost) return openModal('Not enough cash to buy this vessel.');
+  if(state.cash < item.cost) return (window.openModal || alert)('Not enough cash to buy this vessel.');
   state.cash -= item.cost;
     const vessel = new Vessel({
       name: item.name,
@@ -442,7 +442,7 @@ function buyShipyardVessel(idx){
   closeShipyard();
   updateDisplay();
   const msg = `You acquired a used vessel: ${item.name} (Condition: ${item.conditionLabel}). You haggled a fair price at the dockside classifieds.`;
-  openModal(msg);
+  (window.openModal || alert)(msg);
 }
 
 function confirmCustomBuild(){
@@ -452,22 +452,22 @@ function confirmCustomBuild(){
   if(!name){
     input.classList.add('input-error');
     input.title = 'Enter a vessel name';
-    return openModal('Enter a vessel name.');
+    return (window.openModal || alert)('Enter a vessel name.');
   }
   if(state.vessels.some(v=>v.name.toLowerCase()===name.toLowerCase())){
     input.classList.add('input-error');
     input.title = 'Name already exists';
-    return openModal('A vessel with that name already exists.');
+    return (window.openModal || alert)('A vessel with that name already exists.');
   }
   input.classList.remove('input-error');
   input.title = '';
   const req = vesselUnlockDays[cls] || 0;
   if(state.totalDaysElapsed < req && cls !== 'skiff'){
-    return openModal('This vessel class is not unlocked yet.');
+    return (window.openModal || alert)('This vessel class is not unlocked yet.');
   }
   const base = vesselClasses[cls];
   const cost = Math.round(base.cost * CUSTOM_BUILD_MARKUP);
-  if(state.cash < cost) return openModal('Not enough cash to build this vessel.');
+  if(state.cash < cost) return (window.openModal || alert)('Not enough cash to build this vessel.');
   state.cash -= cost;
     const vessel = new Vessel({
       name: name,
@@ -484,12 +484,12 @@ function confirmCustomBuild(){
   state.currentVesselIndex = state.vessels.length - 1;
   updateDisplay();
   backToShipyardList();
-  openModal('Custom vessel constructed!');
+  (window.openModal || alert)('Custom vessel constructed!');
 }
 
 function moveVesselTo(type, idx){
   const vessel = state.vessels[state.currentVesselIndex];
-  if(vessel.isHarvesting) { closeMoveModal(); return openModal('Vessel currently harvesting.'); }
+  if(vessel.isHarvesting) { closeMoveModal(); return (window.openModal || alert)('Vessel currently harvesting.'); }
   let destName;
   let destLoc;
   if(type==='site'){
@@ -503,11 +503,11 @@ function moveVesselTo(type, idx){
   }
   if(vessel.location === destName){
     closeMoveModal();
-    return openModal(`Vessel already at ${destName}.`);
+    return (window.openModal || alert)(`Vessel already at ${destName}.`);
   }
   if(vessel.location === `Traveling to ${destName}`){
     closeMoveModal();
-    return openModal(`Vessel already en route to ${destName}.`);
+    return (window.openModal || alert)(`Vessel already en route to ${destName}.`);
   }
   const startLoc = state.getLocationByName(vessel.location) || state.sites[state.currentSiteIndex].location;
   const dx = startLoc.x - destLoc.x;
@@ -564,16 +564,16 @@ function harvestPen(amount=null, holdIdx=0){
     capacity: vessel.maxBiomassCapacity ?? 0
   };
   if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
-    return openModal('Vessel currently busy.');
+    return (window.openModal || alert)('Vessel currently busy.');
   if(pen.fishCount===0) return;
   if(hold.biomass>0 && hold.species && hold.species !== pen.species){
-    return openModal('Vessel already contains a different species.');
+    return (window.openModal || alert)('Vessel already contains a different species.');
   }
   const vesselRemaining = hold.capacity - hold.biomass;
   const totalBiomass = pen.fishCount * pen.averageWeight;
   const maxHarvest = Math.min(totalBiomass, vesselRemaining);
-  if(maxHarvest <= 0) return openModal("Vessel capacity full.");
-  if(pen.locked) return openModal('Pen currently busy.');
+  if(maxHarvest <= 0) return (window.openModal || alert)("Vessel capacity full.");
+  if(pen.locked) return (window.openModal || alert)('Pen currently busy.');
   const requested = amount === null ? maxHarvest : Math.max(0, Math.min(amount, maxHarvest));
   const avg = pen.averageWeight > 0 ? pen.averageWeight : 1;
   let fishNum = Math.floor(requested / avg);
@@ -647,7 +647,7 @@ function harvestPen(amount=null, holdIdx=0){
         vessel.actionEndsAt = 0;
         state.harvestsCompleted++;
         state.onboarding.steps.harvested = true;
-        openModal(`Harvested ${biomass.toFixed(2)} kg loaded onto ${vessel.name}.`);
+        (window.openModal || alert)(`Harvested ${biomass.toFixed(2)} kg loaded onto ${vessel.name}.`);
         checkVesselContractEligibility(vessel);
       }
       updateDisplay();
@@ -697,19 +697,19 @@ function cancelVesselHarvest(idx){
     if(pen) unlockPen(pen, 'harvest:cancel');
     vessel.harvestingPenIndex = null;
   }
-  openModal('Harvest cancelled.');
+  (window.openModal || alert)('Harvest cancelled.');
   updateDisplay();
 }
 function restockPen(sp, qty){
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
-  if(pen.locked) return openModal('Pen currently busy.');
+  if(pen.locked) return (window.openModal || alert)('Pen currently busy.');
   const data = speciesData[sp];
   qty = Math.max(0, Math.floor(qty));
   const unit = data.restockCost / data.restockCount;
   const cost = qty * unit;
   if(qty <= 0) return;
-  if(state.cash < cost) return openModal("Not enough cash to restock.");
+  if(state.cash < cost) return (window.openModal || alert)("Not enough cash to restock.");
   if(pen.fishCount > 0){
     if(pen.species !== sp) return;
     return; // require empty for now
@@ -875,19 +875,19 @@ function restockPenUI(i){ state.currentPenIndex=i; openRestockModal(); }
 function upgradeFeeder(i){
   const site = state.sites[state.currentSiteIndex];
   const pen = site.pens[i];
-  if(pen.locked) return openModal('Pen currently busy.');
+  if(pen.locked) return (window.openModal || alert)('Pen currently busy.');
   const currentTier = pen.feeder?.tier || 0;
-  if(currentTier >= feederUpgrades.length) return openModal("Feeder already at max tier.");
+  if(currentTier >= feederUpgrades.length) return (window.openModal || alert)("Feeder already at max tier.");
   const nextTier = currentTier + 1;
   const barge = site.barges[pen.bargeIndex];
-  if(nextTier > barge.maxFeederTier) return openModal("Barge tier too low for this feeder upgrade.");
+  if(nextTier > barge.maxFeederTier) return (window.openModal || alert)("Barge tier too low for this feeder upgrade.");
   if(!pen.feeder && site.pens.filter(p=>p.feeder && p.bargeIndex===pen.bargeIndex).length >= barge.feederLimit)
-    return openModal("Barge cannot support more feeders.");
+    return (window.openModal || alert)("Barge cannot support more feeders.");
   const up = feederUpgrades[currentTier];
-  if(state.cash < up.cost) return openModal("Not enough cash for upgrade.");
+  if(state.cash < up.cost) return (window.openModal || alert)("Not enough cash for upgrade.");
   state.cash -= up.cost;
   pen.feeder = { type: up.type, tier: nextTier };
-  openModal(`Feeder upgraded to ${state.capitalizeFirstLetter(up.type)} (Tier ${nextTier}).`);
+  (window.openModal || alert)(`Feeder upgraded to ${state.capitalizeFirstLetter(up.type)} (Tier ${nextTier}).`);
   updateDisplay();
 }
 
@@ -1386,7 +1386,7 @@ for (const key in actions){
 
 onBoot(()=>{
   loadGame();
-  initContracts(state);
+  initContracts();
   initMilestones();
   setInterval(saveGame, state.AUTO_SAVE_INTERVAL_MS);
   setInterval(checkMilestones, 1000);

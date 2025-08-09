@@ -969,18 +969,18 @@ function setupStatusTooltips(){
 }
 
 // --- MODALS ---
-function openModal(msg){
+function openModal(html){
   const bargeModal = document.getElementById('bargeUpgradeModal');
   if(bargeModal && bargeModal.classList.contains('visible')){
     const alertEl = document.getElementById('bargeUpgradeMessage');
     if(alertEl){
-      alertEl.textContent = msg;
+      alertEl.textContent = html;
       alertEl.style.display = 'block';
       setTimeout(()=>{ alertEl.style.display = 'none'; }, 3000);
     }
     return;
   }
-  document.getElementById('modalText').innerText = msg;
+  document.getElementById('modalText').innerText = html;
   document.getElementById('modal').classList.add('visible');
 }
 window.openModal = openModal;
