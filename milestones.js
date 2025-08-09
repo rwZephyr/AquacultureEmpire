@@ -4,6 +4,18 @@ import { openModal } from './ui.js';
 // List of milestone definitions
 const milestones = [
   {
+    id: 'firstStock',
+    description: 'Stock your first pen.',
+    check: () => state.milestones.firstStock === true,
+    reward: () => {}
+  },
+  {
+    id: 'firstSale',
+    description: 'Complete your first sale.',
+    check: () => state.milestones.firstSale === true,
+    reward: () => {}
+  },
+  {
     id: 'firstHarvest',
     description: 'Harvest any pen for the first time.',
     check: () => state.harvestsCompleted > 0,
