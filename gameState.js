@@ -146,9 +146,11 @@ state.setupMarketData = setupMarketData;
 state.updateMarketPrices = updateMarketPrices;
 
 function applyGrowth(pen, species, feedKg){
-  const baseGain = feedKg / speciesData[species].fcr;
+  const data = speciesData[species];
+  if(!data || pen.fishCount === 0) return pen.averageWeight;
+  const baseGain = feedKg / data.fcr;
   let gain = baseGain;
-  const max = speciesData[species].maxWeight;
+  const max = data.maxWeight;
   if(max && pen.averageWeight > max){
     const excess = pen.averageWeight - max;
     const scale = Math.max(0.1, 1 - (excess / max));
@@ -189,6 +191,7 @@ function advanceDay() {
   state.sites.forEach(site => {
     site.pens.forEach(pen => {
       if(pen.locked) return;
+      if(!pen.species || pen.fishCount === 0) return;
       const newAvg = applyGrowth(pen, pen.species, 0);
       pen.averageWeight = newAvg;
     });
