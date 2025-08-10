@@ -945,12 +945,12 @@ html.modal-open {
 .vesselCard {
   background: var(--bg-panel);
   border-radius: 10px;
+  width: 180px;
+  flex: 0 0 auto;
   padding: 12px;
   margin: 0 0 16px;
   color: var(--text-light);
   box-shadow: 0 0 4px var(--shadow-light);
-  max-width: 90vw;
-  flex: 1 1 200px;
   transition: transform 0.2s, box-shadow 0.2s;
   position: relative;
 }
@@ -1586,28 +1586,18 @@ html.modal-open {
   flex: 2;
 }
 
-#rightSidebar {
+#vesselsSection {
   flex: 1;
   min-width: 260px;
   display: flex;
   flex-direction: column;
 }
 
-
-/* Footer vessel section */
-#bottomSection {
-  margin-top: 20px;
-}
-
-#bottomSection .vesselCard {
-  margin: 0;
-}
-
 .vesselGrid {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 16px;
-  justify-content: center;
+  align-items: flex-start;
   padding: 10px 0;
 }
 
@@ -1829,10 +1819,13 @@ html.modal-open {
   #mainLayout {
     flex-direction: column;
   }
-  #rightSidebar {
+  #vesselsSection {
     min-width: unset;
     width: 100%;
     flex-direction: column;
+  }
+  #vesselsSection .vesselGrid {
+    align-items: center;
   }
 }
 
