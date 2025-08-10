@@ -252,7 +252,8 @@ function resumeTime(){
   state.timePaused = false;
   state.pauseStartedAt = 0;
   state.vessels.forEach(v=>{
-    if(v.actionEndsAt) v.actionEndsAt += diff;
+    if(v.busyUntil) v.busyUntil += diff;
+    v.actionEndsAt = v.busyUntil;
   });
 }
 
@@ -299,7 +300,9 @@ state.vessels = [
     upgradeSlots: vesselClasses.skiff.slots,
     upgrades: [],
     tier: 0,
-    actionEndsAt: 0
+    status: 'idle',
+    destination: null,
+    busyUntil: 0
   })
 ];
 

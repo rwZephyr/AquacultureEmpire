@@ -242,7 +242,16 @@
           <span id="harvestHoldInfo"></span>
         </div>
         <div>Max: <span id="harvestMax">0</span> kg</div>
-        <input type="number" id="harvestAmount" min="0" step="0.01">
+        <div class="harvest-input-row">
+          <input type="number" id="harvestAmount" min="0" step="0.01">
+          <span id="harvestFishCount"></span>
+        </div>
+        <input type="range" id="harvestSlider" min="0" step="0.01">
+        <div class="harvest-max-buttons">
+          <button id="harvestMaxHoldBtn" type="button">Max Hold</button>
+          <button id="harvestMaxPenBtn" type="button">Max Pen</button>
+        </div>
+        <div id="harvestReason" class="harvest-reason"></div>
         <button id="harvestConfirmBtn" onclick="confirmHarvest()">Start Harvest</button>
         <button onclick="closeHarvestModal()">Cancel</button>
       </div>

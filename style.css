@@ -642,6 +642,35 @@ html.modal-open {
   text-align: center;
 }
 
+#harvestModalContent input[type=range]{
+  width: 100%;
+}
+.harvest-max-buttons{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-top:4px;
+}
+.harvest-max-buttons button{
+  flex:1;
+  min-width:80px;
+}
+.harvest-input-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  justify-content:center;
+}
+#harvestFishCount{
+  font-size:0.9em;
+}
+.harvest-reason{
+  color:#c00;
+  font-size:0.9em;
+  min-height:1.2em;
+}
+
 #speciesTable {
   width: 100%;
   font-size: 13px;

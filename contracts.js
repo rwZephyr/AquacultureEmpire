@@ -146,7 +146,7 @@ function checkContractExpirations(){
 function getEligibleVessels(contract){
   return state.vessels.filter(v => {
     const hold = v.holds?.[0];
-    return !v.isHarvesting && !v.unloading && !v.deliveringContractId &&
+    return v.status === 'idle' &&
       hold?.species === contract.species &&
       hold.biomass >= contract.biomassGoalKg;
   });
@@ -194,6 +194,10 @@ function closeContractDeliveryModal(){
 function finishContractDelivery(vessel, contract){
     vessel.location = contract.destination;
     vessel.deliveringContractId = null;
+    vessel.status = 'idle';
+    vessel.busyUntil = 0;
+    vessel.destination = null;
+    vessel.actionEndsAt = 0;
     const hold = vessel.holds?.[0];
     let remaining = contract.biomassGoalKg;
     for(let i=0;i<vessel.fishBuffer.length && remaining>0;){
@@ -211,12 +215,8 @@ function finishContractDelivery(vessel, contract){
     if(hold && hold.biomass <= 0.001){
       hold.biomass = 0;
       hold.species = null;
-      vessel.cargoSpecies = null; // TODO: remove after holds migration
-      vessel.currentBiomassLoad = 0; // TODO: remove after holds migration
-    } else if(hold){
-      vessel.cargoSpecies = hold.species; // TODO: remove after holds migration
-      vessel.currentBiomassLoad = hold.biomass; // TODO: remove after holds migration
     }
+    syncLegacyVesselFields(vessel);
   const base = speciesData[contract.species]?.marketPrice || 0;
   const market = state.findMarketByName(contract.destination);
   let payout = contract.biomassGoalKg * base;
@@ -238,7 +238,7 @@ function deliverContract(id, vIdx){
   const contract = contracts.find(c=>c.id===id);
   if(!contract || contract.status !== 'active') return state.addStatusMessage('Contract unavailable.');
   const vessel = state.vessels[vIdx];
-  if(!vessel || vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+  if(!vessel || vessel.status !== 'idle')
     return state.addStatusMessage('Vessel currently busy.');
     const hold = vessel.holds?.[0];
     if(!hold || hold.species !== contract.species || hold.biomass < contract.biomassGoalKg)
@@ -253,15 +253,18 @@ function deliverContract(id, vIdx){
     const dist = Math.hypot(dx, dy);
     travelTime = dist / vessel.speed * state.TRAVEL_TIME_FACTOR;
   }
-  vessel.location = `Traveling to ${contract.destination}`;
-  vessel.actionEndsAt = Date.now() + travelTime;
+  vessel.destination = contract.destination;
+  vessel.status = 'selling';
+  vessel.busyUntil = Date.now() + travelTime;
+  vessel.actionEndsAt = vessel.busyUntil;
   vessel.deliveringContractId = contract.id;
   if(vessel.travelInterval){ clearInterval(vessel.travelInterval); }
   vessel.travelInterval = setInterval(()=>{
     if(state.timePaused) return;
-    if(Date.now() >= vessel.actionEndsAt){
+    if(Date.now() >= vessel.busyUntil){
       clearInterval(vessel.travelInterval);
       vessel.travelInterval = null;
+      vessel.busyUntil = 0;
       vessel.actionEndsAt = 0;
       finishContractDelivery(vessel, contract);
     }

@@ -270,7 +270,7 @@ function upgradeStaffHousing(){
 
 function upgradeVessel(){
   const vessel = state.vessels[state.currentVesselIndex];
-  if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+  if(vessel.status !== 'idle')
     return (window.openModal || alert)('Vessel currently busy.');
   const currentTier = vessel.tier;
   if(currentTier >= vesselTiers.length - 1)
@@ -300,8 +300,9 @@ function buyNewVessel(){
     location: 'Dock',
     tier: 0,
     cargo: {},
-    isHarvesting: false,
-    actionEndsAt: 0
+    status: 'idle',
+    destination: null,
+    busyUntil: 0
   }));
   state.currentVesselIndex = state.vessels.length - 1;
   updateDisplay();
@@ -311,7 +312,7 @@ function buyNewVessel(){
 function renameVessel(){
   const vessel = state.vessels[state.currentVesselIndex];
   if(!vessel) return;
-  if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+  if(vessel.status !== 'idle')
     return (window.openModal || alert)('Vessel currently busy.');
   const input = document.getElementById('renameInput');
   if(input){
@@ -327,7 +328,7 @@ function closeRenameModal(){
 function confirmRename(){
   const vessel = state.vessels[state.currentVesselIndex];
   if(!vessel) return closeRenameModal();
-  if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+  if(vessel.status !== 'idle')
     return (window.openModal || alert)('Vessel currently busy.');
   const input = document.getElementById('renameInput');
   const newName = input.value.trim();
@@ -342,7 +343,7 @@ function confirmRename(){
 
 function openMoveVesselModal(){
   const vessel = state.vessels[state.currentVesselIndex];
-  if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+  if(vessel.status !== 'idle')
     return (window.openModal || alert)('Vessel currently busy.');
   const optionsDiv = document.getElementById('moveOptions');
   optionsDiv.innerHTML = '';
@@ -459,7 +460,7 @@ function confirmCustomBuild(){
 
 function moveVesselTo(type, idx){
   const vessel = state.vessels[state.currentVesselIndex];
-  if(vessel.isHarvesting) { closeMoveModal(); return (window.openModal || alert)('Vessel currently harvesting.'); }
+  if(vessel.status !== 'idle') { closeMoveModal(); return (window.openModal || alert)('Vessel currently busy.'); }
   let destName;
   let destLoc;
   if(type==='site'){
@@ -475,7 +476,7 @@ function moveVesselTo(type, idx){
     closeMoveModal();
     return (window.openModal || alert)(`Vessel already at ${destName}.`);
   }
-  if(vessel.location === `Traveling to ${destName}`){
+  if(vessel.destination === destName && vessel.status === 'enRoute'){
     closeMoveModal();
     return (window.openModal || alert)(`Vessel already en route to ${destName}.`);
   }
@@ -484,16 +485,21 @@ function moveVesselTo(type, idx){
   const dy = startLoc.y - destLoc.y;
   const distance = Math.hypot(dx, dy);
   const travelTime = distance / vessel.speed * state.TRAVEL_TIME_FACTOR;
-  vessel.location = `Traveling to ${destName}`;
-  vessel.actionEndsAt = Date.now() + travelTime;
+  vessel.destination = destName;
+  vessel.status = 'enRoute';
+  vessel.busyUntil = Date.now() + travelTime;
+  vessel.actionEndsAt = vessel.busyUntil;
   closeMoveModal();
   if(vessel.travelInterval){ clearInterval(vessel.travelInterval); }
   vessel.travelInterval = setInterval(()=>{
     if(state.timePaused) return;
-    if(Date.now() >= vessel.actionEndsAt){
+    if(Date.now() >= vessel.busyUntil){
       clearInterval(vessel.travelInterval);
       vessel.travelInterval = null;
       vessel.location = destName;
+      vessel.destination = null;
+      vessel.status = 'idle';
+      vessel.busyUntil = 0;
       vessel.actionEndsAt = 0;
       updateDisplay();
     }
@@ -533,15 +539,15 @@ function harvestPen(amount=null, holdIdx=0){
     biomass: vessel.currentBiomassLoad ?? 0,
     capacity: vessel.maxBiomassCapacity ?? 0
   };
-  if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+  if(vessel.status !== 'idle')
     return (window.openModal || alert)('Vessel currently busy.');
   if(pen.fishCount===0) return;
   if(hold.biomass>0 && hold.species && hold.species !== pen.species){
     return (window.openModal || alert)('Vessel already contains a different species.');
   }
   const vesselRemaining = hold.capacity - hold.biomass;
-  const totalBiomass = pen.fishCount * pen.averageWeight;
-  const maxHarvest = Math.min(totalBiomass, vesselRemaining);
+  const penBiomass = pen.fishCount * pen.averageWeight;
+  const maxHarvest = Math.min(penBiomass, vesselRemaining);
   if(maxHarvest <= 0) return (window.openModal || alert)("Vessel capacity full.");
   if(pen.locked) return (window.openModal || alert)('Pen currently busy.');
   const requested = amount === null ? maxHarvest : Math.max(0, Math.min(amount, maxHarvest));
@@ -558,12 +564,13 @@ function harvestPen(amount=null, holdIdx=0){
     if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
     vessel.harvestProgress = 0;
     vessel.harvestFishBuffer = 0;
+    let remainingFish = fishNum;
     const lockedWeight = pen.averageWeight;
-    const startFishCount = pen.fishCount;
     let last = Date.now();
     const updateEta = () => {
       const rate = state.getSiteHarvestRate(site);
-      vessel.actionEndsAt = Date.now() + (biomass - vessel.harvestProgress) / rate * 1000;
+      vessel.busyUntil = Date.now() + (biomass - vessel.harvestProgress) / rate * 1000;
+      vessel.actionEndsAt = vessel.busyUntil;
     };
     updateEta();
     vessel.harvestInterval = setInterval(()=>{
@@ -587,10 +594,11 @@ function harvestPen(amount=null, holdIdx=0){
       if(!vessel.cargo[pen.species]) vessel.cargo[pen.species] = 0;
       vessel.cargo[pen.species] += delta;
       vessel.harvestFishBuffer += delta / pen.averageWeight;
-      const remove = Math.floor(vessel.harvestFishBuffer);
+      let remove = Math.floor(vessel.harvestFishBuffer);
+      if(remove > remainingFish) remove = remainingFish;
       if(remove>0){
         pen.fishCount -= remove;
-        sanitizePen(pen);
+        remainingFish -= remove;
         vessel.harvestFishBuffer -= remove;
         for(let i=0;i<remove;i++){
           vessel.fishBuffer.push({ species: pen.species, weight: lockedWeight });
@@ -601,20 +609,26 @@ function harvestPen(amount=null, holdIdx=0){
         clearInterval(vessel.harvestInterval);
         vessel.harvestInterval = null;
         vessel.harvestProgress = 0;
-        pen.fishCount = Math.max(0, startFishCount - fishNum);
-        sanitizePen(pen);
-        const leftover = Math.round(vessel.harvestFishBuffer);
+        const leftover = Math.min(remainingFish, Math.round(vessel.harvestFishBuffer));
         if(leftover > 0){
+          pen.fishCount -= leftover;
+          remainingFish -= leftover;
           for(let i=0; i<leftover; i++){
             vessel.fishBuffer.push({ species: pen.species, weight: lockedWeight });
           }
         }
         vessel.harvestFishBuffer = 0;
+        sanitizePen(pen);
+        if(pen.fishCount<=0){ pen.species = null; pen.averageWeight = 0; }
         unlockPen(pen, 'harvest:end');
         vessel.harvestingPenIndex = null;
         vessel.location = site.name;
+        vessel.status = 'idle';
         vessel.isHarvesting = false;
+        vessel.busyUntil = 0;
+        vessel.destination = null;
         vessel.actionEndsAt = 0;
+        syncLegacyVesselFields(vessel);
         state.harvestsCompleted++;
         state.onboarding.steps.harvested = true;
         (window.openModal || alert)(`Harvested ${biomass.toFixed(2)} kg loaded onto ${vessel.name}.`);
@@ -629,14 +643,16 @@ function harvestPen(amount=null, holdIdx=0){
     const dy = startLoc.y - site.location.y;
     const distance = Math.hypot(dx, dy);
     const travelTime = distance / vessel.speed * state.TRAVEL_TIME_FACTOR;
-    vessel.location = `Traveling to ${site.name}`;
+    vessel.destination = site.name;
+    vessel.status = 'harvesting';
     vessel.isHarvesting = true;
-    vessel.actionEndsAt = Date.now() + travelTime;
+    vessel.busyUntil = Date.now() + travelTime;
+    vessel.actionEndsAt = vessel.busyUntil;
     updateDisplay();
     if(vessel.travelInterval){ clearInterval(vessel.travelInterval); }
     vessel.travelInterval = setInterval(()=>{
       if(state.timePaused) return;
-      if(Date.now() >= vessel.actionEndsAt){
+      if(Date.now() >= vessel.busyUntil){
         clearInterval(vessel.travelInterval);
         vessel.travelInterval = null;
         vessel.location = site.name;
@@ -644,6 +660,7 @@ function harvestPen(amount=null, holdIdx=0){
       }
     },250);
   } else {
+    vessel.status = 'harvesting';
     vessel.isHarvesting = true;
     performHarvest();
     updateDisplay();
@@ -653,13 +670,16 @@ function harvestPen(amount=null, holdIdx=0){
 
 function cancelVesselHarvest(idx){
   const vessel = state.vessels[idx];
-  if(!vessel.isHarvesting) return;
+  if(vessel.status !== 'harvesting') return;
   if(vessel.harvestTimeout){ clearTimeout(vessel.harvestTimeout); vessel.harvestTimeout = null; }
   if(vessel.harvestInterval){ clearInterval(vessel.harvestInterval); vessel.harvestInterval = null; }
   if(vessel.travelInterval){ clearInterval(vessel.travelInterval); vessel.travelInterval = null; }
   vessel.harvestProgress = 0;
   vessel.harvestFishBuffer = 0;
+  vessel.status = 'idle';
   vessel.isHarvesting = false;
+  vessel.busyUntil = 0;
+  vessel.destination = null;
   vessel.actionEndsAt = 0;
   if(vessel.harvestingPenIndex !== null){
     const site = state.sites[state.currentSiteIndex];
@@ -1128,8 +1148,17 @@ function loadGame() {
       state.vessels.forEach(v => {
         if(!v.cargo) v.cargo = {};
           if(v.cargoSpecies === undefined) v.cargoSpecies = Object.keys(v.cargo)[0] || null; // TODO: remove after holds migration
-        if(v.isHarvesting === undefined) v.isHarvesting = false;
-        if(v.actionEndsAt === undefined) v.actionEndsAt = 0;
+        if(v.status === undefined){
+          if(v.isHarvesting) v.status = 'harvesting';
+          else if(v.unloading) v.status = 'offloading';
+          else if(v.deliveringContractId) v.status = 'selling';
+          else v.status = 'idle';
+        }
+        if(v.destination === undefined) v.destination = null;
+        if(v.busyUntil === undefined) v.busyUntil = v.actionEndsAt || 0;
+        v.isHarvesting = v.status === 'harvesting';
+        v.unloading = v.status === 'offloading';
+        v.actionEndsAt = v.busyUntil;
         if(v.upgradeSlots === undefined) v.upgradeSlots = vesselClasses.skiff.slots;
         if(!v.upgrades) v.upgrades = [];
         if(!Array.isArray(v.holds)) {
