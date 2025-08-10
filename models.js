@@ -78,6 +78,10 @@ class Vessel {
     upgradeSlots = 2,
     upgrades = [],
     tier = 0,
+    status = 'idle',
+    destination = null,
+    busyUntil = 0,
+    // legacy fields
     isHarvesting = false,
     actionEndsAt = 0
   } = {}) {
@@ -92,8 +96,12 @@ class Vessel {
     this.upgradeSlots = upgradeSlots;
     this.upgrades = upgrades;
     this.tier = tier;
-    this.isHarvesting = isHarvesting;
-    this.actionEndsAt = actionEndsAt;
+    this.status = status;
+    this.destination = destination;
+    this.busyUntil = busyUntil;
+    // maintain legacy flags for backward compatibility
+    this.isHarvesting = status === 'harvesting' ? true : isHarvesting;
+    this.actionEndsAt = busyUntil || actionEndsAt;
 
     // future: support multiple holds; hold[0] mirrors legacy fields
     if (Array.isArray(holds) && holds.length) {
@@ -110,7 +118,7 @@ class Vessel {
       }];
     }
 
-    this.unloading = false;
+    this.unloading = status === 'offloading';
     this.offloadRevenue = 0;
     this.deliveringContractId = null;
 

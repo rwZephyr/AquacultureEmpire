@@ -647,21 +647,21 @@ function renderVesselGrid(){
     const statusEl = card.querySelector('.vessel-status');
     let statusClass = 'status-idle';
     let status = 'Idle';
-    if(vessel.isHarvesting){ status='Harvesting'; statusClass='status-harvesting'; }
-    else if(vessel.unloading || vessel.deliveringContractId){ status='Delivering'; statusClass='status-delivering'; }
+    if(vessel.status === 'harvesting'){ status='Harvesting'; statusClass='status-harvesting'; }
+    else if(vessel.status === 'offloading' || vessel.status === 'selling'){ status='Delivering'; statusClass='status-delivering'; }
+    else if(vessel.status === 'enRoute'){ status='Traveling'; }
     else if(vessel.location === 'Dock'){ status='Docked'; statusClass='status-docked'; }
-    else if(vessel.location.startsWith('Traveling')){ status='Traveling'; }
-    if(vessel.actionEndsAt && vessel.actionEndsAt > Date.now()){
-      const eta = Math.max(0, (vessel.actionEndsAt - Date.now())/1000);
+    if(vessel.busyUntil && vessel.busyUntil > Date.now()){
+      const eta = Math.max(0, (vessel.busyUntil - Date.now())/1000);
       status += ` (${eta.toFixed(0)}s)`;
     }
     statusEl.textContent = status;
     card.classList.add(statusClass);
     const speciesEl = card.querySelector('.harvest-species');
-    if(vessel.unloading){
+    if(vessel.status === 'offloading'){
       speciesEl.textContent = `Revenue $${vessel.offloadRevenue.toFixed(2)}`;
     } else {
-        speciesEl.textContent = vessel.isHarvesting && vessel.cargoSpecies ? `Harvesting ${capitalizeFirstLetter(vessel.cargoSpecies)}` : ''; // TODO: remove after holds migration
+        speciesEl.textContent = vessel.status === 'harvesting' && vessel.cargoSpecies ? `Harvesting ${capitalizeFirstLetter(vessel.cargoSpecies)}` : ''; // TODO: remove after holds migration
     }
       const loadPercent = vessel.maxBiomassCapacity ? (vessel.currentBiomassLoad / vessel.maxBiomassCapacity)*100 : 0; // TODO: derive from holds[0]
       card.querySelector('.vessel-progress').style.width = loadPercent + '%';
@@ -673,16 +673,17 @@ function renderVesselGrid(){
     if(infoEl){ infoEl.textContent = infoStr; infoEl.title = infoStr; }
     const harvestBtn = card.querySelector('.harvest-btn');
     harvestBtn.onclick = ()=>{ state.currentVesselIndex = idx; openHarvestModal(idx); };
-    harvestBtn.style.display = (vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId) ? 'none' : 'block';
+    const busy = vessel.status !== 'idle';
+    harvestBtn.style.display = busy ? 'none' : 'block';
     const moveBtn = card.querySelector('.move-btn');
     moveBtn.onclick = ()=>{ state.currentVesselIndex = idx; openMoveVesselModal(); };
-    moveBtn.disabled = vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId;
+    moveBtn.disabled = busy;
     const sellBtn = card.querySelector('.sell-btn');
     sellBtn.onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
-    sellBtn.disabled = vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId;
+    sellBtn.disabled = busy;
     const upBtn = card.querySelector('.upgrade-btn');
     upBtn.onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
-    upBtn.disabled = vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId;
+    upBtn.disabled = busy;
     const cancelBtn = card.querySelector('.cancel-btn');
     cancelBtn.onclick = ()=>{
       state.currentVesselIndex = idx;
@@ -693,8 +694,8 @@ function renderVesselGrid(){
         cancelVesselHarvest(idx);
       }
     };
-    cancelBtn.textContent = vessel.unloading ? 'Cancel Offloading' : 'Cancel';
-    cancelBtn.style.display = (vessel.isHarvesting || vessel.unloading) ? 'block' : 'none';
+    cancelBtn.textContent = vessel.status === 'offloading' ? 'Cancel Offloading' : 'Cancel';
+    cancelBtn.style.display = (vessel.status === 'harvesting' || vessel.status === 'offloading') ? 'block' : 'none';
 
     const detailsToggle = card.querySelector('.details-toggle');
     const details = card.querySelector('.vessel-details');
@@ -729,22 +730,22 @@ function updateVesselCards(){
     const statusEl = card.querySelector('.vessel-status');
     let statusClass = 'status-idle';
     let status = 'Idle';
-    if(vessel.isHarvesting){ status='Harvesting'; statusClass='status-harvesting'; }
-    else if(vessel.unloading || vessel.deliveringContractId){ status='Delivering'; statusClass='status-delivering'; }
+    if(vessel.status === 'harvesting'){ status='Harvesting'; statusClass='status-harvesting'; }
+    else if(vessel.status === 'offloading' || vessel.status === 'selling'){ status='Delivering'; statusClass='status-delivering'; }
+    else if(vessel.status === 'enRoute'){ status='Traveling'; }
     else if(vessel.location === 'Dock'){ status='Docked'; statusClass='status-docked'; }
-    else if(vessel.location.startsWith('Traveling')){ status='Traveling'; }
-    if(vessel.actionEndsAt && vessel.actionEndsAt > Date.now()){
-      const eta = Math.max(0, (vessel.actionEndsAt - Date.now())/1000);
+    if(vessel.busyUntil && vessel.busyUntil > Date.now()){
+      const eta = Math.max(0, (vessel.busyUntil - Date.now())/1000);
       status += ` (${eta.toFixed(0)}s)`;
     }
     statusEl.textContent = status;
     card.classList.remove('status-harvesting','status-idle','status-delivering','status-docked');
     card.classList.add(statusClass);
     const speciesEl = card.querySelector('.harvest-species');
-    if(vessel.unloading){
+    if(vessel.status === 'offloading'){
       speciesEl.textContent = `Revenue $${vessel.offloadRevenue.toFixed(2)}`;
     } else {
-        speciesEl.textContent = vessel.isHarvesting && vessel.cargoSpecies ? `Harvesting ${capitalizeFirstLetter(vessel.cargoSpecies)}` : ''; // TODO: remove after holds migration
+        speciesEl.textContent = vessel.status === 'harvesting' && vessel.cargoSpecies ? `Harvesting ${capitalizeFirstLetter(vessel.cargoSpecies)}` : ''; // TODO: remove after holds migration
     }
       const loadPercent = vessel.maxBiomassCapacity ? (vessel.currentBiomassLoad / vessel.maxBiomassCapacity)*100 : 0; // TODO: derive from holds[0]
       card.querySelector('.vessel-progress').style.width = loadPercent + '%';
@@ -757,15 +758,16 @@ function updateVesselCards(){
     if(infoEl2){ infoEl2.textContent = infoStr2; infoEl2.title = infoStr2; }
     const harvestBtn2 = card.querySelector('.harvest-btn');
     harvestBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openHarvestModal(idx); };
-    harvestBtn2.style.display = (vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId) ? 'none' : 'block';
+    const busy2 = vessel.status !== 'idle';
+    harvestBtn2.style.display = busy2 ? 'none' : 'block';
     const moveBtn2 = card.querySelector('.move-btn');
-    moveBtn2.disabled = vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId;
+    moveBtn2.disabled = busy2;
     moveBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openMoveVesselModal(); };
     const sellBtn2 = card.querySelector('.sell-btn');
-    sellBtn2.disabled = vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId;
+    sellBtn2.disabled = busy2;
     sellBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
     const upBtn2 = card.querySelector('.upgrade-btn');
-    upBtn2.disabled = vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId;
+    upBtn2.disabled = busy2;
     upBtn2.onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
     const cancelBtn = card.querySelector('.cancel-btn');
     cancelBtn.onclick = ()=>{
@@ -777,8 +779,8 @@ function updateVesselCards(){
         cancelVesselHarvest(idx);
       }
     };
-    cancelBtn.textContent = vessel.unloading ? 'Cancel Offloading' : 'Cancel';
-    cancelBtn.style.display = (vessel.isHarvesting || vessel.unloading) ? 'block' : 'none';
+    cancelBtn.textContent = vessel.status === 'offloading' ? 'Cancel Offloading' : 'Cancel';
+    cancelBtn.style.display = (vessel.status === 'harvesting' || vessel.status === 'offloading') ? 'block' : 'none';
   });
 }
 
@@ -1086,6 +1088,8 @@ function updateRestockCost(){
 }
 function closeRestockModal(){ document.getElementById('restockModal').classList.remove('visible'); }
 
+let lastHarvestTrigger = null;
+
 function updateHarvestModal(){
   const site = state.sites[state.currentSiteIndex];
   const vessel = state.vessels[state.currentVesselIndex];
@@ -1105,6 +1109,7 @@ function updateHarvestModal(){
   const maxHarvest = Math.min(penBiomass, vesselRemaining);
   document.getElementById('harvestMax').innerText = maxHarvest.toFixed(2);
   const input = document.getElementById('harvestAmount');
+  const slider = document.getElementById('harvestSlider');
   const requested = parseFloat(input.value) || 0;
   const avg = pen.averageWeight > 0 ? pen.averageWeight : 1;
   let fishToMove = Math.floor(requested / avg);
@@ -1112,32 +1117,45 @@ function updateHarvestModal(){
   fishToMove = Math.min(fishToMove, Math.floor(vesselRemaining / avg));
   const effectiveKg = fishToMove * avg;
   input.max = maxHarvest;
-  input.value = effectiveKg.toFixed(3);
+  slider.max = maxHarvest;
+  input.value = effectiveKg.toFixed(2);
+  slider.value = effectiveKg;
   const rate = getSiteHarvestRate(site);
   const secs = Math.max(0, effectiveKg / rate);
   document.getElementById('harvestModalContent').querySelector('h2').innerText =
     `Start Harvest (~${secs.toFixed(1)}s)`;
+  document.getElementById('harvestFishCount').textContent = `= ${fishToMove} fish`;
   const infoEl = document.getElementById('harvestHoldInfo');
   const confirmBtn = document.getElementById('harvestConfirmBtn');
+  const reasonEl = document.getElementById('harvestReason');
+  let reason = '';
   if(hold){
     const free = hold.capacity - hold.biomass;
     infoEl.textContent = `Hold ${holdIdx+1} — ${hold.species ? capitalizeFirstLetter(hold.species) : 'Empty'} — ${free.toFixed(1)} kg free`;
     const mismatch = hold.species && hold.species !== pen.species;
-    confirmBtn.disabled = mismatch;
-    confirmBtn.title = mismatch ? 'Hold contains a different species' : '';
+    if(mismatch){ reason = 'Hold contains a different species'; }
+    confirmBtn.disabled = mismatch || maxHarvest <= 0;
   } else {
     infoEl.textContent = 'N/A';
-    confirmBtn.disabled = false;
-    confirmBtn.title = '';
+    confirmBtn.disabled = maxHarvest <= 0;
   }
+  if(maxHarvest <= 0 && !reason) reason = 'No capacity';
+  confirmBtn.title = reason;
+  reasonEl.textContent = reason;
+
+  const maxHoldBtn = document.getElementById('harvestMaxHoldBtn');
+  const maxPenBtn = document.getElementById('harvestMaxPenBtn');
+  if(maxHoldBtn) maxHoldBtn.onclick = ()=>{ input.value = Math.min(vesselRemaining, penBiomass).toFixed(2); slider.value = input.value; updateHarvestModal(); };
+  if(maxPenBtn) maxPenBtn.onclick = ()=>{ input.value = Math.min(penBiomass, vesselRemaining).toFixed(2); slider.value = input.value; updateHarvestModal(); };
 }
 
 function openHarvestModal(vIdx){
   state.currentVesselIndex = vIdx;
   const site = state.sites[state.currentSiteIndex];
   const vessel = state.vessels[vIdx];
-  if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+  if(vessel.status !== 'idle')
     return openModal('Vessel currently busy.');
+  lastHarvestTrigger = document.activeElement;
   const select = document.getElementById('harvestPenSelect');
   select.innerHTML = '';
   site.pens.forEach((pen, idx)=>{
@@ -1173,11 +1191,25 @@ function openHarvestModal(vIdx){
   }
   select.onchange = updateHarvestModal;
   select.value = select.options[0].value;
-  document.getElementById('harvestAmount').oninput = updateHarvestModal;
+  const amountInput = document.getElementById('harvestAmount');
+  const slider = document.getElementById('harvestSlider');
+  amountInput.oninput = ()=>{ slider.value = amountInput.value; updateHarvestModal(); };
+  slider.oninput = ()=>{ amountInput.value = slider.value; updateHarvestModal(); };
   updateHarvestModal();
-  document.getElementById('harvestModal').classList.add('visible');
+  const modal = document.getElementById('harvestModal');
+  modal.classList.add('visible');
+  modal.onkeydown = (e)=>{
+    if(e.key==='Escape'){ e.preventDefault(); closeHarvestModal(); }
+    if(e.key==='Enter'){ e.preventDefault(); confirmHarvest(); }
+  };
+  amountInput.focus();
 }
-function closeHarvestModal(){ document.getElementById('harvestModal').classList.remove('visible'); }
+function closeHarvestModal(){
+  const modal = document.getElementById('harvestModal');
+  modal.classList.remove('visible');
+  modal.onkeydown = null;
+  if(lastHarvestTrigger) lastHarvestTrigger.focus();
+}
 function confirmHarvest(){
   const amount = parseFloat(document.getElementById('harvestAmount').value);
   const holdIdx = Number(document.getElementById('harvestHoldSelect').value) || 0;
@@ -1191,7 +1223,7 @@ function openSellModal(){
   const optionsDiv = document.getElementById('sellOptions');
   optionsDiv.innerHTML = '';
   const vessel = state.vessels[state.currentVesselIndex];
-  if(vessel.isHarvesting || vessel.unloading || vessel.deliveringContractId)
+  if(vessel.status !== 'idle')
     return openModal('Vessel currently busy.');
   const holdSelect = document.getElementById('sellHoldSelect');
   const holdLabel = document.querySelector('label[for="sellHoldSelect"]');
@@ -1412,6 +1444,7 @@ function validateBuildName(){
 
 function startOffloading(vessel, market, holdIndex=0){
   vessel.unloading = true;
+  vessel.status = 'offloading';
   vessel.offloadRevenue = 0;
   vessel.offloadMarket = market.name;
   const holds = vessel.holds && vessel.holds.length > 0 ? vessel.holds : [{ species: vessel.cargoSpecies ?? null, biomass: vessel.currentBiomassLoad ?? 0, capacity: vessel.maxBiomassCapacity ?? 0 }];
@@ -1432,7 +1465,7 @@ function startOffloading(vessel, market, holdIndex=0){
     }
   });
   const rate = state.OFFLOAD_RATE;
-  const updateEta = ()=>{ vessel.actionEndsAt = Date.now() + (hold.biomass / rate) * 1000; };
+  const updateEta = ()=>{ vessel.busyUntil = Date.now() + (hold.biomass / rate) * 1000; vessel.actionEndsAt = vessel.busyUntil; };
   updateEta();
   let last = Date.now();
   vessel.offloadInterval = setInterval(()=>{
@@ -1474,6 +1507,9 @@ function startOffloading(vessel, market, holdIndex=0){
 function finishOffloading(vessel, market, canceled=false){
   if(vessel.offloadInterval){ clearInterval(vessel.offloadInterval); vessel.offloadInterval = null; }
   vessel.unloading = false;
+  vessel.status = 'idle';
+  vessel.busyUntil = 0;
+  vessel.destination = null;
   vessel.actionEndsAt = 0;
   let earned = vessel.offloadRevenue || 0;
   state.cash += earned;
@@ -1503,6 +1539,7 @@ function finishOffloading(vessel, market, canceled=false){
                          `Sold cargo for $${earned.toFixed(2)} at ${market.name}.`;
   openModal(msg);
   vessel.offloadHoldIndex = null;
+  syncLegacyVesselFields(vessel);
   updateDisplay();
 }
 
@@ -1511,10 +1548,10 @@ function sellCargo(idx, holdIndex=0){
   const holds = vessel.holds && vessel.holds.length > 0 ? vessel.holds : [{ species: vessel.cargoSpecies ?? null, biomass: vessel.currentBiomassLoad ?? 0, capacity: vessel.maxBiomassCapacity ?? 0 }];
   if(holdIndex < 0 || holdIndex >= holds.length) holdIndex = 0;
   const hold = holds[holdIndex];
-  if(vessel.isHarvesting || vessel.unloading){ closeSellModal(); return openModal('Vessel currently busy.'); }
+  if(vessel.status !== 'idle'){ closeSellModal(); return openModal('Vessel currently busy.'); }
   if(!hold || hold.biomass<=0) return openModal('No biomass to sell.');
   const market = markets[idx];
-  if(vessel.location === `Traveling to ${market.name}`){
+  if(vessel.destination === market.name && vessel.status === 'enRoute'){
     closeSellModal();
     return openModal('Vessel already en route to this market.');
   }
@@ -1530,17 +1567,21 @@ function sellCargo(idx, holdIndex=0){
     const dy = startLoc.y - market.location.y;
     const distance = Math.hypot(dx, dy);
     const travelTime = distance / vessel.speed * state.TRAVEL_TIME_FACTOR;
-    vessel.location = `Traveling to ${market.name}`;
-    vessel.actionEndsAt = Date.now() + travelTime;
+    vessel.destination = market.name;
+    vessel.status = 'enRoute';
+    vessel.busyUntil = Date.now() + travelTime;
+    vessel.actionEndsAt = vessel.busyUntil;
     closeSellModal();
     if(vessel.travelInterval){ clearInterval(vessel.travelInterval); }
     vessel.travelInterval = setInterval(()=>{
       if(state.timePaused) return;
-      if(Date.now() >= vessel.actionEndsAt){
+      if(Date.now() >= vessel.busyUntil){
         clearInterval(vessel.travelInterval);
         vessel.travelInterval = null;
+        vessel.busyUntil = 0;
         vessel.actionEndsAt = 0;
         vessel.location = market.name;
+        vessel.destination = null;
         begin();
       }
     },250);
