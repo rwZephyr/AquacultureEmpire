@@ -632,15 +632,19 @@ function renderVesselGrid(){
     const clone = tmpl.content.cloneNode(true);
     const card = clone.querySelector('.vesselCard');
     const iconPath = vesselIcons[vessel.class];
-    const badge = document.createElement('div');
-    badge.classList.add('vessel-badge');
+    let badge = card.querySelector('.vessel-badge');
+    if(!badge){
+      badge = document.createElement('div');
+      badge.classList.add('vessel-badge');
+      card.appendChild(badge);
+    }
+    badge.innerHTML = '';
     if(iconPath){
       const icon = document.createElement('img');
       icon.src = iconPath;
       icon.alt = vessel.class;
       badge.appendChild(icon);
     }
-    card.appendChild(badge);
     card.querySelector('.vessel-name .name-text').textContent = vessel.name;
     card.querySelector('.rename-icon').onclick = ()=>{ state.currentVesselIndex = idx; renameVessel(); };
     card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;

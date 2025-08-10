@@ -857,6 +857,7 @@ html.modal-open {
 }
 
 .vessel-badge {
+  /* notification-style overlay */
   width: 40px;
   height: 40px;
   position: absolute;
@@ -864,9 +865,9 @@ html.modal-open {
   right: -12px;
   z-index: 10;
   border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.2);
   border: 2px solid white;
   overflow: hidden;
-  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .vessel-badge img {
