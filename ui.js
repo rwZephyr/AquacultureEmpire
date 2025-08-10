@@ -631,15 +631,16 @@ function renderVesselGrid(){
   state.vessels.forEach((vessel, idx)=>{
     const clone = tmpl.content.cloneNode(true);
     const card = clone.querySelector('.vesselCard');
-    const iconCont = clone.querySelector('.vessel-icon');
     const iconPath = vesselIcons[vessel.class];
-    if(iconCont){
-      if(iconPath){
-        iconCont.innerHTML = `<img src="${iconPath}" class="vessel-icon" alt="${vessel.class}">`;
-      } else {
-        iconCont.textContent = '🛥️';
-      }
+    const badge = document.createElement('div');
+    badge.classList.add('vessel-badge');
+    if(iconPath){
+      const icon = document.createElement('img');
+      icon.src = iconPath;
+      icon.alt = vessel.class;
+      badge.appendChild(icon);
     }
+    card.appendChild(badge);
     card.querySelector('.vessel-name .name-text').textContent = vessel.name;
     card.querySelector('.rename-icon').onclick = ()=>{ state.currentVesselIndex = idx; renameVessel(); };
     card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;
@@ -649,7 +650,7 @@ function renderVesselGrid(){
     let status = 'Idle';
     if(vessel.status === 'harvesting'){ status='Harvesting'; statusClass='status-harvesting'; }
     else if(vessel.status === 'offloading' || vessel.status === 'selling'){ status='Delivering'; statusClass='status-delivering'; }
-    else if(vessel.status === 'enRoute'){ status='Traveling'; }
+    else if(vessel.status === 'enRoute'){ status='Traveling'; statusClass='status-delivering'; }
     else if(vessel.location === 'Dock'){ status='Docked'; statusClass='status-docked'; }
     if(vessel.busyUntil && vessel.busyUntil > Date.now()){
       const eta = Math.max(0, (vessel.busyUntil - Date.now())/1000);
@@ -715,14 +716,19 @@ function updateVesselCards(){
   state.vessels.forEach((vessel, idx)=>{
     const card = grid.children[idx];
     if(!card) return;
-    const iconCont = card.querySelector('.vessel-icon');
     const iconPath = vesselIcons[vessel.class];
-    if(iconCont){
-      if(iconPath){
-        iconCont.innerHTML = `<img src="${iconPath}" class="vessel-icon" alt="${vessel.class}">`;
-      } else {
-        iconCont.textContent = '🛥️';
-      }
+    let badge = card.querySelector('.vessel-badge');
+    if(!badge){
+      badge = document.createElement('div');
+      badge.classList.add('vessel-badge');
+      card.appendChild(badge);
+    }
+    badge.innerHTML = '';
+    if(iconPath){
+      const icon = document.createElement('img');
+      icon.src = iconPath;
+      icon.alt = vessel.class;
+      badge.appendChild(icon);
     }
     card.querySelector('.vessel-name .name-text').textContent = vessel.name;
     card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;
@@ -732,7 +738,7 @@ function updateVesselCards(){
     let status = 'Idle';
     if(vessel.status === 'harvesting'){ status='Harvesting'; statusClass='status-harvesting'; }
     else if(vessel.status === 'offloading' || vessel.status === 'selling'){ status='Delivering'; statusClass='status-delivering'; }
-    else if(vessel.status === 'enRoute'){ status='Traveling'; }
+    else if(vessel.status === 'enRoute'){ status='Traveling'; statusClass='status-delivering'; }
     else if(vessel.location === 'Dock'){ status='Docked'; statusClass='status-docked'; }
     if(vessel.busyUntil && vessel.busyUntil > Date.now()){
       const eta = Math.max(0, (vessel.busyUntil - Date.now())/1000);

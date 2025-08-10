@@ -856,6 +856,25 @@ html.modal-open {
   object-fit: contain;
 }
 
+.vessel-badge {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  z-index: 10;
+  border-radius: 50%;
+  border: 2px solid white;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.vessel-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .penCard:hover,
 .vesselCard:hover,
 .bargeCard:hover,
@@ -991,10 +1010,22 @@ html.modal-open {
   top: auto;
   bottom: 100%;
 }
-.status-harvesting { border-left: 6px solid #2ecc71; }
-.status-idle { border-left: 6px solid #3498db; }
-.status-delivering { border-left: 6px solid #e67e22; }
-.status-docked { border-left: 6px solid #7f8c8d; }
+.status-harvesting,
+.status-idle,
+.status-delivering,
+.status-docked {
+  border-left: none;
+}
+
+.status-idle .vessel-badge,
+.status-docked .vessel-badge {
+  background-color: #2ecc71;
+}
+
+.status-harvesting .vessel-badge,
+.status-delivering .vessel-badge {
+  background-color: #e67e22;
+}
 .vesselCard.placeholder { opacity: 0.6; }
 .staffCard {
   background: var(--bg-panel);
@@ -1735,12 +1766,6 @@ html.modal-open {
 }
 
 .species-icon {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-}
-
-.vessel-icon {
   width: 48px;
   height: 48px;
   object-fit: contain;
