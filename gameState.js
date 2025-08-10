@@ -15,6 +15,8 @@ const state = {
   FEED_THRESHOLD_PERCENT: 0.2,
   AUTO_SAVE_INTERVAL_MS: 30000, // 30 seconds
   SAVE_KEY: 'aquacultureEmpireSave',
+  skipSave: false,
+  autoSaveIntervalId: null,
   TRAVEL_TIME_FACTOR: 1000, // ms per distance unit
   OFFLOAD_RATE: 10, // kg per second
 

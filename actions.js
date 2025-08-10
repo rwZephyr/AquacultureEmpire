@@ -755,7 +755,13 @@ function devAddBiomass(amount = 10){
 
 function devRestartGame() {
   if (confirm("Restart the game?")) {
-    localStorage.clear();
+    state.skipSave = true;
+    window.removeEventListener('beforeunload', saveGame);
+    window.removeEventListener('pagehide', saveGame);
+    if (state.autoSaveIntervalId) {
+      clearInterval(state.autoSaveIntervalId);
+    }
+    localStorage.removeItem(state.SAVE_KEY);
     location.reload();
   }
 }
@@ -1074,6 +1080,7 @@ function gameTimeTick(){
 
 // --- SAVE SYSTEM ---
 function saveGame() {
+  if (state.skipSave) return;
   const data = {
     cash: state.cash,
     penPurchaseCost: state.penPurchaseCost,
@@ -1353,13 +1360,13 @@ function safeInit(name){
   }
 }
 
-onBoot(()=>{
-  loadGame();
-  safeInit('initContracts');
-  safeInit('initMilestones');
-  setInterval(saveGame, state.AUTO_SAVE_INTERVAL_MS);
-  setInterval(checkMilestones, 1000);
-  setInterval(autoFeedTick, 1000);
-  setInterval(checkFeedManagers, 5000);
-  setInterval(gameTimeTick, state.DAY_DURATION_MS);
-});
+  onBoot(()=>{
+    loadGame();
+    safeInit('initContracts');
+    safeInit('initMilestones');
+    state.autoSaveIntervalId = setInterval(saveGame, state.AUTO_SAVE_INTERVAL_MS);
+    setInterval(checkMilestones, 1000);
+    setInterval(autoFeedTick, 1000);
+    setInterval(checkFeedManagers, 5000);
+    setInterval(gameTimeTick, state.DAY_DURATION_MS);
+  });
