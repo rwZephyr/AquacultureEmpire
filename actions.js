@@ -1339,10 +1339,24 @@ for (const key in actions){
   window[key] = (...args) => window.bootGuard(()=>actions[key](...args));
 }
 
+function safeInit(name){
+  if (typeof window[name] === 'function'){
+    window[name]();
+  } else {
+    const id = setInterval(()=>{
+      const fn = window[name];
+      if (typeof fn === 'function'){
+        clearInterval(id);
+        fn();
+      }
+    }, 50);
+  }
+}
+
 onBoot(()=>{
   loadGame();
-  initContracts();
-  initMilestones();
+  safeInit('initContracts');
+  safeInit('initMilestones');
   setInterval(saveGame, state.AUTO_SAVE_INTERVAL_MS);
   setInterval(checkMilestones, 1000);
   setInterval(autoFeedTick, 1000);
