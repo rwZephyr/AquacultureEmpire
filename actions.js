@@ -1069,6 +1069,7 @@ function simulateOfflineProgress(ms){
 function gameTimeTick(){
   if(!state.timePaused){
     state.advanceDay();
+    updateDisplay();
   }
 }
 
