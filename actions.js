@@ -293,6 +293,7 @@ function buyNewVessel(){
   state.cash -= NEW_VESSEL_COST;
     state.vessels.push(new Vessel({
       name: `Vessel ${state.vessels.length + 1}`,
+      class: 'skiff',
       maxBiomassCapacity: vesselTiers[0].maxBiomassCapacity, // TODO: remove after holds migration
       currentBiomassLoad: 0, // TODO: remove after holds migration
       cargoSpecies: null, // TODO: remove after holds migration
@@ -398,6 +399,7 @@ function buyShipyardVessel(idx){
   state.cash -= item.cost;
     const vessel = new Vessel({
       name: item.name,
+      class: item.class,
       maxBiomassCapacity: item.cargoCapacity, // TODO: remove after holds migration
       currentBiomassLoad: 0, // TODO: remove after holds migration
       cargoSpecies: null, // TODO: remove after holds migration
@@ -442,6 +444,7 @@ function confirmCustomBuild(){
   state.cash -= cost;
     const vessel = new Vessel({
       name: name,
+      class: cls,
       maxBiomassCapacity: base.baseCapacity, // TODO: remove after holds migration
       currentBiomassLoad: 0, // TODO: remove after holds migration
       cargoSpecies: null, // TODO: remove after holds migration
@@ -1154,6 +1157,7 @@ function loadGame() {
       state.vessels = obj.vessels ?? state.vessels;
       state.vessels.forEach(v => {
         if(!v.cargo) v.cargo = {};
+        if(!v.class) v.class = 'skiff';
           if(v.cargoSpecies === undefined) v.cargoSpecies = Object.keys(v.cargo)[0] || null; // TODO: remove after holds migration
         if(v.status === undefined){
           if(v.isHarvesting) v.status = 'harvesting';

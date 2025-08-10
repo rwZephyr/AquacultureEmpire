@@ -68,6 +68,7 @@ class Site {
 class Vessel {
   constructor({
     name,
+    class: vesselClass = 'skiff',
       maxBiomassCapacity = 1000, // TODO: remove after holds migration
       currentBiomassLoad = 0, // TODO: remove after holds migration
       cargo = {},
@@ -86,6 +87,7 @@ class Vessel {
     actionEndsAt = 0
   } = {}) {
     this.name = name;
+    this.class = vesselClass;
       this.maxBiomassCapacity = maxBiomassCapacity; // TODO: remove after holds migration
       this.currentBiomassLoad = currentBiomassLoad; // TODO: remove after holds migration
     // Deprecated: cargo is maintained for legacy saves but no longer used

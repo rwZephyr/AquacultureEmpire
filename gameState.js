@@ -297,6 +297,7 @@ state.sites = [
 state.vessels = [
     new Vessel({
       name: 'Hauler 1',
+      class: 'skiff',
       maxBiomassCapacity: vesselTiers[0].maxBiomassCapacity, // TODO: remove after holds migration
       currentBiomassLoad: 0, // TODO: remove after holds migration
       cargoSpecies: null, // TODO: remove after holds migration
