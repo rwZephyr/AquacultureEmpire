@@ -1927,10 +1927,11 @@ html.modal-open {
   position: fixed;
   bottom: 10px;
   right: 10px;
-  background: #fff;
-  border: 1px solid #ccc;
-  padding: 8px;
-  font-size: 0.9rem;
+  background: #f4f4f4;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 0.95rem;
   z-index: 5;
   max-width: 200px;
 }
@@ -1940,9 +1941,21 @@ html.modal-open {
   margin: 0;
   padding: 0;
 }
+.onboarding-card li {
+  margin: 2px 0;
+  padding: 2px 4px;
+  color: #222;
+  font-weight: 500;
+}
+.onboarding-card li:hover {
+  color: #000;
+}
 .onboarding-card li.done {
   text-decoration: line-through;
-  color: #555;
+  color: #999;
+}
+.onboarding-card li.done:hover {
+  color: #666;
 }
 .onboarding-card a {
   display: block;
