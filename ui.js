@@ -728,33 +728,10 @@ function renderVesselGrid(){
       const first = actionMenu.querySelector('[role="menuitem"]');
       if(first) first.focus();
     };
-    const hoverMq = window.matchMedia('(hover:hover)');
-    if(hoverMq.matches){
-      let closeTimer;
-      const scheduleClose = ()=>{ closeTimer = setTimeout(closeMenu, 150); };
-      const cancelClose = ()=>{ clearTimeout(closeTimer); };
-      actionsToggle.addEventListener('mouseenter', openMenu);
-      actionsToggle.addEventListener('focusin', openMenu);
-      actionsToggle.addEventListener('mouseleave', scheduleClose);
-      actionsToggle.addEventListener('focusout', scheduleClose);
-      actionMenu.addEventListener('mouseenter', cancelClose);
-      actionMenu.addEventListener('mouseleave', scheduleClose);
-    } else {
-      actionsToggle.addEventListener('click', e=>{
-        e.stopPropagation();
-        if(actionMenu.classList.contains('hidden')) openMenu();
-        else closeMenu();
-      });
-    }
-    actionsToggle.addEventListener('keydown', e=>{
-      if(e.key === 'Enter' || e.key === ' '){
-        e.preventDefault();
-        if(actionMenu.classList.contains('hidden')) openMenu();
-        else closeMenu();
-      } else if(e.key === 'ArrowDown'){
-        e.preventDefault();
-        if(actionMenu.classList.contains('hidden')) openMenu();
-      }
+    actionsToggle.addEventListener('click', e=>{
+      e.stopPropagation();
+      if(actionMenu.classList.contains('hidden')) openMenu();
+      else closeMenu();
     });
 
     const renameBtn = card.querySelector('.rename-btn');

@@ -804,8 +804,8 @@ html.modal-open {
   color: var(--text-muted);
   margin-bottom: 4px;
 }
-.penCard button,
-.vesselCard button {
+.penCard button:not(.icon-btn),
+.vesselCard button:not(.icon-btn) {
   display: block;
   width: 100%;
   margin-top: 4px;
@@ -817,8 +817,8 @@ html.modal-open {
   border-radius: 6px;
   cursor: pointer;
 }
-.penCard button:hover,
-.vesselCard button:hover {
+.penCard button:not(.icon-btn):hover,
+.vesselCard button:not(.icon-btn):hover {
   background-color: var(--accent);
   color: var(--bg-darker);
 }
@@ -830,8 +830,8 @@ html.modal-open {
   background-color: #d45c5c;
 }
 
-.penCard button:disabled,
-.vesselCard button:disabled {
+.penCard button:not(.icon-btn):disabled,
+.vesselCard button:not(.icon-btn):disabled {
   background-color: #555;
   cursor: not-allowed;
 }
@@ -1102,21 +1102,25 @@ html.modal-open {
   font-size: 18px;
   margin-bottom: 10px;
   color: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  text-align: center;
 }
 .vessel-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 4px;
 }
 .ellipsis-trigger {
+  position: absolute;
+  top: 10px;
+  right: 10px;
   background: none;
   border: 0;
   padding: 6px;
+  min-width: 32px;
+  min-height: 32px;
   line-height: 1;
+  font-size: 20px;
   cursor: pointer;
   opacity: 0.9;
 }
@@ -1124,11 +1128,13 @@ html.modal-open {
 .ellipsis-trigger:hover,
 .ellipsis-trigger:focus {
   opacity: 1;
+  outline: 2px solid var(--focus, rgba(255,255,255,.25));
+  outline-offset: 2px;
 }
 .action-menu {
   position: absolute;
-  top: 28px;
-  right: 4px;
+  top: 40px;
+  right: 10px;
   background: var(--bg-panel);
   padding: 6px;
   border-radius: 6px;
@@ -1136,7 +1142,7 @@ html.modal-open {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  z-index: 5;
+  z-index: 10;
 }
 .action-menu.hidden {
   display: none;
@@ -1145,8 +1151,9 @@ html.modal-open {
 .vessel-actions {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin-top: 6px;
+  gap: 14px;
+  margin-top: 10px;
+  width: 100%;
 }
 
 .vessel-actions button {
@@ -1154,8 +1161,8 @@ html.modal-open {
 }
 
 .icon-btn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1167,18 +1174,20 @@ html.modal-open {
 }
 
 .icon-btn img {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
 }
 
 .icon-btn:hover,
 .icon-btn:focus {
   opacity: 1;
+  outline: 2px solid var(--focus, rgba(255,255,255,.25));
+  outline-offset: 3px;
 }
 
 .icon-btn[aria-disabled="true"] {
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0.35;
 }
 .load-line {
   font-size: 13px;
