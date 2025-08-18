@@ -1113,12 +1113,31 @@ html.modal-open {
   gap: 4px;
 }
 .actions-toggle {
-  background: none;
-  border: none;
-  color: var(--text-light);
-  cursor: pointer;
-  font-size: 16px;
-}
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 20px;
+    margin: 0;
+    padding: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    line-height: 1;
+  }
+
+  .actions-toggle:hover,
+  .actions-toggle:focus {
+    background-color: var(--bg-button);
+    color: var(--accent);
+  }
+
+  .actions-toggle:active {
+    transform: scale(0.95);
+  }
 .action-menu {
   position: absolute;
   top: 28px;
