@@ -705,11 +705,15 @@ function renderVesselGrid(){
     const detailsToggle = card.querySelector('.details-toggle');
     const details = card.querySelector('.vessel-details');
     if(detailsToggle && details){ detailsToggle.onclick = ()=>{ details.classList.toggle('hidden'); }; }
-    const actionsToggle = card.querySelector('.actions-toggle');
-    const actionMenu = card.querySelector('.action-menu');
-    if(actionsToggle && actionMenu){
-      actionsToggle.onclick = (e)=>{ e.stopPropagation(); actionMenu.classList.toggle('hidden'); };
-    }
+      const actionsToggle = card.querySelector('.actions-toggle');
+      const actionMenu = card.querySelector('.action-menu');
+      if(actionsToggle && actionMenu){
+        actionsToggle.onclick = (e)=>{
+          e.stopPropagation();
+          const isHidden = actionMenu.classList.toggle('hidden');
+          actionsToggle.setAttribute('aria-expanded', String(!isHidden));
+        };
+      }
     grid.appendChild(clone);
   });
 }

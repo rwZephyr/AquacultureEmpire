@@ -190,14 +190,14 @@
             <div class="vessel-badge"></div>
             <div class="vessel-header">
               <h3 class="vessel-name"><span class="name-text"></span><span class="rename-icon" title="Rename">&#9998;</span></h3>
-              <button class="actions-toggle" title="Actions">⚙</button>
-              <div class="action-menu hidden">
-                <button class="harvest-btn">Harvest</button>
-                <button class="move-btn">Move</button>
-                <button class="sell-btn">Sell</button>
-                <button class="upgrade-btn">Upgrade</button>
-                <button class="cancel-btn">Cancel</button>
-              </div>
+                <button class="actions-toggle" aria-label="More vessel actions" title="More vessel actions" aria-expanded="false">⋮</button>
+                <div class="action-menu hidden" role="menu">
+                  <button class="harvest-btn" role="menuitem">Harvest</button>
+                  <button class="move-btn" role="menuitem">Move</button>
+                  <button class="sell-btn" role="menuitem">Sell</button>
+                  <button class="upgrade-btn" role="menuitem">Upgrade</button>
+                  <button class="cancel-btn" role="menuitem">Cancel</button>
+                </div>
             </div>
             <div class="stat status-line">Status: <span class="vessel-status"></span></div>
             <div class="progressBar"><div class="progress vessel-progress"></div></div>
