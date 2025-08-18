@@ -733,7 +733,16 @@ function renderVesselGrid(){
       if(actionMenu.classList.contains('hidden')) openMenu();
       else closeMenu();
     });
-
+    const hideOnLeave = e=>{
+      if(actionMenu.classList.contains('hidden')) return;
+      const to = e.relatedTarget;
+      if(!actionMenu.contains(to) && !actionsToggle.contains(to)){
+        closeMenu();
+      }
+    };
+    actionsToggle.addEventListener('pointerleave', hideOnLeave);
+    actionMenu.addEventListener('pointerleave', hideOnLeave);
+    
     const renameBtn = card.querySelector('.rename-btn');
     renameBtn.onclick = ()=>{ state.currentVesselIndex = idx; closeMenu(); renameVessel(); };
     const upBtn = card.querySelector('.upgrade-btn');
