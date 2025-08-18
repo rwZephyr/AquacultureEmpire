@@ -1112,31 +1112,18 @@ html.modal-open {
   justify-content: space-between;
   gap: 4px;
 }
-.actions-toggle {
+.ellipsis-trigger {
   background: none;
-  border: none;
-  color: var(--text-light);
-  cursor: pointer;
-  font-size: 20px;
-  margin: 0;
-  padding: 0;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  border: 0;
+  padding: 6px;
   line-height: 1;
+  cursor: pointer;
+  opacity: 0.9;
 }
 
-.actions-toggle:hover,
-.actions-toggle:focus {
-  background-color: var(--bg-button);
-  color: var(--accent);
-}
-
-.actions-toggle:active {
-  transform: scale(0.95);
+.ellipsis-trigger:hover,
+.ellipsis-trigger:focus {
+  opacity: 1;
 }
 .action-menu {
   position: absolute;
@@ -1157,13 +1144,41 @@ html.modal-open {
 /* footer vessel action bar */
 .vessel-actions {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
   margin-top: 6px;
 }
 
 .vessel-actions button {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.icon-btn img {
+  width: 26px;
+  height: 26px;
+}
+
+.icon-btn:hover,
+.icon-btn:focus {
+  opacity: 1;
+}
+
+.icon-btn[aria-disabled="true"] {
+  pointer-events: none;
+  opacity: 0.4;
 }
 .load-line {
   font-size: 13px;
