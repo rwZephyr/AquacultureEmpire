@@ -189,20 +189,24 @@
           <div class="vesselCard compact">
             <div class="vessel-badge"></div>
             <div class="vessel-header">
-              <h3 class="vessel-name"><span class="name-text"></span><span class="rename-icon" title="Rename">&#9998;</span></h3>
-                <button class="actions-toggle" aria-label="More vessel actions" title="More vessel actions" aria-expanded="false">⋮</button>
-                <div class="action-menu hidden" role="menu">
-                  <button class="harvest-btn" role="menuitem">Harvest</button>
-                  <button class="move-btn" role="menuitem">Move</button>
-                  <button class="sell-btn" role="menuitem">Sell</button>
-                  <button class="upgrade-btn" role="menuitem">Upgrade</button>
-                  <button class="cancel-btn" role="menuitem">Cancel</button>
-                </div>
+              <h3 class="vessel-name"><span class="name-text"></span></h3>
+              <button class="actions-toggle" aria-label="More vessel actions" title="More vessel actions" role="button" aria-haspopup="menu" aria-controls="" aria-expanded="false">⋮</button>
+              <div class="action-menu hidden" role="menu">
+                <button class="rename-btn" role="menuitem">Rename</button>
+                <button class="upgrade-btn" role="menuitem">Upgrade</button>
+                <button class="sell-vessel-btn" role="menuitem">Sell Vessel</button>
+                <button class="details-btn" role="menuitem">Details</button>
+                <button class="cancel-btn" role="menuitem">Cancel</button>
+              </div>
             </div>
             <div class="stat status-line">Status: <span class="vessel-status"></span></div>
             <div class="progressBar"><div class="progress vessel-progress"></div></div>
             <div class="stat load-line"><span class="vessel-load"></span> / <span class="vessel-capacity"></span> kg (<span class="load-percent"></span>%)</div>
-            <div class="details-toggle">Details ⌄</div>
+            <div class="vessel-actions">
+              <button class="harvest-btn" id="btn-harvest" title="Harvest">Harvest</button>
+              <button class="move-btn" id="btn-move" title="Move">Move</button>
+              <button class="offload-btn" id="btn-offload" title="Offload">Offload</button>
+            </div>
             <div class="vessel-details hidden">
               <div class="stat">Tier: <span class="vessel-tier"></span></div>
               <div class="stat">Location: <span class="vessel-location"></span></div>
