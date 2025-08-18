@@ -711,7 +711,7 @@ function renderVesselGrid(){
     offloadBtn.id = `btn-offload-${idx}`;
     offloadBtn.onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
 
-    const actionsToggle = card.querySelector('.actions-toggle');
+    const actionsToggle = card.querySelector('.ellipsis-trigger');
     const actionMenu = card.querySelector('.action-menu');
     actionMenu.id = `vessel-menu-${idx}`;
     actionsToggle.setAttribute('aria-controls', actionMenu.id);
@@ -719,11 +719,14 @@ function renderVesselGrid(){
       actionMenu.classList.add('hidden');
       actionsToggle.setAttribute('aria-expanded', 'false');
       menuManager.clear(closeMenu);
+      actionsToggle.focus();
     };
     const openMenu = ()=>{
       actionMenu.classList.remove('hidden');
       actionsToggle.setAttribute('aria-expanded', 'true');
       menuManager.register(actionsToggle, actionMenu, closeMenu);
+      const first = actionMenu.querySelector('[role="menuitem"]');
+      if(first) first.focus();
     };
     const hoverMq = window.matchMedia('(hover:hover)');
     if(hoverMq.matches){
@@ -751,8 +754,6 @@ function renderVesselGrid(){
       } else if(e.key === 'ArrowDown'){
         e.preventDefault();
         if(actionMenu.classList.contains('hidden')) openMenu();
-        const first = actionMenu.querySelector('[role="menuitem"]');
-        if(first) first.focus();
       }
     });
 
@@ -778,8 +779,11 @@ function renderVesselGrid(){
     };
     const busy = vessel.status !== 'idle';
     harvestBtn.disabled = busy;
+    harvestBtn.setAttribute('aria-disabled', busy ? 'true' : 'false');
     moveBtn.disabled = busy;
+    moveBtn.setAttribute('aria-disabled', busy ? 'true' : 'false');
     offloadBtn.disabled = busy;
+    offloadBtn.setAttribute('aria-disabled', busy ? 'true' : 'false');
     upBtn.disabled = busy;
     renameBtn.disabled = busy;
     sellVesselBtn.disabled = busy;
@@ -854,8 +858,11 @@ function updateVesselCards(){
     const sellVesselBtn2 = card.querySelector('.sell-vessel-btn');
     const busy2 = vessel.status !== 'idle';
     harvestBtn2.disabled = busy2;
+    harvestBtn2.setAttribute('aria-disabled', busy2 ? 'true' : 'false');
     moveBtn2.disabled = busy2;
+    moveBtn2.setAttribute('aria-disabled', busy2 ? 'true' : 'false');
     offloadBtn2.disabled = busy2;
+    offloadBtn2.setAttribute('aria-disabled', busy2 ? 'true' : 'false');
     upBtn2.disabled = busy2;
     if(renameBtn2) renameBtn2.disabled = busy2;
     if(sellVesselBtn2) sellVesselBtn2.disabled = busy2;

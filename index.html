@@ -190,7 +190,7 @@
             <div class="vessel-badge"></div>
             <div class="vessel-header">
               <h3 class="vessel-name"><span class="name-text"></span></h3>
-              <button class="actions-toggle" aria-label="More vessel actions" title="More vessel actions" role="button" aria-haspopup="menu" aria-controls="" aria-expanded="false">⋮</button>
+              <span class="ellipsis-trigger" aria-label="More vessel actions" title="More vessel actions" role="button" aria-haspopup="menu" aria-controls="" aria-expanded="false" tabindex="0">…</span>
               <div class="action-menu hidden" role="menu">
                 <button class="rename-btn" role="menuitem">Rename</button>
                 <button class="upgrade-btn" role="menuitem">Upgrade</button>
@@ -203,9 +203,9 @@
             <div class="progressBar"><div class="progress vessel-progress"></div></div>
             <div class="stat load-line"><span class="vessel-load"></span> / <span class="vessel-capacity"></span> kg (<span class="load-percent"></span>%)</div>
             <div class="vessel-actions">
-              <button class="harvest-btn" id="btn-harvest" title="Harvest">Harvest</button>
-              <button class="move-btn" id="btn-move" title="Move">Move</button>
-              <button class="offload-btn" id="btn-offload" title="Offload">Offload</button>
+              <button class="icon-btn harvest-btn" aria-label="Harvest" title="Harvest"><img src="assets/vessel-icons/HarvestVessel.png" alt="" /></button>
+              <button class="icon-btn move-btn" aria-label="Move" title="Move"><img src="assets/vessel-icons/MoveVessel.png" alt="" /></button>
+              <button class="icon-btn offload-btn" aria-label="Offload" title="Offload"><img src="assets/vessel-icons/OffloadVessel.png" alt="" /></button>
             </div>
             <div class="vessel-details hidden">
               <div class="stat">Tier: <span class="vessel-tier"></span></div>
