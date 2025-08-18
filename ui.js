@@ -50,6 +50,32 @@ document.addEventListener('click', evt => {
   }
 });
 
+// simple shared dropdown manager
+const menuManager = (()=>{
+  let current = null;
+  function register(trigger, menu, closeFn){
+    if(current && current.closeFn && current.closeFn !== closeFn){
+      current.closeFn();
+    }
+    current = { trigger, menu, closeFn };
+  }
+  function clear(fn){
+    if(current && (!fn || current.closeFn === fn)) current = null;
+  }
+  document.addEventListener('pointerdown', e=>{
+    if(current && !current.menu.contains(e.target) && !current.trigger.contains(e.target)){
+      current.closeFn();
+    }
+  });
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape' && current){
+      current.closeFn();
+      current.trigger.focus();
+    }
+  });
+  return { register, clear };
+})();
+
 function pulseOnce(el){
   if(!el) return;
   el.classList.add('pulse-once');
@@ -448,7 +474,7 @@ function maybeShowOnboardingTips(){
     return;
   }
   if(state.onboarding.steps.harvested && !state.onboarding.steps.sold && !state.tips.tipSellShown){
-    const btn = document.querySelector('.sell-btn');
+    const btn = document.querySelector('.offload-btn');
     if(btn){
       showOnboardingTip(btn, 'Sell at market to make cash.');
       state.tips.tipSellShown = true;
@@ -646,7 +672,6 @@ function renderVesselGrid(){
       badge.appendChild(icon);
     }
     card.querySelector('.vessel-name .name-text').textContent = vessel.name;
-    card.querySelector('.rename-icon').onclick = ()=>{ state.currentVesselIndex = idx; renameVessel(); };
     card.querySelector('.vessel-tier').textContent = vesselTiers[vessel.tier].name;
     card.querySelector('.vessel-location').textContent = vessel.location;
     const statusEl = card.querySelector('.vessel-status');
@@ -677,18 +702,69 @@ function renderVesselGrid(){
     const infoStr = getFishBufferInfo(vessel.fishBuffer);
     if(infoEl){ infoEl.textContent = infoStr; infoEl.title = infoStr; }
     const harvestBtn = card.querySelector('.harvest-btn');
+    harvestBtn.id = `btn-harvest-${idx}`;
     harvestBtn.onclick = ()=>{ state.currentVesselIndex = idx; openHarvestModal(idx); };
-    const busy = vessel.status !== 'idle';
-    harvestBtn.style.display = busy ? 'none' : 'block';
     const moveBtn = card.querySelector('.move-btn');
+    moveBtn.id = `btn-move-${idx}`;
     moveBtn.onclick = ()=>{ state.currentVesselIndex = idx; openMoveVesselModal(); };
-    moveBtn.disabled = busy;
-    const sellBtn = card.querySelector('.sell-btn');
-    sellBtn.onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
-    sellBtn.disabled = busy;
+    const offloadBtn = card.querySelector('.offload-btn');
+    offloadBtn.id = `btn-offload-${idx}`;
+    offloadBtn.onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
+
+    const actionsToggle = card.querySelector('.actions-toggle');
+    const actionMenu = card.querySelector('.action-menu');
+    actionMenu.id = `vessel-menu-${idx}`;
+    actionsToggle.setAttribute('aria-controls', actionMenu.id);
+    const closeMenu = ()=>{
+      actionMenu.classList.add('hidden');
+      actionsToggle.setAttribute('aria-expanded', 'false');
+      menuManager.clear(closeMenu);
+    };
+    const openMenu = ()=>{
+      actionMenu.classList.remove('hidden');
+      actionsToggle.setAttribute('aria-expanded', 'true');
+      menuManager.register(actionsToggle, actionMenu, closeMenu);
+    };
+    const hoverMq = window.matchMedia('(hover:hover)');
+    if(hoverMq.matches){
+      let closeTimer;
+      const scheduleClose = ()=>{ closeTimer = setTimeout(closeMenu, 150); };
+      const cancelClose = ()=>{ clearTimeout(closeTimer); };
+      actionsToggle.addEventListener('mouseenter', openMenu);
+      actionsToggle.addEventListener('focusin', openMenu);
+      actionsToggle.addEventListener('mouseleave', scheduleClose);
+      actionsToggle.addEventListener('focusout', scheduleClose);
+      actionMenu.addEventListener('mouseenter', cancelClose);
+      actionMenu.addEventListener('mouseleave', scheduleClose);
+    } else {
+      actionsToggle.addEventListener('click', e=>{
+        e.stopPropagation();
+        if(actionMenu.classList.contains('hidden')) openMenu();
+        else closeMenu();
+      });
+    }
+    actionsToggle.addEventListener('keydown', e=>{
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        if(actionMenu.classList.contains('hidden')) openMenu();
+        else closeMenu();
+      } else if(e.key === 'ArrowDown'){
+        e.preventDefault();
+        if(actionMenu.classList.contains('hidden')) openMenu();
+        const first = actionMenu.querySelector('[role="menuitem"]');
+        if(first) first.focus();
+      }
+    });
+
+    const renameBtn = card.querySelector('.rename-btn');
+    renameBtn.onclick = ()=>{ state.currentVesselIndex = idx; closeMenu(); renameVessel(); };
     const upBtn = card.querySelector('.upgrade-btn');
-    upBtn.onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
-    upBtn.disabled = busy;
+    upBtn.onclick = ()=>{ state.currentVesselIndex = idx; closeMenu(); upgradeVessel(); };
+    const sellVesselBtn = card.querySelector('.sell-vessel-btn');
+    sellVesselBtn.onclick = ()=>{ closeMenu(); openModal('Selling vessels not yet implemented'); };
+    const detailsBtn = card.querySelector('.details-btn');
+    const details = card.querySelector('.vessel-details');
+    detailsBtn.onclick = ()=>{ details.classList.toggle('hidden'); closeMenu(); };
     const cancelBtn = card.querySelector('.cancel-btn');
     cancelBtn.onclick = ()=>{
       state.currentVesselIndex = idx;
@@ -698,22 +774,18 @@ function renderVesselGrid(){
       } else {
         cancelVesselHarvest(idx);
       }
+      closeMenu();
     };
+    const busy = vessel.status !== 'idle';
+    harvestBtn.disabled = busy;
+    moveBtn.disabled = busy;
+    offloadBtn.disabled = busy;
+    upBtn.disabled = busy;
+    renameBtn.disabled = busy;
+    sellVesselBtn.disabled = busy;
     cancelBtn.textContent = vessel.status === 'offloading' ? 'Cancel Offloading' : 'Cancel';
     cancelBtn.style.display = (vessel.status === 'harvesting' || vessel.status === 'offloading') ? 'block' : 'none';
 
-    const detailsToggle = card.querySelector('.details-toggle');
-    const details = card.querySelector('.vessel-details');
-    if(detailsToggle && details){ detailsToggle.onclick = ()=>{ details.classList.toggle('hidden'); }; }
-      const actionsToggle = card.querySelector('.actions-toggle');
-      const actionMenu = card.querySelector('.action-menu');
-      if(actionsToggle && actionMenu){
-        actionsToggle.onclick = (e)=>{
-          e.stopPropagation();
-          const isHidden = actionMenu.classList.toggle('hidden');
-          actionsToggle.setAttribute('aria-expanded', String(!isHidden));
-        };
-      }
     grid.appendChild(clone);
   });
 }
@@ -772,17 +844,21 @@ function updateVesselCards(){
     if(infoEl2){ infoEl2.textContent = infoStr2; infoEl2.title = infoStr2; }
     const harvestBtn2 = card.querySelector('.harvest-btn');
     harvestBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openHarvestModal(idx); };
-    const busy2 = vessel.status !== 'idle';
-    harvestBtn2.style.display = busy2 ? 'none' : 'block';
     const moveBtn2 = card.querySelector('.move-btn');
-    moveBtn2.disabled = busy2;
     moveBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openMoveVesselModal(); };
-    const sellBtn2 = card.querySelector('.sell-btn');
-    sellBtn2.disabled = busy2;
-    sellBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
+    const offloadBtn2 = card.querySelector('.offload-btn');
+    offloadBtn2.onclick = ()=>{ state.currentVesselIndex = idx; openSellModal(); };
     const upBtn2 = card.querySelector('.upgrade-btn');
-    upBtn2.disabled = busy2;
     upBtn2.onclick = ()=>{ state.currentVesselIndex = idx; upgradeVessel(); };
+    const renameBtn2 = card.querySelector('.rename-btn');
+    const sellVesselBtn2 = card.querySelector('.sell-vessel-btn');
+    const busy2 = vessel.status !== 'idle';
+    harvestBtn2.disabled = busy2;
+    moveBtn2.disabled = busy2;
+    offloadBtn2.disabled = busy2;
+    upBtn2.disabled = busy2;
+    if(renameBtn2) renameBtn2.disabled = busy2;
+    if(sellVesselBtn2) sellVesselBtn2.disabled = busy2;
     const cancelBtn = card.querySelector('.cancel-btn');
     cancelBtn.onclick = ()=>{
       state.currentVesselIndex = idx;

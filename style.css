@@ -1113,31 +1113,31 @@ html.modal-open {
   gap: 4px;
 }
 .actions-toggle {
-    background: none;
-    border: none;
-    color: var(--text-light);
-    cursor: pointer;
-    font-size: 20px;
-    margin: 0;
-    padding: 0;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    line-height: 1;
-  }
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  font-size: 20px;
+  margin: 0;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  line-height: 1;
+}
 
-  .actions-toggle:hover,
-  .actions-toggle:focus {
-    background-color: var(--bg-button);
-    color: var(--accent);
-  }
+.actions-toggle:hover,
+.actions-toggle:focus {
+  background-color: var(--bg-button);
+  color: var(--accent);
+}
 
-  .actions-toggle:active {
-    transform: scale(0.95);
-  }
+.actions-toggle:active {
+  transform: scale(0.95);
+}
 .action-menu {
   position: absolute;
   top: 28px;
@@ -1154,11 +1154,16 @@ html.modal-open {
 .action-menu.hidden {
   display: none;
 }
-.details-toggle {
-  cursor: pointer;
-  color: var(--accent);
-  font-size: 12px;
-  margin-top: 4px;
+/* footer vessel action bar */
+.vessel-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.vessel-actions button {
+  flex: 1 1 auto;
 }
 .load-line {
   font-size: 13px;
@@ -1166,15 +1171,6 @@ html.modal-open {
 }
 .vessel-details.hidden {
   display: none;
-}
-.rename-icon {
-  cursor: pointer;
-  margin-left: 8px;
-  font-size: 16px;
-  color: var(--icon-muted);
-}
-.rename-icon:hover {
-  color: var(--accent);
 }
 .assign-icon, .unassign-icon {
   cursor: pointer;
