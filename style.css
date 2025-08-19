@@ -1119,15 +1119,15 @@ html.modal-open {
   justify-content: center;
   background: none;
   border: 0;
-  padding: 4px;
-  width: 36px;
-  height: 36px;
+  padding: 0;
+  width: clamp(32px, 6vw, 40px);
+  height: clamp(32px, 6vw, 40px);
   line-height: 1;
-  font-size: 24px;
+  font-size: clamp(20px, 5vw, 28px);
   cursor: pointer;
   opacity: 0.9;
   margin: 0;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .ellipsis-trigger:hover,
@@ -1155,7 +1155,7 @@ html.modal-open {
 .vessel-actions {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: clamp(16px, 4vw, 32px);
   margin-top: 10px;
   width: 100%;
 }
@@ -1165,23 +1165,23 @@ html.modal-open {
 }
 
 .icon-btn {
-  width: 48px;
-  height: 48px;
+  width: clamp(44px, 10vw, 60px);
+  height: clamp(44px, 10vw, 60px);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+  background: none;
   border: 0;
   padding: 0;
   margin: 0;
   cursor: pointer;
   opacity: 0.9;
-  border-radius: 50%;
+  border-radius: 8px;
 }
 
 .icon-btn img {
-  width: 32px;
-  height: 32px;
+  width: clamp(32px, 7vw, 44px);
+  height: clamp(32px, 7vw, 44px);
 }
 
 .icon-btn:hover,
