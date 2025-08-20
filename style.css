@@ -1369,29 +1369,46 @@ body.panel-open {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   padding: 4px 12px;
   margin: 0 auto;
   max-width: 1200px;
   color: var(--text-light);
 }
 
-body.topbar-status-only .topbar-actions {
+.topbar-actions {
   display: none;
 }
 
 #gameTitle {
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 18px;
   font-weight: bold;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 360px) {
   :root {
     --header-height: 48px;
   }
   #topBar {
-    flex-direction: column;
-    gap: 2px;
     padding: 2px 4px;
+  }
+  #gameTitle {
+    flex-basis: 100%;
+  }
+  #siteGroup,
+  #statusGroup {
+    flex-basis: 50%;
+  }
+  #siteGroup {
+    justify-content: flex-start;
+  }
+  #statusGroup {
+    justify-content: flex-end;
   }
   .top-bar-group {
     gap: 2px;
@@ -1431,9 +1448,19 @@ body.topbar-status-only .topbar-actions {
 }
 
 .time-btn {
-  cursor: pointer;
-  margin-left: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0 0 0 4px;
   font-size: 16px;
+  cursor: pointer;
+  color: inherit;
+}
+
+.time-btn:hover,
+.time-btn:focus {
+  background: none;
+  color: inherit;
 }
 
 .top-bar-group button:hover {
