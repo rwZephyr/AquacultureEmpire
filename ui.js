@@ -26,51 +26,61 @@ function adjustHeaderPadding(){
 }
 window.addEventListener('resize', adjustHeaderPadding);
 
-// tiny view router
+// lightweight view router
 (function(){
-  const nav = document.getElementById('app-nav');
-  if(!nav) return;
   const sections = Array.from(document.querySelectorAll('#app-main > section[id^="view-"]'));
-  const buttons  = Array.from(nav.querySelectorAll('[data-view]'));
+  const navLinks = document.getElementById('nav-links');
+  const buttons = navLinks ? Array.from(navLinks.querySelectorAll('button[data-view]')) : [];
+  const toggle = document.getElementById('nav-toggle');
 
   function show(view){
     sections.forEach(sec => {
-      if(sec.id === `view-${view}`){
-        sec.classList.remove('hidden');
-      } else {
-        sec.classList.add('hidden');
-      }
+      sec.classList.toggle('hidden', sec.id !== `view-${view}`);
     });
     buttons.forEach(btn => {
       if(btn.dataset.view === view){
-        btn.setAttribute('aria-current', 'page');
+        btn.setAttribute('aria-current','page');
       } else {
         btn.removeAttribute('aria-current');
       }
     });
     localStorage.setItem('aqe_view', view);
-  }
-
-  const stored = localStorage.getItem('aqe_view');
-  show(stored || 'Farm');
-
-  nav.addEventListener('click', e => {
-    const btn = e.target.closest('[data-view]');
-    if(btn){
-      show(btn.dataset.view);
-      document.body.classList.remove('drawer-open');
-    }
-  });
-
-  const toggle = document.getElementById('nav-toggle');
-  if(toggle){
-    toggle.addEventListener('click', () => {
-      document.body.classList.toggle('drawer-open');
-    });
+    if(location.hash !== `#${view}`) location.hash = `#${view}`;
+    document.dispatchEvent(new CustomEvent('view:changed',{ detail:{ view } }));
   }
 
   window.AQE = window.AQE || {};
   window.AQE.router = { show };
+
+  if(navLinks){
+    navLinks.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-view]');
+      if(!btn) return;
+      show(btn.dataset.view);
+      if(document.body.classList.contains('drawer-open')){
+        document.body.classList.remove('drawer-open');
+        if(toggle) toggle.setAttribute('aria-expanded','false');
+      }
+    });
+  }
+
+  if(toggle){
+    toggle.setAttribute('aria-expanded','false');
+    toggle.addEventListener('click', () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      document.body.classList.toggle('drawer-open', !expanded);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    let initial = 'Farm';
+    const hash = location.hash.replace('#','');
+    if(hash) initial = hash;
+    else if(localStorage.getItem('aqe_view')) initial = localStorage.getItem('aqe_view');
+    if(!sections.some(sec => sec.id === `view-${initial}`)) initial = 'Farm';
+    show(initial);
+  });
 })();
 
 // close site dropdown when clicking outside
@@ -2347,7 +2357,6 @@ window.addEventListener('beforeunload', saveGame);
   }
 })();
 
-(function wireDebugClose(){
   const btn = document.getElementById('debugClose');
   if (btn){
     btn.addEventListener('click', () => {
@@ -2370,11 +2379,3 @@ window.addEventListener('beforeunload', saveGame);
     obs.observe(document.body, { attributes:true, attributeFilter:['class'] });
   }
 })();
-
-// Ensure router shows a default view after DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    const last = localStorage.getItem('aqe_view') || 'Farm';
-    if (window.AQE?.router?.show) window.AQE.router.show(last);
-  } catch(e){ console.error('Router init error', e); }
-});
