@@ -1996,28 +1996,21 @@ function openMarketReports(){
 }
 
 function openSiteManagementModalLegacy(){
-  const modal = document.getElementById('siteManagementModal');
-  const nameEl = document.getElementById('siteManagementSiteName');
-  if(nameEl) nameEl.innerText = state.sites[state.currentSiteIndex].name;
-  updateSiteLicenses();
-  updateLicenseDropdown();
-  updateSiteUpgrades();
-  modal.classList.add('visible');
-  document.body.style.overflow = 'hidden';
-  document.documentElement.style.overflow = 'hidden';
+  // Legacy helper now routes to the in-page panel
+  openSiteManagement();
 }
 
 function closeSiteManagementModalLegacy(){
-  document.getElementById('siteManagementModal').classList.remove('visible');
-  document.body.style.overflow = '';
-  document.documentElement.style.overflow = '';
+  // Legacy helper now routes to the in-page panel
+  closeSiteManagement();
 }
 
 let siteMgmtTriggerEl = null;
+let siteMgmtKeyHandler = null;
 
 function openSiteManagement(tab = null, trigger = null){
   const panel = document.getElementById('siteManagementPanel');
-  if(!panel) return;
+  if(!panel || panel.classList.contains('open')) return;
   siteMgmtTriggerEl = trigger || document.activeElement;
   const nameEl = document.getElementById('siteMgmtSiteName');
   if(nameEl) nameEl.innerText = state.sites[state.currentSiteIndex].name;
@@ -2026,8 +2019,30 @@ function openSiteManagement(tab = null, trigger = null){
   updateSiteUpgrades();
   panel.classList.add('open');
   panel.setAttribute('aria-hidden','false');
+  const backdrop = document.getElementById('siteMgmtBackdrop');
+  backdrop && backdrop.classList.add('open');
+  document.body.classList.add('panel-open');
   switchSiteMgmtTab(tab || localStorage.getItem('siteMgmtTab') || 'licenses');
   localStorage.setItem('siteMgmtOpen','true');
+  siteMgmtKeyHandler = function(e){
+    if(e.key === 'Escape'){
+      e.preventDefault();
+      closeSiteManagement();
+    } else if(e.key === 'Tab'){
+      const focusables = panel.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])');
+      if(focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if(e.shiftKey && document.activeElement === first){
+        e.preventDefault();
+        last.focus();
+      } else if(!e.shiftKey && document.activeElement === last){
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  };
+  document.addEventListener('keydown', siteMgmtKeyHandler);
   const header = document.getElementById('siteMgmtHeader');
   header && header.focus();
 }
@@ -2037,6 +2052,13 @@ function closeSiteManagement(){
   if(panel){
     panel.classList.remove('open');
     panel.setAttribute('aria-hidden','true');
+  }
+  const backdrop = document.getElementById('siteMgmtBackdrop');
+  backdrop && backdrop.classList.remove('open');
+  document.body.classList.remove('panel-open');
+  if(siteMgmtKeyHandler){
+    document.removeEventListener('keydown', siteMgmtKeyHandler);
+    siteMgmtKeyHandler = null;
   }
   localStorage.setItem('siteMgmtOpen','false');
   if(siteMgmtTriggerEl){
