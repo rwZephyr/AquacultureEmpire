@@ -117,24 +117,48 @@
         <div class="farm-actions-section">
           <h3><button id="operations-toggle" class="action-toggle" aria-expanded="true" aria-controls="operations-list">Operations</button></h3>
           <div id="operations-list" class="actions-list">
-            <button onclick="toggleStatusPanel('feed')">Feed</button>
-            <button onclick="toggleStatusPanel('barge')">Barges/Vessels</button>
-            <button onclick="toggleStatusPanel('staff')">Staff</button>
+            <button id="action-feed" class="action-badge" aria-label="Feed" onclick="toggleStatusPanel('feed')">
+              <span class="badge-icon"><img src="assets/general-icons/bulkbag.png" alt=""><span id="feedActionBadge" class="badge-count"></span></span>
+              <span class="badge-label">Feed</span>
+            </button>
+            <button id="action-vessels" class="action-badge" aria-label="Barges and Vessels" onclick="AQE.router.show('Vessels')">
+              <span class="badge-icon"><img src="assets/general-icons/cagesystem.png" alt=""><span id="vesselActionBadge" class="badge-count"></span></span>
+              <span class="badge-label">Barges</span>
+            </button>
+            <button id="action-staff" class="action-badge" aria-label="Staff" onclick="AQE.router.show('Staff')">
+              <span class="badge-icon"><img src="assets/general-icons/farmer.png" alt=""><span id="staffActionBadge" class="badge-count"></span></span>
+              <span class="badge-label">Staff</span>
+            </button>
           </div>
         </div>
         <div class="farm-actions-section">
           <h3><button id="site-toggle" class="action-toggle" aria-expanded="true" aria-controls="site-list">Site Management</button></h3>
           <div id="site-list" class="actions-list">
-            <button onclick="openSiteManagement()">Licenses</button>
-            <button onclick="openSiteManagement()">Upgrades</button>
+            <button id="action-licenses" class="action-badge" aria-label="Licenses" onclick="openSiteManagement()">
+              <span class="badge-icon"><img src="assets/general-icons/siteactions.png" alt=""></span>
+              <span class="badge-label">Licenses</span>
+            </button>
+            <button id="action-upgrades" class="action-badge" aria-label="Upgrades" onclick="openSiteManagement()">
+              <span class="badge-icon"><img src="assets/general-icons/shipyard.png" alt=""></span>
+              <span class="badge-label">Upgrades</span>
+            </button>
           </div>
         </div>
         <div class="farm-actions-section">
           <h3><button id="tools-toggle" class="action-toggle" aria-expanded="true" aria-controls="tools-list">Tools</button></h3>
           <div id="tools-list" class="actions-list">
-            <button onclick="toggleDevTools()">Dev</button>
-            <button onclick="openSpeciesData()">Codex</button>
-            <button onclick="window.__AQE_setDebugNav && window.__AQE_setDebugNav(true)">Debug</button>
+            <button id="action-dev" class="action-badge" aria-label="Dev Tools" onclick="toggleDevTools()">
+              <span class="badge-icon"><img src="assets/general-icons/browser.png" alt=""></span>
+              <span class="badge-label">Dev</span>
+            </button>
+            <button id="action-codex" class="action-badge" aria-label="Codex" onclick="openSpeciesData()">
+              <span class="badge-icon"><img src="assets/general-icons/marketreports.png" alt=""></span>
+              <span class="badge-label">Codex</span>
+            </button>
+            <button id="action-debug" class="action-badge" aria-label="Debug" onclick="window.__AQE_setDebugNav && window.__AQE_setDebugNav(true)">
+              <span class="badge-icon"><img src="assets/general-icons/restock.png" alt=""></span>
+              <span class="badge-label">Debug</span>
+            </button>
           </div>
         </div>
       </aside>

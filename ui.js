@@ -278,6 +278,13 @@ function legacyUpdateDisplay(){
       state.tips.vesselUnlocked = true;
     }
   }
+  const vesselAction = document.getElementById('action-vessels');
+  if(vesselAction){
+    vesselAction.classList.toggle('locked', !shipyardUnlocked);
+    vesselAction.setAttribute('aria-disabled', String(!shipyardUnlocked));
+    if(!shipyardUnlocked) vesselAction.title = 'Unlocks after stocking your first pen.';
+    else vesselAction.removeAttribute('title');
+  }
   const penBtn = document.getElementById('buyPenBtn');
   const penReason = document.getElementById('penLockReason');
   const penUnlocked = state.milestones.firstHarvest && state.milestones.firstSale;
@@ -330,6 +337,16 @@ function legacyUpdateDisplay(){
       staffBadge.classList.remove('alert');
     }
   }
+  const feedActionBadge = document.getElementById('feedActionBadge');
+  if(feedActionBadge) feedActionBadge.textContent = `${totalFeed.toFixed(0)}/${totalFeedCap}kg`;
+  const vesselActionBadge = document.getElementById('vesselActionBadge');
+  if(vesselActionBadge){
+    const owned = state.vessels?.length || 0;
+    const limit = state.vesselLimit;
+    vesselActionBadge.textContent = limit ? `${owned}/${limit}` : String(owned);
+  }
+  const staffActionBadge = document.getElementById('staffActionBadge');
+  if(staffActionBadge) staffActionBadge.textContent = site.staff.length;
 
   // vessel grid
 
