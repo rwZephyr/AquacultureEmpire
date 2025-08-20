@@ -610,6 +610,72 @@ html.modal-open {
   width: 340px;
 }
 
+/* In-page Site Management panel */
+.site-management-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 360px;
+  height: 100%;
+  background: var(--bg-panel);
+  box-shadow: 0 0 8px var(--shadow-medium);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 10;
+}
+
+.site-management-panel.open {
+  transform: translateX(0);
+}
+
+.site-mgmt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid var(--accent);
+}
+
+.site-mgmt-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+}
+
+.site-mgmt-tabs [role="tab"] {
+  flex: 1;
+  background: var(--bg-button);
+  color: var(--text-light);
+  border: none;
+  padding: 6px;
+}
+
+.site-mgmt-tabs [aria-selected="true"] {
+  background: var(--accent);
+}
+
+.site-mgmt-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12px;
+}
+
+.site-mgmt-pane.hidden {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .site-management-panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    max-width: none;
+  }
+}
+
 #devModalContent h3 {
   margin-top: 16px;
   font-size: 14px;
@@ -1675,6 +1741,7 @@ html.modal-open {
 }
 #farm-main {
   flex: 1;
+  position: relative;
 }
 .farm-actions-section {
   margin-bottom: 12px;

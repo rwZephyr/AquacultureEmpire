@@ -67,7 +67,7 @@
           <img id="siteActionToggle" src="assets/general-icons/siteactions.png" alt="Site Actions" class="icon-button" onclick="toggleSiteActions()" />
           <div id="siteActionMenu" class="hidden">
             <button onclick="buyNewSite()">+ New Site</button>
-            <button onclick="openSiteManagement()">Manage Site</button>
+            <button onclick="openSiteManagement(null, this)">Manage Site</button>
           </div>
         </div>
         <div class="mobile-action-wrapper" id="toolsActionGroup">
@@ -134,11 +134,11 @@
         <div class="farm-actions-section">
           <h3><button id="site-toggle" class="action-toggle" aria-expanded="true" aria-controls="site-list">Site Management</button></h3>
           <div id="site-list" class="actions-list">
-            <button id="action-licenses" class="action-badge" aria-label="Licenses" onclick="openSiteManagement()">
+            <button id="action-licenses" class="action-badge" aria-label="Licenses" onclick="openSiteManagement('licenses', this)">
               <span class="badge-icon"><img src="assets/general-icons/siteactions.png" alt=""></span>
               <span class="badge-label">Licenses</span>
             </button>
-            <button id="action-upgrades" class="action-badge" aria-label="Upgrades" onclick="openSiteManagement()">
+            <button id="action-upgrades" class="action-badge" aria-label="Upgrades" onclick="openSiteManagement('upgrades', this)">
               <span class="badge-icon"><img src="assets/general-icons/shipyard.png" alt=""></span>
               <span class="badge-label">Upgrades</span>
             </button>
@@ -163,6 +163,51 @@
         </div>
       </aside>
       <div id="farm-main">
+
+    <div id="siteManagementPanel" class="site-management-panel" aria-hidden="true">
+      <div class="site-mgmt-header">
+        <h2 id="siteMgmtHeader" tabindex="-1">Site Management – <span id="siteMgmtSiteName"></span></h2>
+        <button id="siteMgmtClose" aria-label="Close" onclick="closeSiteManagement()">×</button>
+      </div>
+      <div class="site-mgmt-tabs" role="tablist">
+        <button id="siteMgmtTab-licenses" role="tab" aria-selected="true" aria-controls="siteMgmtPane-licenses" onclick="switchSiteMgmtTab('licenses')">Licenses</button>
+        <button id="siteMgmtTab-upgrades" role="tab" aria-selected="false" aria-controls="siteMgmtPane-upgrades" onclick="switchSiteMgmtTab('upgrades')">Upgrades</button>
+        <button id="siteMgmtTab-settings" role="tab" aria-selected="false" aria-controls="siteMgmtPane-settings" onclick="switchSiteMgmtTab('settings')">Settings</button>
+      </div>
+      <div class="site-mgmt-content">
+        <div id="siteMgmtPane-licenses" class="site-mgmt-pane">
+          <div id="siteLicenses"></div>
+          <section id="licenseShop">
+            <div class="site-switcher">
+              <button id="licenseDropdownBtn" onclick="toggleLicenseList()">Buy License ⌄</button>
+              <div id="licenseDropdownList" class="site-list hidden"></div>
+            </div>
+          </section>
+        </div>
+        <div id="siteMgmtPane-upgrades" class="site-mgmt-pane hidden">
+          <div id="siteUpgrades" class="site-upgrade-grid">
+            <div class="site-upgrade-card">
+              <h4>Dock Upgrade</h4>
+              <p>Improves vessel turnaround speed.</p>
+              <button data-upgrade="dockUpgrade" disabled>Work in Progress</button>
+            </div>
+            <div class="site-upgrade-card">
+              <h4>Warehouse Expansion</h4>
+              <p>Increases passive storage or barge feed storage.</p>
+              <button data-upgrade="warehouseExpansion" disabled>Work in Progress</button>
+            </div>
+            <div class="site-upgrade-card">
+              <h4>Environmental Sensors</h4>
+              <p>Unlocks weather or seasonal UI in future.</p>
+              <button data-upgrade="envSensors" disabled>Work in Progress</button>
+            </div>
+          </div>
+        </div>
+        <div id="siteMgmtPane-settings" class="site-mgmt-pane hidden">
+          <p>Settings coming soon.</p>
+        </div>
+      </div>
+    </div>
 
     <div id="feedPanel" class="status-panel">
     <h2>Feed Management</h2>
@@ -455,6 +500,8 @@
       </div>
     </div>
 
+    <!-- Legacy Site Management Modal kept for reference -->
+    <!--
     <div id="siteManagementModal">
       <div id="siteManagementContent">
         <button class="close-report-btn" onclick="closeSiteManagement()">Back</button>
@@ -486,6 +533,7 @@
         </div>
       </div>
     </div>
+    -->
 
     <div id="bargeUpgradeModal">
       <div id="bargeUpgradeModalContent">
