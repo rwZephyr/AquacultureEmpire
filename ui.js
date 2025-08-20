@@ -2372,7 +2372,10 @@ for (const key in ui){
   onBoot(()=>{
     adjustHeaderPadding();
     updateDisplay();
-    setupStatusTooltips();
+    const actions = document.querySelector('.topbar-actions');
+    if(actions && getComputedStyle(actions).display !== 'none'){
+      setupStatusTooltips();
+    }
     setupMapInteractions();
     initFarmActions();
     initSiteManagementPanel();
