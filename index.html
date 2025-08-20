@@ -39,14 +39,7 @@
     </ul>
   </nav>
   <main id="app-main">
-    <section id="view-Farm" class="hidden"></section>
-    <section id="view-Vessels" class="hidden"></section>
-    <section id="view-Staff" class="hidden"></section>
-    <section id="view-Market" class="hidden"></section>
-    <section id="view-Shipyard" class="hidden"></section>
-    <section id="view-Finance" class="hidden"></section>
-    <section id="view-Logbook" class="hidden"></section>
-
+    <section id="view-Farm" class="hidden">
   <header id="topHeader">
     <div class="container">
     <!-- Top bar grouped for easier styling -->
@@ -84,6 +77,8 @@
             <button id="shipyardBtn" onclick="openShipyard()">Shipyard</button><span id="shipyardLockReason" class="lock-reason"></span>
             <button onclick="openLogbook()" title="Open Logbook">Logbook</button>
             <button onclick="toggleDevTools()">⚙️</button>
+            <button onclick="openSpeciesData()">Codex</button>
+            <button onclick="window.__AQE_setDebugNav && window.__AQE_setDebugNav(true)">Debug</button>
           </div>
         </div>
         <div class="mobile-action-wrapper" id="bankActionGroup">
@@ -115,9 +110,37 @@
       </div>
     </div>
     </div>
-  </header>
+    </header>
 
-  <div id="feedPanel" class="status-panel">
+    <div id="farm-view">
+      <aside id="farm-actions">
+        <div class="farm-actions-section">
+          <h3><button id="operations-toggle" class="action-toggle" aria-expanded="true" aria-controls="operations-list">Operations</button></h3>
+          <div id="operations-list" class="actions-list">
+            <button onclick="toggleStatusPanel('feed')">Feed</button>
+            <button onclick="toggleStatusPanel('barge')">Barges/Vessels</button>
+            <button onclick="toggleStatusPanel('staff')">Staff</button>
+          </div>
+        </div>
+        <div class="farm-actions-section">
+          <h3><button id="site-toggle" class="action-toggle" aria-expanded="true" aria-controls="site-list">Site Management</button></h3>
+          <div id="site-list" class="actions-list">
+            <button onclick="openSiteManagement()">Licenses</button>
+            <button onclick="openSiteManagement()">Upgrades</button>
+          </div>
+        </div>
+        <div class="farm-actions-section">
+          <h3><button id="tools-toggle" class="action-toggle" aria-expanded="true" aria-controls="tools-list">Tools</button></h3>
+          <div id="tools-list" class="actions-list">
+            <button onclick="toggleDevTools()">Dev</button>
+            <button onclick="openSpeciesData()">Codex</button>
+            <button onclick="window.__AQE_setDebugNav && window.__AQE_setDebugNav(true)">Debug</button>
+          </div>
+        </div>
+      </aside>
+      <div id="farm-main">
+
+    <div id="feedPanel" class="status-panel">
     <h2>Feed Management</h2>
     <div class="progressBar"><div id="feedProgress" class="progress"></div></div>
     <div><span id="totalFeed">0</span> / <span id="totalFeedCapacity">0</span> kg</div>
@@ -255,10 +278,19 @@
           </div>
         </template>
       </div>
+      </section>
+    </main>
+      </div>
+    </div>
     </section>
-  </main>
+    <section id="view-Vessels" class="hidden"></section>
+    <section id="view-Staff" class="hidden"></section>
+    <section id="view-Market" class="hidden"></section>
+    <section id="view-Shipyard" class="hidden"></section>
+    <section id="view-Finance" class="hidden"></section>
+    <section id="view-Logbook" class="hidden"></section>
 
-  <!-- Modals -->
+    <!-- Modals -->
     <div id="modal">
       <div id="modalContent">
         <p id="modalText"></p>
