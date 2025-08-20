@@ -2159,16 +2159,17 @@ body.debug-nav #app-main {
 /* Debug overlay: visible Close button */
 body.debug-nav #debugClose{
   position: fixed;
-  top: 10px; right: 12px;
+
+  top: 10px; right: 10px;
   z-index: 10000;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid #2a323a;
-  background: #161b21;
-  color: #e9eef4;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.6);
+  color: #eee;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: .2px;
-  display: inline-block;
+
 }
 
 /* Ensure overlay elements accept taps when debug is on */
