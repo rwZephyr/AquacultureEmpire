@@ -2155,3 +2155,23 @@ body.debug-nav .top-icon-menu {
 body.debug-nav #app-main {
   pointer-events: none;
 }
+
+/* Debug overlay: visible Close button */
+body.debug-nav #debugClose{
+  position: fixed;
+  top: 10px; right: 12px;
+  z-index: 10000;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #2a323a;
+  background: #161b21;
+  color: #e9eef4;
+  font-weight: 600;
+  letter-spacing: .2px;
+  display: inline-block;
+}
+
+/* Ensure overlay elements accept taps when debug is on */
+body.debug-nav #app-nav,
+body.debug-nav #nav-links,
+body.debug-nav #debugClose{ pointer-events: auto; }

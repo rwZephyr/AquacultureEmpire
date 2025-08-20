@@ -2347,6 +2347,30 @@ window.addEventListener('beforeunload', saveGame);
   }
 })();
 
+(function wireDebugClose(){
+  const btn = document.getElementById('debugClose');
+  if (btn){
+    btn.addEventListener('click', () => {
+      // Prefer central setter if present, else toggle class
+      if (window.__AQE_setDebugNav){
+        window.__AQE_setDebugNav(false);
+      } else {
+        document.body.classList.remove('debug-nav');
+      }
+    });
+
+    // Show/hide based on debug state
+    const obs = new MutationObserver(() => {
+      if (document.body.classList.contains('debug-nav')) {
+        btn.removeAttribute('hidden');
+      } else {
+        btn.setAttribute('hidden','');
+      }
+    });
+    obs.observe(document.body, { attributes:true, attributeFilter:['class'] });
+  }
+})();
+
 // Ensure router shows a default view after DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   try {
