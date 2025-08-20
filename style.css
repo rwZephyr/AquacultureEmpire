@@ -2159,6 +2159,7 @@ body.debug-nav #app-main {
 /* Debug overlay: visible Close button */
 body.debug-nav #debugClose{
   position: fixed;
+
   top: 10px; right: 10px;
   z-index: 10000;
   padding: 4px 10px;
@@ -2168,6 +2169,7 @@ body.debug-nav #debugClose{
   color: #eee;
   font-size: 14px;
   font-weight: 600;
+
 }
 
 /* Ensure overlay elements accept taps when debug is on */
