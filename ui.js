@@ -1995,7 +1995,7 @@ function openMarketReports(){
   openMarketReport();
 }
 
-function openSiteManagement(){
+function openSiteManagementModalLegacy(){
   const modal = document.getElementById('siteManagementModal');
   const nameEl = document.getElementById('siteManagementSiteName');
   if(nameEl) nameEl.innerText = state.sites[state.currentSiteIndex].name;
@@ -2007,10 +2007,66 @@ function openSiteManagement(){
   document.documentElement.style.overflow = 'hidden';
 }
 
-function closeSiteManagement(){
+function closeSiteManagementModalLegacy(){
   document.getElementById('siteManagementModal').classList.remove('visible');
   document.body.style.overflow = '';
   document.documentElement.style.overflow = '';
+}
+
+let siteMgmtTriggerEl = null;
+
+function openSiteManagement(tab = null, trigger = null){
+  const panel = document.getElementById('siteManagementPanel');
+  if(!panel) return;
+  siteMgmtTriggerEl = trigger || document.activeElement;
+  const nameEl = document.getElementById('siteMgmtSiteName');
+  if(nameEl) nameEl.innerText = state.sites[state.currentSiteIndex].name;
+  updateSiteLicenses();
+  updateLicenseDropdown();
+  updateSiteUpgrades();
+  panel.classList.add('open');
+  panel.setAttribute('aria-hidden','false');
+  switchSiteMgmtTab(tab || localStorage.getItem('siteMgmtTab') || 'licenses');
+  localStorage.setItem('siteMgmtOpen','true');
+  const header = document.getElementById('siteMgmtHeader');
+  header && header.focus();
+}
+
+function closeSiteManagement(){
+  const panel = document.getElementById('siteManagementPanel');
+  if(panel){
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden','true');
+  }
+  localStorage.setItem('siteMgmtOpen','false');
+  if(siteMgmtTriggerEl){
+    siteMgmtTriggerEl.focus();
+    siteMgmtTriggerEl = null;
+  }
+}
+
+function switchSiteMgmtTab(tab){
+  const tabs = ['licenses','upgrades','settings'];
+  tabs.forEach(t => {
+    const btn = document.getElementById('siteMgmtTab-' + t);
+    const pane = document.getElementById('siteMgmtPane-' + t);
+    const selected = t === tab;
+    if(btn){
+      btn.setAttribute('aria-selected', String(selected));
+    }
+    if(pane){
+      pane.classList.toggle('hidden', !selected);
+    }
+  });
+  localStorage.setItem('siteMgmtTab', tab);
+}
+
+function initSiteManagementPanel(){
+  const storedTab = localStorage.getItem('siteMgmtTab') || 'licenses';
+  switchSiteMgmtTab(storedTab);
+  if(localStorage.getItem('siteMgmtOpen') === 'true'){
+    openSiteManagement(storedTab);
+  }
 }
 
 function openDevModal(){
@@ -2372,6 +2428,7 @@ function toggleStatusPanel(key){
   openMarketReports,
   openSiteManagement,
   closeSiteManagement,
+  switchSiteMgmtTab,
   updateSiteUpgrades,
   openDevModal,
   closeDevModal,
@@ -2407,6 +2464,7 @@ for (const key in ui){
     setupStatusTooltips();
     setupMapInteractions();
     initFarmActions();
+    initSiteManagementPanel();
   });
 
 window.addEventListener('pagehide', saveGame);
