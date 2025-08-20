@@ -947,6 +947,17 @@ body.panel-open {
   object-fit: contain;
 }
 
+.pen-locked {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: var(--accent);
+  color: var(--text-dark);
+  border-radius: 10px;
+  padding: 1px 4px;
+  font-size: 10px;
+}
+
 .vessel-badge {
   /* notification-style overlay */
   width: 40px;
@@ -1064,43 +1075,6 @@ body.panel-open {
   box-shadow: 0 0 4px var(--shadow-light);
   transition: transform 0.2s, box-shadow 0.2s;
   position: relative;
-}
-
-/* Status tooltip for quick icons */
-.status-tooltip {
-  position: fixed;
-  pointer-events: none;
-  background: var(--bg-darker);
-  color: var(--text-light);
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  white-space: nowrap;
-  opacity: 0;
-  transform: translate(-50%, -4px);
-  transition: opacity 0.15s ease;
-  z-index: 20;
-}
-
-.status-tooltip.visible {
-  opacity: 1;
-}
-
-.status-tooltip::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: var(--bg-darker);
-  top: 100%;
-}
-
-.status-tooltip.below::after {
-  border-top-color: transparent;
-  border-bottom-color: var(--bg-darker);
-  top: auto;
-  bottom: 100%;
 }
 .status-harvesting,
 .status-idle,
@@ -1377,11 +1351,6 @@ body.panel-open {
   color: var(--text-light);
 }
 
-.topbar-actions {
-  display: none;
-  pointer-events: none;
-}
-
 #gameTitle {
   flex: 1;
   text-align: center;
@@ -1563,61 +1532,6 @@ body.panel-open {
 .icon-menu div:hover {
   background-color: var(--accent);
   color: var(--bg-darker);
-}
-
-/* Quick Status Bar */
-#quickStatusBar {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  padding: 8px 0;
-}
-
-.status-icon {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: var(--bg-button);
-  color: var(--text-light);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  cursor: pointer;
-  box-shadow: 0 0 4px var(--shadow-light);
-  transition: box-shadow 0.2s ease;
-}
-
-.status-icon img {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-  margin-bottom: 2px;
-}
-
-.status-label {
-  font-size: 12px;
-}
-
-.status-badge {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  background: var(--accent);
-  color: var(--text-dark);
-  border-radius: 10px;
-  padding: 1px 4px;
-  font-size: 10px;
-}
-
-.status-badge.alert {
-  background: #e74c3c;
-  color: #fff;
-}
-
-.status-icon.active {
-  box-shadow: 0 0 8px var(--accent);
 }
 
 .status-panel {
