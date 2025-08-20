@@ -6,7 +6,7 @@
   <title>Aquaculture Empire</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="topbar-status-only">
+<body>
   <button id="debugChip" style="position:fixed;top:8px;right:8px;z-index:10000;padding:6px 10px;border-radius:8px;border:1px solid #2a323a;background:#161b21;color:#e9eef4;display:none">
     Debug
   </button>
@@ -55,12 +55,12 @@
       </div>
       <strong id="gameTitle">Aquaculture Empire</strong>
       <div class="top-bar-group" id="statusGroup">
-        <div><strong id="cashLabel">Cash:</strong> $<span id="cashCount">0</span></div>
+        <div><strong id="cashLabel">Cash:</strong> $<span id="cashCount" aria-live="polite">0</span></div>
         <div>
           <strong>Date:</strong>
-          <span id="dateDisplay">Spring 1, Year 1</span>
-          <span id="pauseButton" class="time-btn" title="Pause" onclick="pauseTime()">⏸️</span>
-          <span id="playButton" class="time-btn" title="Resume" onclick="resumeTime()">▶️</span>
+          <span id="dateDisplay" aria-live="polite">Spring 1, Year 1</span>
+          <button id="pauseButton" class="time-btn" title="Pause" aria-label="Pause" onclick="pauseTime()">⏸️</button>
+          <button id="playButton" class="time-btn" title="Resume" aria-label="Resume" onclick="resumeTime()">▶️</button>
         </div>
       </div>
         <div id="quickStatusBar" class="topbar-actions">

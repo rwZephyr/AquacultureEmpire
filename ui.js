@@ -998,7 +998,8 @@ function setupMapInteractions(){
 
 // tooltip for quick status icons
 function setupStatusTooltips(){
-  if(document.body.classList.contains('topbar-status-only')) return;
+  const actions = document.querySelector('.topbar-actions');
+  if(!actions || getComputedStyle(actions).display === 'none') return;
   const tooltip = document.getElementById('statusTooltip');
   if(!tooltip) return;
 
