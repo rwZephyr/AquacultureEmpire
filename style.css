@@ -2169,10 +2169,11 @@ body.debug-nav #debugClose{
   color: #eee;
   font-size: 14px;
   font-weight: 600;
+  display: inline-block !important;
+  pointer-events: auto;
 
 }
 
 /* Ensure overlay elements accept taps when debug is on */
 body.debug-nav #app-nav,
-body.debug-nav #nav-links,
-body.debug-nav #debugClose{ pointer-events: auto; }
+body.debug-nav #nav-links{ pointer-events: auto; }
