@@ -2297,3 +2297,37 @@ onBoot(()=>{
 
 window.addEventListener('pagehide', saveGame);
 window.addEventListener('beforeunload', saveGame);
+
+(function mobileDebugToggle(){
+  function toggleDebugNav(){
+    document.body.classList.toggle('debug-nav');
+    console.log('Debug nav:', document.body.classList.contains('debug-nav') ? 'ON' : 'OFF');
+  }
+
+  // 5-tap on Cash label
+  const cashEl = document.getElementById('cashLabel');
+  if (cashEl){
+    let taps = 0, timer = null;
+    cashEl.addEventListener('click', () => {
+      taps++;
+      clearTimeout(timer);
+      timer = setTimeout(()=>{ taps = 0; }, 3000);
+      if (taps >= 5){ toggleDebugNav(); taps = 0; }
+    });
+  } else {
+    // Fallback chip if Cash isn’t found
+    const chip = document.getElementById('debugChip');
+    if (chip){
+      chip.style.display = 'inline-block';
+      chip.addEventListener('click', toggleDebugNav);
+    }
+  }
+})();
+
+// Ensure router shows a default view after DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    const last = localStorage.getItem('aqe_view') || 'Farm';
+    if (window.AQE?.router?.show) window.AQE.router.show(last);
+  } catch(e){ console.error('Router init error', e); }
+});
