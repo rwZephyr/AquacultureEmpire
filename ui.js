@@ -170,6 +170,30 @@ let logbookSection = 'milestones';
 
 // --- UPDATE UI ---
 function updateDisplay(){
+  const hash = window.location.hash;
+  const vesselView = document.getElementById('view-Vessels');
+  const mainView = document.getElementById('mainLayout');
+  const footerView = document.getElementById('bottomSection');
+
+  if(hash === '#view-Vessels'){
+    if(mainView) mainView.classList.add('hidden');
+    if(footerView) footerView.classList.add('hidden');
+    if(vesselView){
+      vesselView.classList.remove('hidden');
+      if(typeof window.renderVessels === 'function') window.renderVessels();
+      if(vesselView.children.length === 0){
+        const p = document.createElement('p');
+        p.className = 'placeholder';
+        p.textContent = 'Coming soon';
+        vesselView.appendChild(p);
+      }
+    }
+  } else {
+    if(mainView) mainView.classList.remove('hidden');
+    if(footerView) footerView.classList.remove('hidden');
+    if(vesselView) vesselView.classList.add('hidden');
+  }
+
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
 
@@ -573,6 +597,12 @@ function renderVesselGrid(){
     }
     grid.appendChild(clone);
   });
+}
+
+if(!window.renderVessels){
+  window.renderVessels = function(){
+    if(typeof renderVesselGrid === 'function') renderVesselGrid();
+  };
 }
 
 function updateVesselCards(){
