@@ -7,6 +7,24 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <nav id="app-nav" class="sidebar">
+    <button id="nav-toggle">☰</button>
+    <button>Farm</button>
+    <button>Vessels</button>
+    <button>Staff</button>
+    <button>Market</button>
+    <button>Shipyard</button>
+    <button>Finance</button>
+    <button>Logbook</button>
+  </nav>
+  <main id="app-main">
+    <section id="view-Farm"></section>
+    <section id="view-Vessels"></section>
+    <section id="view-Staff"></section>
+    <section id="view-Market"></section>
+    <section id="view-Shipyard"></section>
+    <section id="view-Finance"></section>
+    <section id="view-Logbook"></section>
 
   <header id="topHeader">
     <div class="container">
@@ -461,6 +479,7 @@
     <div id="statusTooltip" class="status-tooltip" role="tooltip"></div>
     <div id="onboardingChecklist" class="onboarding-card hidden"></div>
     <div id="toastContainer"></div>
+  </main>
     <script src="data.js" defer></script>
     <script src="models.js" defer></script>
     <script src="gameState.js" defer></script>
