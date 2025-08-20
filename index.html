@@ -63,36 +63,7 @@
           <span id="playButton" class="time-btn" title="Resume" onclick="resumeTime()">▶️</span>
         </div>
       </div>
-      <div id="actionIconsWrapper" class="topbar-actions">
-        <div class="mobile-action-wrapper" id="siteActionGroup">
-          <img id="siteActionToggle" src="assets/general-icons/siteactions.png" alt="Site Actions" class="icon-button" />
-          <div id="siteActionMenu" class="hidden">
-            <button onclick="buyNewSite()">+ New Site</button>
-            <button onclick="openSiteManagement(null, this)">Manage Site</button>
-          </div>
-        </div>
-        <div class="mobile-action-wrapper" id="toolsActionGroup">
-          <img id="mobileActionToggle" src="assets/general-icons/browser.png" alt="Tools" class="icon-button" />
-          <div id="mobileActionGroup" class="hidden">
-            <button onclick="openMarketReport()">Market</button>
-            <button id="shipyardBtn" onclick="openShipyard()">Shipyard</button><span id="shipyardLockReason" class="lock-reason"></span>
-            <button onclick="openLogbook()" title="Open Logbook">Logbook</button>
-            <button onclick="toggleDevTools()">⚙️</button>
-            <button onclick="openSpeciesData()">Codex</button>
-            <button onclick="window.__AQE_setDebugNav && window.__AQE_setDebugNav(true)">Debug</button>
-          </div>
-        </div>
-        <div class="mobile-action-wrapper" id="bankActionGroup">
-          <img id="bankActionToggle" src="assets/general-icons/bank.png"
-               alt="Bank" class="icon-button" />
-          <div id="bankActionMenu" class="hidden">
-            <button onclick="openBank()">Bank</button>
-            <button onclick="openMarketReports()">Market Reports</button>
-            <button disabled>Fiscal Data (WIP)</button>
-          </div>
-        </div>
-      </div>
-      <div id="quickStatusBar" class="topbar-actions">
+        <div id="quickStatusBar" class="topbar-actions">
         <div id="feedStatusIcon" class="status-icon">
           <img src="assets/general-icons/bulkbag.png" alt="Feed">
           <div class="status-label">Feed</div>

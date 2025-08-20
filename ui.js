@@ -140,102 +140,6 @@ function pulseOnce(el){
   setTimeout(()=>el.classList.remove('pulse-once'), 1500);
 }
 
-function toggleMobileActions(){
-  const group = document.getElementById('mobileActionGroup');
-  const toggle = document.getElementById('mobileActionToggle');
-  if(!group || !toggle) return;
-  if(group.classList.contains('visible')){
-    group.classList.remove('visible');
-    group.classList.add('hidden');
-    toggle.classList.remove('active');
-  } else {
-    group.classList.remove('hidden');
-    group.classList.add('visible');
-    toggle.classList.add('active');
-  }
-}
-
-function outsideMobileActionHandler(evt){
-  const group = document.getElementById('mobileActionGroup');
-  const toggle = document.getElementById('mobileActionToggle');
-  if(!group || !toggle) return;
-  if(group.classList.contains('visible') &&
-     !group.contains(evt.target) && !toggle.contains(evt.target)){
-    group.classList.remove('visible');
-    group.classList.add('hidden');
-    toggle.classList.remove('active');
-  }
-}
-
-document.addEventListener('click', outsideMobileActionHandler);
-
-function toggleSiteActions(){
-  const menu = document.getElementById('siteActionMenu');
-  const toggle = document.getElementById('siteActionToggle');
-  if(!menu || !toggle) return;
-  if(menu.classList.contains('visible')){
-    menu.classList.remove('visible');
-    menu.classList.add('hidden');
-    toggle.classList.remove('active');
-  } else {
-    menu.classList.remove('hidden');
-    menu.classList.add('visible');
-    toggle.classList.add('active');
-    document.addEventListener('click', outsideSiteActionHandler);
-  }
-}
-
-function outsideSiteActionHandler(e){
-  const menu = document.getElementById('siteActionMenu');
-  const toggle = document.getElementById('siteActionToggle');
-  if(!menu || !toggle) return;
-  if(!menu.contains(e.target) && !toggle.contains(e.target)){
-    menu.classList.remove('visible');
-    menu.classList.add('hidden');
-    toggle.classList.remove('active');
-    document.removeEventListener('click', outsideSiteActionHandler);
-  }
-}
-
-function toggleBankActions(){
-  const menu = document.getElementById('bankActionMenu');
-  const toggle = document.getElementById('bankActionToggle');
-  if(!menu || !toggle) return;
-  if(menu.classList.contains('visible')){
-    menu.classList.remove('visible');
-    menu.classList.add('hidden');
-    toggle.classList.remove('active');
-    document.removeEventListener('click', outsideBankActionHandler);
-  } else {
-    menu.classList.remove('hidden');
-    menu.classList.add('visible');
-    toggle.classList.add('active');
-    const otherMenus = [
-      document.getElementById('siteActionMenu'),
-      document.getElementById('mobileActionGroup')
-    ];
-    otherMenus.forEach(m=>{
-      if(m && m.classList.contains('visible')){
-        m.classList.remove('visible');
-        m.classList.add('hidden');
-      }
-    });
-    document.addEventListener('click', outsideBankActionHandler);
-  }
-}
-
-function outsideBankActionHandler(e){
-  const menu = document.getElementById('bankActionMenu');
-  const toggle = document.getElementById('bankActionToggle');
-  if(!menu || !toggle) return;
-  if(!menu.contains(e.target) && !toggle.contains(e.target)){
-    menu.classList.remove('visible');
-    menu.classList.add('hidden');
-    toggle.classList.remove('active');
-    document.removeEventListener('click', outsideBankActionHandler);
-  }
-}
-
 // Track counts to avoid re-rendering lists every tick
 let lastSiteIndex = -1;
 let lastPenCount = 0;
@@ -265,26 +169,15 @@ function legacyUpdateDisplay(){
     }
   }
 
-  // milestone-gated actions
-  const shipyardBtn = document.getElementById('shipyardBtn');
-  const shipyardReason = document.getElementById('shipyardLockReason');
-  const shipyardUnlocked = state.milestones.firstStock;
-  if(shipyardBtn){
-    shipyardBtn.disabled = !shipyardUnlocked;
-    if(shipyardReason) shipyardReason.textContent = shipyardUnlocked ? '' : 'Unlocks after stocking your first pen.';
-    if(shipyardUnlocked && !state.tips.vesselUnlocked){
-      pulseOnce(shipyardBtn);
-      openModal('Now you can buy another vessel to speed up harvesting.');
-      state.tips.vesselUnlocked = true;
+    // milestone-gated actions
+    const shipyardUnlocked = state.milestones.firstStock;
+    const vesselAction = document.getElementById('action-vessels');
+    if(vesselAction){
+      vesselAction.classList.toggle('locked', !shipyardUnlocked);
+      vesselAction.setAttribute('aria-disabled', String(!shipyardUnlocked));
+      if(!shipyardUnlocked) vesselAction.title = 'Unlocks after stocking your first pen.';
+      else vesselAction.removeAttribute('title');
     }
-  }
-  const vesselAction = document.getElementById('action-vessels');
-  if(vesselAction){
-    vesselAction.classList.toggle('locked', !shipyardUnlocked);
-    vesselAction.setAttribute('aria-disabled', String(!shipyardUnlocked));
-    if(!shipyardUnlocked) vesselAction.title = 'Unlocks after stocking your first pen.';
-    else vesselAction.removeAttribute('title');
-  }
   const penBtn = document.getElementById('buyPenBtn');
   const penReason = document.getElementById('penLockReason');
   const penUnlocked = state.milestones.firstHarvest && state.milestones.firstSale;
@@ -2463,19 +2356,13 @@ function toggleStatusPanel(key){
   updateFeedPurchaseUI,
   syncFeedPurchase,
   confirmBuyFeed,
-  setFeedPurchaseMax,
-  toggleSiteList,
-  toggleMobileActions,
-  outsideMobileActionHandler,
-  toggleSiteActions,
-  outsideSiteActionHandler,
-  toggleBankActions,
-  outsideBankActionHandler,
-  selectSite,
-  populateSiteList,
-  toggleLicenseList,
-  toggleStatusPanel,
-};
+    setFeedPurchaseMax,
+    toggleSiteList,
+    selectSite,
+    populateSiteList,
+    toggleLicenseList,
+    toggleStatusPanel,
+  };
 
 for (const key in ui){
   window[key] = (...args) => window.bootGuard(()=>ui[key](...args));
