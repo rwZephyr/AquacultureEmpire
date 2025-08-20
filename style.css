@@ -1266,7 +1266,7 @@ html.modal-open {
 #topHeader {
   position: fixed;
   top: 0;
-  left: 0;
+  left: 240px;
   right: 0;
   min-height: var(--header-height);
   background: var(--bg-panel);
@@ -1302,6 +1302,14 @@ html.modal-open {
   }
   #statusGroup div {
     margin: 0;
+  }
+}
+
+@media (max-width: 800px) {
+  #topHeader {
+    top: 50px;
+    left: 0;
+    right: 0;
   }
 }
 
@@ -2034,7 +2042,7 @@ html.modal-open {
   display: flex;
   flex-direction: column;
   padding-top: 10px;
-  z-index: 5;
+  z-index: 110;
 }
 #app-nav button {
   background: none;
@@ -2092,9 +2100,14 @@ html.modal-open {
   body.drawer-open #app-nav {
     height: 100%;
     flex-direction: column;
+    z-index: 120;
   }
   body.drawer-open #app-nav button {
     display: block;
+  }
+  body.drawer-open #topHeader {
+    pointer-events: none;
+    opacity: 0.5;
   }
 }
 
