@@ -2092,3 +2092,66 @@ body.debug-nav #nav-links button[aria-current="page"]{ background:#32404d; }
   body.debug-nav #nav-links{ transform:none !important; }
 }
 body.debug-nav #app-main{ padding-top:64px; } /* prevent overlap on mobile */
+
+/* === DEBUG OVERLAY (strong) === */
+body.debug-nav {
+  overflow: hidden; /* prevent background scroll */
+}
+
+/* Backdrop */
+body.debug-nav::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  background: rgba(8,10,12,0.66);
+  z-index: 9997;
+}
+
+/* Sidebar container */
+body.debug-nav #app-nav{
+  position: fixed;
+  top: 0; left: 0; right: 0; /* full width on mobile */
+  z-index: 9999;            /* above everything */
+  background: transparent;  /* backdrop handled by ::before */
+  border: 0;
+}
+
+/* The links panel fills the screen under a small header gap */
+body.debug-nav #nav-links{
+  position: fixed;
+  top: 56px; left: 0; right: 0; bottom: 0;
+  display: grid !important;
+  gap: 12px;
+  background: rgba(18,22,26,0.98);
+  padding: 12px;
+  overflow: auto;
+  transform: none !important; /* defeat drawer transform */
+}
+
+/* Buttons, flat */
+body.debug-nav #nav-links button{
+  all: unset;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #27313a;
+  color: #e9eef4;
+  cursor: pointer;
+  display: block;
+}
+body.debug-nav #nav-links button[aria-current="page"]{ background:#32404d; }
+
+/* Hide legacy UI that competes for focus while debugging */
+body.debug-nav #nav-toggle,
+body.debug-nav .hamburger,
+body.debug-nav .menu,
+body.debug-nav .dropdown,
+body.debug-nav .popover,
+body.debug-nav .site-actions,
+body.debug-nav .top-icon-menu {
+  display: none !important;
+}
+
+/* Make sure main content is not clickable behind overlay */
+body.debug-nav #app-main {
+  pointer-events: none;
+}

@@ -2300,9 +2300,32 @@ window.addEventListener('beforeunload', saveGame);
 
 (function mobileDebugToggle(){
   function toggleDebugNav(){
-    document.body.classList.toggle('debug-nav');
-    console.log('Debug nav:', document.body.classList.contains('debug-nav') ? 'ON' : 'OFF');
+    window.__AQE_setDebugNav?.(!document.body.classList.contains('debug-nav'));
   }
+
+  (function enhanceDebugOverlay(){
+    function closeLegacyMenus(){
+      document.querySelectorAll('.open,.is-open,[data-open="true"]')
+        .forEach(el => el.classList.remove('open','is-open'));
+    }
+
+    const originalToggle = document.body.classList.contains('debug-nav');
+
+    function setDebugNav(on){
+      document.body.classList.toggle('debug-nav', on);
+      if (on) closeLegacyMenus();
+      console.log('Debug nav:', on ? 'ON' : 'OFF');
+    }
+
+    window.__AQE_setDebugNav = setDebugNav;
+
+    // ESC to exit debug overlay
+    document.addEventListener('keydown', (e)=>{
+      if (e.key === 'Escape' && document.body.classList.contains('debug-nav')){
+        setDebugNav(false);
+      }
+    });
+  })();
 
   // 5-tap on Cash label
   const cashEl = document.getElementById('cashLabel');
