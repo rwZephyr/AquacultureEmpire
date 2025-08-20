@@ -1105,6 +1105,7 @@ function setupMapInteractions(){
 
 // tooltip for quick status icons
 function setupStatusTooltips(){
+  if(document.body.classList.contains('topbar-status-only')) return;
   const tooltip = document.getElementById('statusTooltip');
   if(!tooltip) return;
 
