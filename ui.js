@@ -47,6 +47,7 @@ window.addEventListener('resize', adjustHeaderPadding);
     localStorage.setItem('aqe_view', view);
     if(location.hash !== `#${view}`) location.hash = `#${view}`;
     document.dispatchEvent(new CustomEvent('view:changed',{ detail:{ view } }));
+    window.updateDisplay && window.updateDisplay();
   }
 
   window.AQE = window.AQE || {};
@@ -242,7 +243,7 @@ let lastVesselCount = 0;
 let logbookSection = 'milestones';
 
 // --- UPDATE UI ---
-function updateDisplay(){
+function legacyUpdateDisplay(){
   const site = state.sites[state.currentSiteIndex];
   const pen  = site.pens[state.currentPenIndex];
 
@@ -390,6 +391,37 @@ function updateDisplay(){
   updateOnboardingToggleButton();
   maybeShowOnboardingTips();
 }
+
+// global display updater shim for legacy calls
+window.updateDisplay = (function(){
+  const safe = fn => { try { typeof fn === 'function' && fn(); } catch(e){ console.warn('updateDisplay part failed', e); } };
+  return function(){
+    // top status
+    safe(window.renderTopBar || function(){
+      try {
+        const site = window.state?.sites?.[window.state.currentSiteIndex];
+        if(site){
+          const siteEl = document.getElementById('siteName');
+          if(siteEl) siteEl.innerText = site.name;
+          const cashEl = document.getElementById('cashCount');
+          if(cashEl) cashEl.innerText = state.cash.toFixed(2);
+          const dateEl = document.getElementById('dateDisplay');
+          if(dateEl && typeof getDateString === 'function') dateEl.innerText = getDateString();
+        }
+      } catch(err){ console.warn('updateDisplay topbar failed', err); }
+    });
+
+    const active = document.querySelector('#nav-links [aria-current="page"]')?.dataset.view
+      || localStorage.getItem('aqe_view') || 'Farm';
+    if(active === 'Farm')      safe(window.renderFarm || legacyUpdateDisplay);
+    if(active === 'Vessels')   safe(window.renderVessels);
+    if(active === 'Market')    safe(window.renderMarket);
+    if(active === 'Finance')   safe(window.renderFinance);
+    if(active === 'Staff')     safe(window.renderStaff);
+    if(active === 'Shipyard')  safe(window.renderShipyard);
+    if(active === 'Logbook')   safe(window.renderLogbook);
+  };
+})();
 
 // harvest preview
 // license management
@@ -2230,9 +2262,39 @@ function toggleStatusPanel(key){
   }
 }
 
-// --- PURCHASES & ACTIONS ---
-const ui = {
-  updateDisplay,
+  // setup collapsible sections for farm actions
+  function initFarmActions(){
+    const sections = [
+      { key: 'operations', toggle: 'operations-toggle', panel: 'operations-list' },
+      { key: 'site',       toggle: 'site-toggle',       panel: 'site-list' },
+      { key: 'tools',      toggle: 'tools-toggle',      panel: 'tools-list' }
+    ];
+    const isDesktop = window.matchMedia('(min-width: 701px)').matches;
+    sections.forEach(({key, toggle, panel}) => {
+      const btn = document.getElementById(toggle);
+      const list = document.getElementById(panel);
+      if(!btn || !list) return;
+      const storageKey = `farm-section-${key}`;
+      function set(open){
+        btn.setAttribute('aria-expanded', String(open));
+        list.hidden = !open;
+      }
+      const stored = localStorage.getItem(storageKey);
+      if(stored === null){
+        set(isDesktop);
+      } else {
+        set(stored === 'true');
+      }
+      btn.addEventListener('click', () => {
+        const open = btn.getAttribute('aria-expanded') !== 'true';
+        set(open);
+        localStorage.setItem(storageKey, open);
+      });
+    });
+  }
+
+  // --- PURCHASES & ACTIONS ---
+  const ui = {
   updateLicenseDropdown,
   updateSiteLicenses,
   renderPenGrid,
@@ -2298,12 +2360,13 @@ for (const key in ui){
   window[key] = (...args) => window.bootGuard(()=>ui[key](...args));
 }
 
-onBoot(()=>{
-  adjustHeaderPadding();
-  updateDisplay();
-  setupStatusTooltips();
-  setupMapInteractions();
-});
+  onBoot(()=>{
+    adjustHeaderPadding();
+    updateDisplay();
+    setupStatusTooltips();
+    setupMapInteractions();
+    initFarmActions();
+  });
 
 window.addEventListener('pagehide', saveGame);
 window.addEventListener('beforeunload', saveGame);
@@ -2330,12 +2393,12 @@ window.addEventListener('beforeunload', saveGame);
     window.__AQE_setDebugNav = setDebugNav;
 
     // ESC to exit debug overlay
-    document.addEventListener('keydown', (e)=>{
-      if (e.key === 'Escape' && document.body.classList.contains('debug-nav')){
-        setDebugNav(false);
-      }
-    });
-  })();
+  document.addEventListener('keydown', (e)=>{
+    if (e.key === 'Escape' && document.body.classList.contains('debug-nav')){
+      setDebugNav(false);
+    }
+  });
+})();
 
   // 5-tap on Cash label
   const cashEl = document.getElementById('cashLabel');
@@ -2353,9 +2416,8 @@ window.addEventListener('beforeunload', saveGame);
     if (chip){
       chip.style.display = 'inline-block';
       chip.addEventListener('click', toggleDebugNav);
-    }
+}
   }
-})();
 
   const btn = document.getElementById('debugClose');
   if (btn){
