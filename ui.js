@@ -420,8 +420,32 @@ window.updateDisplay = (function(){
     if(active === 'Staff')     safe(window.renderStaff);
     if(active === 'Shipyard')  safe(window.renderShipyard);
     if(active === 'Logbook')   safe(window.renderLogbook);
+
+    const section = document.getElementById(`view-${active}`);
+    if(section && section.innerHTML.trim() === ''){
+      const p = document.createElement('p');
+      p.className = 'placeholder';
+      p.textContent = 'Coming soon';
+      section.appendChild(p);
+    }
   };
 })();
+
+window.renderVessels = window.renderVessels || function(){
+  const section = document.getElementById('view-Vessels');
+  if(!section) return;
+  section.querySelectorAll('.placeholder').forEach(el => el.remove());
+  const grid = section.querySelector('#vesselGridContainer');
+  if(grid && typeof renderVesselGrid === 'function'){
+    renderVesselGrid();
+  }
+  if(section.children.length === 1){
+    const p = document.createElement('p');
+    p.className = 'placeholder';
+    p.textContent = 'Coming soon';
+    section.appendChild(p);
+  }
+};
 
 // harvest preview
 // license management
