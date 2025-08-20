@@ -21,7 +21,7 @@
   --border: #444;
   --black: #000;
   --font-main: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-  --header-height: 56px;
+  --header-height: 52px;
 }
 
 /* Global Styles */
@@ -1361,6 +1361,7 @@ body.panel-open {
   right: 0;
   min-height: var(--header-height);
   background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
   box-shadow: 0 2px 6px var(--shadow-medium);
   z-index: 100;
 }
@@ -1370,7 +1371,7 @@ body.panel-open {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  padding: 4px 12px;
+  padding: 2px 12px;
   margin: 0 auto;
   max-width: 1200px;
   color: var(--text-light);
@@ -1378,6 +1379,7 @@ body.panel-open {
 
 .topbar-actions {
   display: none;
+  pointer-events: none;
 }
 
 #gameTitle {
