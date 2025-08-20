@@ -26,6 +26,53 @@ function adjustHeaderPadding(){
 }
 window.addEventListener('resize', adjustHeaderPadding);
 
+// tiny view router
+(function(){
+  const nav = document.getElementById('app-nav');
+  if(!nav) return;
+  const sections = Array.from(document.querySelectorAll('#app-main > section[id^="view-"]'));
+  const buttons  = Array.from(nav.querySelectorAll('[data-view]'));
+
+  function show(view){
+    sections.forEach(sec => {
+      if(sec.id === `view-${view}`){
+        sec.classList.remove('hidden');
+      } else {
+        sec.classList.add('hidden');
+      }
+    });
+    buttons.forEach(btn => {
+      if(btn.dataset.view === view){
+        btn.setAttribute('aria-current', 'page');
+      } else {
+        btn.removeAttribute('aria-current');
+      }
+    });
+    localStorage.setItem('aqe_view', view);
+  }
+
+  const stored = localStorage.getItem('aqe_view');
+  show(stored || 'Farm');
+
+  nav.addEventListener('click', e => {
+    const btn = e.target.closest('[data-view]');
+    if(btn){
+      show(btn.dataset.view);
+      document.body.classList.remove('drawer-open');
+    }
+  });
+
+  const toggle = document.getElementById('nav-toggle');
+  if(toggle){
+    toggle.addEventListener('click', () => {
+      document.body.classList.toggle('drawer-open');
+    });
+  }
+
+  window.AQE = window.AQE || {};
+  window.AQE.router = { show };
+})();
+
 // close site dropdown when clicking outside
 document.addEventListener('click', evt => {
   const list = document.getElementById('siteDropdownList');

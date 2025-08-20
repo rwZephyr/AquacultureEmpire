@@ -2068,11 +2068,11 @@ html.modal-open {
     margin-left: 0;
     margin-top: 50px;
   }
-  #app-nav.open {
+  body.drawer-open #app-nav {
     height: 100%;
     flex-direction: column;
   }
-  #app-nav.open button {
+  body.drawer-open #app-nav button {
     display: block;
   }
 }
