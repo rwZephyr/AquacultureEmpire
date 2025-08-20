@@ -2076,3 +2076,19 @@ html.modal-open {
     display: block;
   }
 }
+
+/* === DEBUG: reveal nav when enabled === */
+body.debug-nav #app-nav{ position:fixed; top:0; left:0; right:auto; z-index:9999; }
+body.debug-nav #nav-links{
+  display:grid !important; gap:8px; background:rgba(18,22,26,.98);
+  padding:12px; border-right:1px solid #20262d;
+}
+body.debug-nav #nav-links button{
+  all:unset; padding:10px 12px; border-radius:8px; background:#27313a;
+  color:#e9eef4; cursor:pointer; display:block;
+}
+body.debug-nav #nav-links button[aria-current="page"]{ background:#32404d; }
+@media (max-width:800px){
+  body.debug-nav #nav-links{ transform:none !important; }
+}
+body.debug-nav #app-main{ padding-top:64px; } /* prevent overlap on mobile */
