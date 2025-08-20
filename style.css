@@ -21,7 +21,7 @@
   --border: #444;
   --black: #000;
   --font-main: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-  --header-height: 80px;
+  --header-height: 56px;
 }
 
 /* Global Styles */
@@ -1369,10 +1369,19 @@ body.panel-open {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: 4px 12px;
   margin: 0 auto;
   max-width: 1200px;
   color: var(--text-light);
+}
+
+body.topbar-status-only .topbar-actions {
+  display: none;
+}
+
+#gameTitle {
+  font-size: 18px;
+  font-weight: bold;
 }
 
 @media (max-width: 500px) {
@@ -1407,7 +1416,7 @@ body.panel-open {
 .top-bar-group {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
 }
 
 .top-bar-group button {
