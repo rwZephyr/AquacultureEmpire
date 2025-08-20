@@ -13,15 +13,30 @@
   <nav id="app-nav" class="sidebar">
     <button id="nav-toggle">☰</button>
     <button id="debugClose" aria-label="Close navigation" hidden>Close</button>
-    <div id="nav-links">
-      <button data-view="Farm">Farm</button>
-      <button data-view="Vessels">Vessels</button>
-      <button data-view="Staff">Staff</button>
-      <button data-view="Market">Market</button>
-      <button data-view="Shipyard">Shipyard</button>
-      <button data-view="Finance">Finance</button>
-      <button data-view="Logbook">Logbook</button>
-    </div>
+    <div class="brand">Aquaculture Empire</div>
+    <ul id="nav-links">
+      <li>
+        <button data-view="Farm"><span class="ico" data-ico="farm"></span><span class="txt">Farm</span></button>
+      </li>
+      <li>
+        <button data-view="Vessels"><span class="ico" data-ico="vessels"></span><span class="txt">Vessels</span></button>
+      </li>
+      <li>
+        <button data-view="Staff"><span class="ico" data-ico="staff"></span><span class="txt">Staff</span></button>
+      </li>
+      <li>
+        <button data-view="Market"><span class="ico" data-ico="market"></span><span class="txt">Market</span></button>
+      </li>
+      <li>
+        <button data-view="Shipyard"><span class="ico" data-ico="shipyard"></span><span class="txt">Shipyard</span></button>
+      </li>
+      <li>
+        <button data-view="Finance"><span class="ico" data-ico="finance"></span><span class="txt">Finance</span></button>
+      </li>
+      <li>
+        <button data-view="Logbook"><span class="ico" data-ico="logbook"></span><span class="txt">Logbook</span></button>
+      </li>
+    </ul>
   </nav>
   <main id="app-main">
     <section id="view-Farm" class="hidden"></section>
